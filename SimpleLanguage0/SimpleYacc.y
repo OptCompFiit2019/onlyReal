@@ -20,7 +20,7 @@
 
 %namespace SimpleParser
 
-%token BEGIN END ASSIGN SEMICOLON WHILE DO FOR TO WRITE PRINTLN SKOBKA_O SKOBKA_C IF THEN ELSE VAR ZP ADD SUB MULT DIV
+%token BEGIN END ASSIGN SEMICOLON WHILE FOR TO WRITE PRINTLN SKOBKA_O SKOBKA_C IF THEN ELSE VAR ZP ADD SUB MULT DIV
 %token <iVal> INUM 
 %token <dVal> RNUM 
 %token <sVal> ID
@@ -89,15 +89,15 @@ params: expr { $$ =  new ParamsNode($1); }
         | params ZP expr {$$ = new ParamsNode($3, $1 as ParamsNode); }
         ;
         
-if      : IF expr THEN statement { $$ = new IfNode($2, $4); }
-        | IF expr THEN statement ELSE statement { $$ = new IfNode($2, $4, $6); }
+if      : IF SKOBKA_O expr SKOBKA_C statement { $$ = new IfNode($2, $4); }
+        | IF SKOBKA_O expr SKOBKA_C statement ELSE statement { $$ = new IfNode($2, $4, $6); }
         ;
 
 block   : BEGIN stlist END { $$ = $2; }
         ;
         
         
-while   : WHILE expr DO statement { $$ = new WhileNode($2, $4); }
+while   : WHILE SKOBKA_O expr SKOBKA_C statement { $$ = new WhileNode($3, $5); }
         ;
         
         
