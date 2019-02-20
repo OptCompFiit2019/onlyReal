@@ -3,61 +3,129 @@
 //  GPPG error listing for yacc source file <SimpleYacc.y>
 // ==========================================================================
 //  Version:  1.3.6
-//  Machine:  SSM
-//  DateTime: 17.08.2014 10:25:15
-//  UserName: Станислав
+//  Machine:  MIL8A-315-01
+//  DateTime: 20.02.2019 13:03:57
+//  UserName: user
 // ==========================================================================
 
 
 %{
 // Ýòè îáúÿâëåíèÿ äîáàâëÿþòñÿ â êëàññ GPPGParser, ïðåäñòàâëÿþùèé ñîáîé ïàðñåð, ãåíåðèðóåìûé ñèñòåìîé gppg
-    public Parser(AbstractScanner<int, LexLocation> scanner) : base(scanner) { }
+    public BlockNode root; // Êîðíåâîé óçåë ñèíòàêñè÷åñêîãî äåðåâà 
+    public Parser(AbstractScanner<ValueType, LexLocation> scanner) : base(scanner) { }
 %}
 
 %output = SimpleYacc.cs
 
-%using System.IO;
+%union { 
+            public double dVal; 
+            public int iVal; 
+            public string sVal; 
+            public Node nVal;
+            public ExprNode eVal;
+            public StatementNode stVal;
+            public BlockNode blVal;
+       }
+
+%using ProgramTree;
 
 %namespace SimpleParser
 
-%token BEGIN END CYCLE INUM RNUM ID ASSIGN SEMICOLON  
+%token BEGIN END ASSIGN SEMICOLON WHILE DO FOR TO WRITE SKOBKA_O SKOBKA_C IF THEN ELSE VAR ZP ADD SUB MULT DIV
+%token <iVal> INUM 
+%token <dVal> RNUM 
+%token <sVal> ID
+
+%type <eVal> expr ident params T F
+%type <stVal> assign statement cycle while repeat for write if var
+%type <blVal> stlist block
 
 %%
-// Error: NonTerminal symbol "st" has no productions
-// Warning: Terminating st fixes the following size-2 NonTerminal set
-   // {cycle, st}
+// Error: NonTerminal symbol "cycle" has no productions
+// Warning: NonTerminal symbol "repeat" is unreachable
+// Error: NonTerminal symbol "repeat" has no productions
+// Warning: NonTerminal symbol "cycle" is unreachable
 // Error: There are 2 non-terminating NonTerminal Symbols
-   //  {cycle, st}
-// ------------------------------------------------------------------
+   //  {cycle, repeat}
+// Warning: Terminating cycle fixes the following size-1 NonTerminal set
+   // {cycle}
+// Warning: Terminating repeat fixes the following size-1 NonTerminal set
+   // {repeat}
+// ----------------------------------------------------------------------
 
-progr   : block
-		;
+progr   : block { root = $1; }
+        ;
 
-stlist	: statement 
-		| stlist SEMICOLON statement 
-		;
+stlist  : statement 
+            { 
+                $$ = new BlockNode($1); 
+            }
+        | stlist statement 
+            { 
+                $1.Add($2); 
+                $$ = $1; 
+            }
+        ;
 
-statement: assign
-		| block  
-		| cycle  
-		;
+statement: assign SEMICOLON { $$ = $1; }
+        | block SEMICOLON   { $$ = $1; }
+        | while SEMICOLON   { $$ = $1; }
+        | for SEMICOLON     { $$ = $1; }
+        | write SEMICOLON   { $$ = $1; }
+        | if SEMICOLON     { $$ = $1; }
+        | var SEMICOLON     { $$ = $1; }
+    ;
 
-ident 	: ID 
-		;
-	
-assign 	: ident ASSIGN expr 
-		;
+ident   : ID { $$ = new IdNode($1); }   
+        ;
 
-expr	: ident  
-		| INUM 
-		;
+write   : WRITE SKOBKA_O expr SKOBKA_C { $$ = new WriteNode($3); }
+        ;
+    
+assign  : ident ASSIGN expr { $$ = new AssignNode($1 as IdNode, $3); }
+        ;
 
-block	: BEGIN stlist END 
-		;
+var     : VAR params { $$ = new VarNode($2 as ParamsNode); }
+        ;
 
-cycle	: CYCLE expr st 
-		;
-	
+//expr  : ident  { $$ = $1 as IdNode; }
+//      | INUM { $$ = new IntNumNode($1); }
+//      ;
+
+expr    : T { $$ = $1 as OperationNode; }
+        | expr ADD T { $$ = new OperationNode($1, $3, SimpleParser.Tokens.ADD); }
+        | expr SUB T { $$ = new OperationNode($1, $3, SimpleParser.Tokens.SUB); }
+        ;
+        
+T       : F { $$ = $1 as ExprNode; }
+        | T MULT F { $$ = new OperationNode ( $1, $3, SimpleParser.Tokens.MULT); }
+        | T DIV F { $$ = new OperationNode ($1, $3, SimpleParser.Tokens.DIV); }
+        ;
+        
+F       : ident { $$ = $1 as IdNode; }
+        | INUM { $$ = new IntNumNode($1); }
+        | SKOBKA_O expr SKOBKA_C { $$ = $2 as ExprNode; }
+        ;
+        
+params: expr { $$ =  new ParamsNode($1); }
+        | params ZP expr {$$ = new ParamsNode($3, $1 as ParamsNode); }
+        ;
+        
+if      : IF expr THEN statement { $$ = new IfNode($2, $4); }
+        | IF expr THEN statement ELSE statement { $$ = new IfNode($2, $4, $6); }
+        ;
+
+block   : BEGIN stlist END { $$ = $2; }
+        ;
+        
+        
+while   : WHILE expr DO statement { $$ = new WhileNode($2, $4); }
+        ;
+        
+        
+for     : FOR assign TO expr DO statement { $$ = new ForNode($2 as AssignNode, $4, $6); }
+        ;
+    
 %%
 
 // ==========================================================================

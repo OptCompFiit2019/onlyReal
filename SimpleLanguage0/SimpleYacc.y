@@ -20,13 +20,13 @@
 
 %namespace SimpleParser
 
-%token BEGIN END ASSIGN SEMICOLON WHILE DO FOR TO WRITE SKOBKA_O SKOBKA_C IF THEN ELSE VAR ZP ADD SUB MULT DIV
+%token BEGIN END ASSIGN SEMICOLON WHILE DO FOR TO WRITE PRINTLN SKOBKA_O SKOBKA_C IF THEN ELSE VAR ZP ADD SUB MULT DIV
 %token <iVal> INUM 
 %token <dVal> RNUM 
 %token <sVal> ID
 
 %type <eVal> expr ident params T F
-%type <stVal> assign statement cycle while repeat for write if var
+%type <stVal> assign statement while for write if var
 %type <blVal> stlist block
 
 %%
@@ -34,9 +34,9 @@
 progr   : block { root = $1; }
         ;
 
-stlist  : statement 
+stlist  :
             { 
-                $$ = new BlockNode($1); 
+                $$ = new BlockNode(); 
             }
         | stlist statement 
             { 
