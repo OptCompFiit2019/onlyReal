@@ -12,6 +12,8 @@ namespace ProgramTree
     {
     }
 
+    public class LogicExprNode : Node { }
+
     public class IdNode : ExprNode
     {
         public string Name { get; set; }
@@ -45,6 +47,29 @@ namespace ProgramTree
             AssOp = assop;
         }
     }
+    public class LogicNumNode : LogicExprNode
+    {
+        public bool Val { get; set; }
+        public LogicNumNode(bool val) { Val = val; }
+    }
+    public class LogicIdNode: LogicExprNode
+    {
+        public IdNode Val { get; set; }
+        public LogicIdNode(IdNode val) { Val = val;  }
+    }
+    public class LogicOperationNode : LogicExprNode
+    {
+        public LogicExprNode Before { get; set; }
+        public LogicExprNode After { get; set; }
+        public SimpleParser.Tokens Operation { get; set; }
+        public LogicOperationNode(LogicExprNode b, LogicExprNode a, SimpleParser.Tokens t)
+        {
+            Before = b;
+            After = a;
+            Operation = t;
+        }
+    }
+
     public class WriteNode : StatementNode
     {
         public ExprNode ID { get; set; }
@@ -55,10 +80,10 @@ namespace ProgramTree
     }
     public class IfNode : StatementNode
     {
-        public ExprNode Expr { get; set; }
+        public LogicExprNode Expr { get; set; }
         public StatementNode _IF { get; set; }
         public StatementNode _ELSE { get; set; }
-        public IfNode(ExprNode Ex, StatementNode __IF, StatementNode __ELSE = null)
+        public IfNode(LogicExprNode Ex, StatementNode __IF, StatementNode __ELSE = null)
         {
             Expr = Ex;
             _IF = __IF;
@@ -102,9 +127,9 @@ namespace ProgramTree
 
     public class WhileNode : StatementNode
     {
-        public ExprNode Expr { get; set; }
+        public LogicExprNode Expr { get; set; }
         public StatementNode Stat { get; set; }
-        public WhileNode(ExprNode expr, StatementNode stat)
+        public WhileNode(LogicExprNode expr, StatementNode stat)
         {
             Expr = expr;
             Stat = stat;
