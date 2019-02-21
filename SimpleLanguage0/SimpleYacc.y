@@ -73,7 +73,7 @@ var     : VAR params { $$ = new VarNode($2 as ParamsNode); }
 //      | INUM { $$ = new IntNumNode($1); }
 //      ;
 
-logic_expr  :   logic_T { $$ = $1 as LogicOperationNode; }
+logic_expr  :   logic_T { $$ = $1; }
             |   logic_expr LOGIC_OR logic_T { $$ = new LogicOperationNode($1, $3, SimpleParser.Tokens.LOGIC_OR); }
             ;
             
@@ -91,7 +91,7 @@ logic_F     :   ident {$$ = new LogicIdNode($1 as IdNode); }
             ;
             
 
-expr    : T { $$ = $1 as OperationNode; }
+expr    : T { $$ = $1; }
         | expr ADD T { $$ = new OperationNode($1, $3, SimpleParser.Tokens.ADD); }
         | expr SUB T { $$ = new OperationNode($1, $3, SimpleParser.Tokens.SUB); }
         ;

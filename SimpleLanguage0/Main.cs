@@ -71,7 +71,7 @@ namespace SimpleCompiler
             if (node is ProgramTree.ForNode)
             {
                 ForNode f = node as ForNode;
-                Console.WriteLine(delimer + "for ( {0}={1} to {2} )", ToString(f.ID), ToString(f.StartValue), ToString(f.End));
+                Console.WriteLine(delimer + "for ( {0}= {1} to {2} )", ToString(f.ID), ToString(f.StartValue), ToString(f.End));
                 FormatNode(f.Stat, delimer + "\t");
             }
             if (node is AssignNode)
