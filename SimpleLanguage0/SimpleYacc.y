@@ -46,12 +46,12 @@ stlist  :
         ;
 
 statement: assign SEMICOLON { $$ = $1; }
-        | block SEMICOLON   { $$ = $1; }
-        | while SEMICOLON   { $$ = $1; }
-        | for SEMICOLON     { $$ = $1; }
+        | while   { $$ = $1; }
+        | for     { $$ = $1; }
         | write SEMICOLON   { $$ = $1; }
-        | if SEMICOLON     { $$ = $1; }
+        | if     { $$ = $1; }
         | var SEMICOLON     { $$ = $1; }
+        | block   { $$ = $1; }
     ;
 
 ident   : ID { $$ = new IdNode($1); }   
@@ -82,6 +82,7 @@ T       : F { $$ = $1 as ExprNode; }
         
 F       : ident { $$ = $1 as IdNode; }
         | INUM { $$ = new IntNumNode($1); }
+        | RNUM { $$ = new DoubleNumNode($1); }
         | SKOBKA_O expr SKOBKA_C { $$ = $2 as ExprNode; }
         ;
         
@@ -89,8 +90,8 @@ params: expr { $$ =  new ParamsNode($1); }
         | params ZP expr {$$ = new ParamsNode($3, $1 as ParamsNode); }
         ;
         
-if      : IF SKOBKA_O expr SKOBKA_C statement { $$ = new IfNode($2, $4); }
-        | IF SKOBKA_O expr SKOBKA_C statement ELSE statement { $$ = new IfNode($2, $4, $6); }
+if      : IF SKOBKA_O expr SKOBKA_C statement { $$ = new IfNode($3, $5); }
+        | IF SKOBKA_O expr SKOBKA_C statement ELSE statement { $$ = new IfNode($3, $5, $7); }
         ;
 
 block   : BEGIN stlist END { $$ = $2; }
@@ -101,7 +102,7 @@ while   : WHILE SKOBKA_O expr SKOBKA_C statement { $$ = new WhileNode($3, $5); }
         ;
         
         
-for     : FOR assign TO expr DO statement { $$ = new ForNode($2 as AssignNode, $4, $6); }
+for     : FOR SKOBKA_O assign TO expr SKOBKA_C statement { $$ = new ForNode($3 as AssignNode, $5, $7); }
         ;
     
 %%

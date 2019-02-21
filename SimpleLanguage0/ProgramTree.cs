@@ -23,6 +23,11 @@ namespace ProgramTree
         public int Num { get; set; }
         public IntNumNode(int num) { Num = num; }
     }
+    public class DoubleNumNode: ExprNode
+    {
+        public double Num { get; set;  }
+        public DoubleNumNode(double num) { Num = num;  }
+    }
 
     public class StatementNode : Node // базовый класс для всех операторов
     {
@@ -105,16 +110,6 @@ namespace ProgramTree
             Stat = stat;
         }
     }
-    public class RepeatNode : StatementNode
-    {
-        public ExprNode Expr { get; set; }
-        public StatementNode Stat { get; set; }
-        public RepeatNode(ExprNode expr, StatementNode stat)
-        {
-            Expr = expr;
-            Stat = stat;
-        }
-    }
     public class ForNode : StatementNode
     {
         public ExprNode StartValue { get; set; }
@@ -130,17 +125,6 @@ namespace ProgramTree
         }
     }
 
-    public class CycleNode : StatementNode
-    {
-        public ExprNode Expr { get; set; }
-        public StatementNode Stat { get; set; }
-        public CycleNode(ExprNode expr, StatementNode stat)
-        {
-            Expr = expr;
-            Stat = stat;
-        }
-    }
-
     public class BlockNode : StatementNode
     {
         public List<StatementNode> StList = new List<StatementNode>();
@@ -148,6 +132,7 @@ namespace ProgramTree
         {
             Add(stat);
         }
+        public BlockNode() { }
         public void Add(StatementNode stat)
         {
             StList.Add(stat);
