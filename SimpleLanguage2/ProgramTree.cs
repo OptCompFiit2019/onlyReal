@@ -100,6 +100,10 @@ namespace ProgramTree
         public override void Visit(Visitor v)
         {
         }
+        public override string ToString()
+        {
+            return Val.ToString();
+        }
     }
     public class LogicIdNode : LogicExprNode
     {
@@ -107,6 +111,10 @@ namespace ProgramTree
         public LogicIdNode(IdNode val) { Val = val; }
         public override void Visit(Visitor v)
         {
+        }
+        public override string ToString()
+        {
+            return Val.ToString();
         }
     }
     public class LogicOperationNode : LogicExprNode
@@ -122,6 +130,10 @@ namespace ProgramTree
         }
         public override void Visit(Visitor v)
         {
+        }
+        public override string ToString()
+        {
+            return Before.ToString() + " " + Operation.ToString() + " " + After.ToString();
         }
     }
 
@@ -154,6 +166,13 @@ namespace ProgramTree
         public override void Visit(Visitor v)
         {
         }
+        public override string ToString()
+        {
+            string res = "if ( " + Expr.ToString() + " )\n\t" + _IF.ToString();
+            if (_ELSE != null)
+                res += "\nelse\n\t" + _ELSE.ToString();
+            return res;
+        }
     }
 
     public class WhileNode : StatementNode
@@ -167,6 +186,10 @@ namespace ProgramTree
         }
         public override void Visit(Visitor v)
         {
+        }
+        public override string ToString()
+        {
+            return "while ( " + Expr.ToString() + " )\n\t" + Stat.ToString();
         }
     }
     public class ForNode : StatementNode
@@ -184,6 +207,10 @@ namespace ProgramTree
         }
         public override void Visit(Visitor v)
         {
+        }
+        public override string ToString()
+        {
+            return "for ( " + ID.ToString() + " = " + StartValue.ToString() + " to " + End.ToString() + " )\n\t" + Stat.ToString();
         }
     }
 
@@ -205,11 +232,12 @@ namespace ProgramTree
         }
         public override string ToString()
         {
-            string res = "";
+            string res = "{\n";
             foreach (var it in StList)
             {
-                res += it.ToString() + "\n";
+                res += "\t" + it.ToString() + "\n";
             }
+            res += "}\n";
             return res;
         }
     }
