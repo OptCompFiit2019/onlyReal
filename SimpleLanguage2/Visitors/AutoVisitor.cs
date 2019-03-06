@@ -21,8 +21,31 @@ namespace SimpleLang.Visitors
             // для каких-то визиторов порядок может быть обратный - вначале обойти выражение, потом - идентификатор
             a.Id.Visit(this);
             a.Expr.Visit(this);
-        }
-        public override void VisitCycleNode(CycleNode c) 
+        }		
+		public override void VisitLogicOperationNode(LogicOperationNode lop)
+		{
+			lop.Before.Visit(this);
+			lop.After.Visit(this);
+		}
+		public override void VisitWhileNode(WhileNode w)
+		{
+			w.Expr.Visit(this);
+			w.Stat.Visit(this);
+		}
+		public override void VisitForNode(ForNode f)
+		{
+			f.StartValue.Visit(this);
+			f.ID.Visit(this);
+			f.End.Visit(this);
+			f.Stat.Visit(this);
+		}
+		public override void VisitIfNode(IfNode ifn)
+		{
+			ifn.Expr.Visit(this);
+			ifn._IF.Visit(this);
+			ifn._ELSE.Visit(this);
+		}
+		public override void VisitCycleNode(CycleNode c) 
         {
             c.Expr.Visit(this);
             c.Stat.Visit(this);
