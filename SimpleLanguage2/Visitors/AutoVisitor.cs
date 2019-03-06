@@ -43,7 +43,7 @@ namespace SimpleLang.Visitors
 		{
 			ifn.Expr.Visit(this);
 			ifn._IF.Visit(this);
-			ifn._ELSE.Visit(this);
+			ifn._ELSE?.Visit(this);
 		}
 		public override void VisitCycleNode(CycleNode c) 
         {

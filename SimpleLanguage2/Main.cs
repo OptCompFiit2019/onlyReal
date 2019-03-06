@@ -32,7 +32,22 @@ namespace SimpleCompiler
                     var r = parser.root;
                     Console.WriteLine(r.ToString());
 
-                    /*var avis = new AssignCountVisitor();
+					Console.WriteLine("\nMaxCountExprOpsVisitor");
+					MaxCountExprOpsVisitor mceoVis = new MaxCountExprOpsVisitor();
+					r.Visit(mceoVis);
+					Console.WriteLine(mceoVis.Max);
+
+					Console.WriteLine("\nNestedCyclesVisitor");
+					NestedCyclesVisitor ncVis = new NestedCyclesVisitor();
+					r.Visit(ncVis);
+					Console.WriteLine(ncVis.HasNestedCycles);
+
+					Console.WriteLine("\nCycleNestedToIfVisitor");
+					CycleNestedToIfVisitor cnifVis = new CycleNestedToIfVisitor();
+					r.Visit(cnifVis);
+					Console.WriteLine(cnifVis.HasCycleNestedToIf);
+
+					/*var avis = new AssignCountVisitor();
                     parser.root.Visit(avis);
                     Console.WriteLine("Количество присваиваний = {0}", avis.Count);
                     Console.WriteLine("-------------------------------");
@@ -40,7 +55,7 @@ namespace SimpleCompiler
                     var pp = new PrettyPrintVisitor();
                     parser.root.Visit(pp);
                     Console.WriteLine(pp.Text);*/
-                }
+				}
             }
             catch (FileNotFoundException)
             {
