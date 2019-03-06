@@ -1,6 +1,6 @@
 {
 	if ((a==true) && (b == false))
-		b=3.14;
+		b=3,14;
 
 
 	while (gg) {

@@ -30,7 +30,7 @@ namespace ProgramTree
         public DoubleNumNode(double num) { Num = num; }
         public override void Visit(Visitor v)
         {
-            //v(this);
+			v.VisitDoubleNumNode(this);
         }
         public override string ToString() => Num.ToString();
 
@@ -99,6 +99,7 @@ namespace ProgramTree
         public LogicNumNode(bool val) { Val = val; }
         public override void Visit(Visitor v)
         {
+			v.VisitLogicNumNode(this);
         }
         public override string ToString()
         {
@@ -111,6 +112,7 @@ namespace ProgramTree
         public LogicIdNode(IdNode val) { Val = val; }
         public override void Visit(Visitor v)
         {
+			v.VisitLogicIdNode(this);
         }
         public override string ToString()
         {
@@ -130,7 +132,8 @@ namespace ProgramTree
         }
         public override void Visit(Visitor v)
         {
-        }
+			v.VisitLogicOperationNode(this);
+		}
         public override string ToString()
         {
             return Before.ToString() + " " + Operation.ToString() + " " + After.ToString();
@@ -165,7 +168,8 @@ namespace ProgramTree
         }
         public override void Visit(Visitor v)
         {
-        }
+			v.VisitIfNode(this);
+		}
         public override string ToString()
         {
             string res = "if ( " + Expr.ToString() + " )\n\t" + _IF.ToString();
@@ -186,7 +190,8 @@ namespace ProgramTree
         }
         public override void Visit(Visitor v)
         {
-        }
+			v.VisitWhileNode(this);
+		}
         public override string ToString()
         {
             return "while ( " + Expr.ToString() + " )\n\t" + Stat.ToString();
@@ -207,7 +212,8 @@ namespace ProgramTree
         }
         public override void Visit(Visitor v)
         {
-        }
+			v.VisitForNode(this);
+		}
         public override string ToString()
         {
             return "for ( " + ID.ToString() + " = " + StartValue.ToString() + " to " + End.ToString() + " )\n\t" + Stat.ToString();
