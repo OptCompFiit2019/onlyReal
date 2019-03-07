@@ -47,6 +47,11 @@ namespace SimpleCompiler
 					r.Visit(cnifVis);
 					Console.WriteLine(cnifVis.HasCycleNestedToIf);
 
+                    Console.WriteLine("\nGenerate Three address code");
+                    ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
+                    r.Visit(treeCode);
+                    Console.WriteLine(treeCode.ToString());
+
 					/*var avis = new AssignCountVisitor();
                     parser.root.Visit(avis);
                     Console.WriteLine("Количество присваиваний = {0}", avis.Count);
