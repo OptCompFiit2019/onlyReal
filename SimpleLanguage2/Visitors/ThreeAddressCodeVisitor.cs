@@ -175,7 +175,7 @@ namespace SimpleLang.Visitors
 
 
         public override void VisitAssignNode(AssignNode a) {
-            AddCode(new ThreeCode(a.Id.ToString(), GenVariable(a.Expr)))
+            AddCode(new ThreeCode(a.Id.ToString(), GenVariable(a.Expr)));
         }
 
         public override void VisitWhileNode(WhileNode w) {

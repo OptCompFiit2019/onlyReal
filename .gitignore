@@ -1,0 +1,5 @@
+bin
+build
+obj
+SimpleLex.cs
+SimpleYacc.cs
