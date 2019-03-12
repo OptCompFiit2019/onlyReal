@@ -33,15 +33,11 @@ namespace SimpleLang.Visitors
 			Count += 1;
 			base.VisitForNode(f);
 		}
-		public override void VisitBlockNode(BlockNode b)
+		/*public override void VisitBlockNode(BlockNode b)
 		{
 			Count += 1;
 			base.VisitBlockNode(b);
-		}
-		public override void VisitEmptyNode(EmptyNode c)
-		{
-			Count += 1;
-		}
+		}*/
 		public override void VisitPrintlnNode(PrintlnNode w)
 		{
 			Count += 1;

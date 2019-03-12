@@ -8,29 +8,57 @@ namespace SimpleLang.Visitors
 {
 	class MaxCountExprOpsVisitor : AutoVisitor
 	{
-		public int Max = 0; 
-		private int Current = 0;
-		public override void VisitBinOpNode(BinOpNode bop)
-		{
-			Current += 1;
-			base.VisitBinOpNode(bop);
-
-			if (Current > Max)
-				Max = Current;
-			Current = 0;
-		}
-        public override void VisitLogicOperationNode(LogicOpNode lop)
+		public int Max = 0;
+        private int Current = 0;
+        public override void VisitAssignNode(AssignNode a)
         {
-            Current += 1;
-            base.VisitLogicOperationNode(lop);
+            a.Expr.Visit(this);
 
             if (Current > Max)
                 Max = Current;
             Current = 0;
         }
-        public override void VisitPrintlnNode(PrintlnNode w)
+        public override void VisitWhileNode(WhileNode w)
+        {
+            w.Expr.Visit(this);
+
+            if (Current > Max)
+                Max = Current;
+            Current = 0;
+        }
+        public override void VisitIfNode(IfNode ifn)
+        {
+            ifn.Cond.Visit(this);
+
+            if (Current > Max)
+                Max = Current;
+            Current = 0;
+        }
+        public override void VisitForNode(ForNode f)
+        {
+            f.End.Visit(this);
+
+            if (Current > Max)
+                Max = Current;
+            Current = 0;
+        }
+        public override void VisitBinOpNode(BinOpNode bop)
 		{
-		}
+            ++Current;
+            base.VisitBinOpNode(bop);
+        }
+        public override void VisitLogicOpNode(LogicOpNode lop)
+        {
+            ++Current;
+            base.VisitLogicOpNode(lop);
+        }
+        public override void VisitPrintlnNode(PrintlnNode p)
+		{
+            base.VisitPrintlnNode(p);
+            if (Current > Max)
+                Max = Current;
+            Current = 0;
+        }
 		public override void VisitVarDefNode(VarDefNode w)
 		{
 		}

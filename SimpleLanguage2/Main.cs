@@ -35,20 +35,40 @@ namespace SimpleCompiler
                     r.Visit(ppvis);
                     Console.WriteLine(ppvis.Text);
 
+                    Console.WriteLine("\nAssignCountVisitor");
+                    AssignCountVisitor vis1 = new AssignCountVisitor();
+                    r.Visit(vis1);
+                    Console.WriteLine(vis1.Count);
+
+                    Console.WriteLine("\nStatementCountVisitor");
+                    StatementCountVisitor vis2 = new StatementCountVisitor();
+                    r.Visit(vis2);
+                    Console.WriteLine(vis2.Count);
+
                     Console.WriteLine("\nMaxCountExprOpsVisitor");
-					MaxCountExprOpsVisitor mceoVis = new MaxCountExprOpsVisitor();
-					r.Visit(mceoVis);
-					Console.WriteLine(mceoVis.Max);
+					MaxCountExprOpsVisitor vis3 = new MaxCountExprOpsVisitor();
+					r.Visit(vis3);
+					Console.WriteLine(vis3.Max);
 
 					Console.WriteLine("\nNestedCyclesVisitor");
-					NestedCyclesVisitor ncVis = new NestedCyclesVisitor();
-					r.Visit(ncVis);
-					Console.WriteLine(ncVis.HasNestedCycles);
+					NestedCyclesVisitor vis4 = new NestedCyclesVisitor();
+					r.Visit(vis4);
+					Console.WriteLine(vis4.HasNestedCycles);
 
 					Console.WriteLine("\nCycleNestedToIfVisitor");
-					CycleNestedToIfVisitor cnifVis = new CycleNestedToIfVisitor();
-					r.Visit(cnifVis);
-					Console.WriteLine(cnifVis.HasCycleNestedToIf);
+					CycleNestedToIfVisitor vis5 = new CycleNestedToIfVisitor();
+					r.Visit(vis5);
+					Console.WriteLine(vis5.HasCycleNestedToIf);
+
+                    Console.WriteLine("\nIfNestedToCycleVisitor");
+                    IfNestedToCycleVisitor vis6 = new IfNestedToCycleVisitor();
+                    r.Visit(vis6);
+                    Console.WriteLine(vis6.HasIfNestedToCycle);
+
+                    Console.WriteLine("\nMaxDepthOfNestedCyclesVisitor");
+                    MaxDepthOfNestedCyclesVisitor vis7 = new MaxDepthOfNestedCyclesVisitor();
+                    r.Visit(vis7);
+                    Console.WriteLine(vis7.Max);
 
                     Console.WriteLine("\nGenerate Three address code");
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();

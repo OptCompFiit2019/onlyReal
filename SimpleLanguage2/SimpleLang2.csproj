@@ -48,6 +48,7 @@
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />
     <Compile Include="Visitors\IfNestedToCycleVisitor.cs" />
     <Compile Include="Visitors\MaxCountExprOpsVisitor.cs" />
+    <Compile Include="Visitors\MaxDepthOfNestedCyclesVisitor.cs" />
     <Compile Include="Visitors\NestedCyclesVisitor.cs" />
     <Compile Include="Visitors\PrettyPrintVisitor.cs" />
     <Compile Include="Visitors\StatementCountVisitor.cs" />

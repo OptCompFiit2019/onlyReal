@@ -193,7 +193,7 @@ namespace SimpleLang.Visitors
         public override void VisitLogicIdNode(LogicIdNode lnum) {
             throw new Exception("Logic error");
         }
-        public override void VisitLogicOperationNode(LogicOpNode lop) {
+        public override void VisitLogicOpNode(LogicOpNode lop) {
             throw new Exception("Logic error");
         }
 
@@ -229,7 +229,7 @@ namespace SimpleLang.Visitors
             currentLabel = label_end;
         }
         public override void VisitForNode(ForNode f) {
-            string expr = GenVariable(f.StartValue);
+            string expr = GenVariable(f.Start);
             AddCode(new ThreeCode(f.Id.Name, expr));
             string label_start = GenLabel();
             string label_middle = GenLabel();

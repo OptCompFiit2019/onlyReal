@@ -134,7 +134,7 @@ namespace ProgramTree
         }
         public override void Visit(Visitor v)
         {
-			v.VisitLogicOperationNode(this);
+			v.VisitLogicOpNode(this);
 		}
         public override string ToString()
         {
@@ -219,13 +219,13 @@ namespace ProgramTree
     }
     public class ForNode : StatementNode
     {
-        public ExprNode StartValue { get; set; }
+        public ExprNode Start { get; set; }
         public IdNode Id { get; set; }
         public ExprNode End { get; set; }
         public StatementNode Stat { get; set; }
         public ForNode(AssignNode start, ExprNode end, StatementNode stat)
         {
-            StartValue = start.Expr;
+            Start = start.Expr;
             Id = start.Id;
             End = end;
             Stat = stat;
@@ -236,7 +236,7 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            return "for (" + Id.ToString() + " = " + StartValue.ToString()
+            return "for (" + Id.ToString() + " = " + Start.ToString()
                 + " to " + End.ToString() + ")\n" + Stat.ToString();
         }
     }

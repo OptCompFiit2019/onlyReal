@@ -16,7 +16,7 @@ namespace SimpleLang.Visitors
 		public virtual void VisitBooleanNode(BooleanNode lnum) { }
 		public virtual void VisitLogicIdNode(LogicIdNode lid) { }
         public virtual void VisitLogicNotNode(LogicNotNode lnot) { }
-        public virtual void VisitLogicOperationNode(LogicOpNode lop) { }		
+        public virtual void VisitLogicOpNode(LogicOpNode lop) { }		
 		public virtual void VisitWhileNode(WhileNode w) { }
 		public virtual void VisitForNode(ForNode f) { }
 		public virtual void VisitIfNode(IfNode ifn) { }

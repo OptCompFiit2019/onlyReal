@@ -65,7 +65,7 @@ namespace SimpleLang.Visitors
             Text += "!";
             lnot.LogExpr.Visit(this);
         }
-        public override void VisitLogicOperationNode(LogicOpNode lop)
+        public override void VisitLogicOpNode(LogicOpNode lop)
         {
             Text += "(";
             lop.Left.Visit(this);
@@ -88,7 +88,7 @@ namespace SimpleLang.Visitors
         public override void VisitForNode(ForNode f)
         {
             Text += IndentStr() + "for (" + f.Id.Name + " = ";
-            f.StartValue.Visit(this);
+            f.Start.Visit(this);
             Text += " to ";
             f.End.Visit(this);
             Text += ")\n";
