@@ -8,3 +8,6 @@
 [Презентации по курсу "Методы разработки оптимизирующих компиляторов"](https://drive.google.com/drive/folders/127Dj3_lesQxzR_1TgBZtKZEX8gE-nLcQ?usp=sharing)
 --
 [Таблица-заявка на приглашение в репозиторий](https://docs.google.com/spreadsheets/d/1vI3KjlL_-7diOvpxurB1GmnClEGmGQ0Jk1CTQtAj_IE/edit?usp=sharing)
+--
+Фото задания 07.03.19
+![Фото задания 07.03.19](https://drive.google.com/file/d/1rxZwFUP7hWXu3JhPwLffL4bqdkgMI3kZ/view?usp=sharing)
