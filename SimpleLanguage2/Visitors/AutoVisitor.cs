@@ -24,10 +24,14 @@ namespace SimpleLang.Visitors
         }		
 		public override void VisitLogicOperationNode(LogicOperationNode lop)
 		{
-			lop.Before.Visit(this);
-			lop.After.Visit(this);
+			lop.Left.Visit(this);
+			lop.Right.Visit(this);
 		}
-		public override void VisitWhileNode(WhileNode w)
+        public override void VisitLogicNotNode(LogicNotNode lnot)
+        {
+            lnot.LogExpr.Visit(this);
+        }
+        public override void VisitWhileNode(WhileNode w)
 		{
 			w.Expr.Visit(this);
 			w.Stat.Visit(this);
@@ -42,8 +46,8 @@ namespace SimpleLang.Visitors
 		public override void VisitIfNode(IfNode ifn)
 		{
 			ifn.Expr.Visit(this);
-			ifn._IF.Visit(this);
-			ifn._ELSE?.Visit(this);
+			ifn.If.Visit(this);
+			ifn.Else?.Visit(this);
 		}
 		public override void VisitCycleNode(CycleNode c) 
         {
@@ -55,7 +59,7 @@ namespace SimpleLang.Visitors
             foreach (var st in bl.StList)
                 st.Visit(this);
         }
-        public override void VisitWriteNode(WriteNode w) 
+        public override void VisitWriteNode(PrintlnNode w) 
         {
             w.Expr.Visit(this);
         }

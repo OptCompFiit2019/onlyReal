@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using SimpleLang.Visitors;
 
 namespace ProgramTree
@@ -32,7 +33,7 @@ namespace ProgramTree
         {
 			v.VisitDoubleNumNode(this);
         }
-        public override string ToString() => Num.ToString();
+        public override string ToString() => Num.ToString(CultureInfo.InvariantCulture);
 
     }
 
@@ -89,7 +90,7 @@ namespace ProgramTree
         }
         public override string ToString()
         {
-            return Id.ToString() + " = " + Expr.ToString() + "\n";
+            return Id.ToString() + " = " + Expr.ToString() + ";";
         }
     }
     public abstract class LogicExprNode : Node { }
@@ -119,16 +120,17 @@ namespace ProgramTree
             return Val.ToString();
         }
     }
+
     public class LogicOperationNode : LogicExprNode
     {
-        public LogicExprNode Before { get; set; }
-        public LogicExprNode After { get; set; }
-        public SimpleParser.Tokens Operation { get; set; }
-        public LogicOperationNode(LogicExprNode b, LogicExprNode a, SimpleParser.Tokens t)
+        public LogicExprNode Left { get; set; }
+        public LogicExprNode Right { get; set; }
+        public string Operation { get; set; }
+        public LogicOperationNode(LogicExprNode Left, LogicExprNode Right, string op)
         {
-            Before = b;
-            After = a;
-            Operation = t;
+            this.Left = Left;
+            this.Right = Right;
+            Operation = op;
         }
         public override void Visit(Visitor v)
         {
@@ -136,7 +138,25 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            return Before.ToString() + " " + Operation.ToString() + " " + After.ToString();
+            return Left.ToString() + " " + Operation + " " + Right.ToString();
+        }
+    }
+
+    public class LogicNotNode : LogicExprNode
+    {
+        public LogicExprNode LogExpr { get; set; }
+        public SimpleParser.Tokens Operation { get; set; }
+        public LogicNotNode(LogicExprNode LogExpr)
+        {
+            this.LogExpr = LogExpr;
+        }
+        public override void Visit(Visitor v)
+        {
+            v.VisitLogicNotNode(this);
+        }
+        public override string ToString()
+        {
+            return "!" + LogExpr.ToString();
         }
     }
 
@@ -158,13 +178,13 @@ namespace ProgramTree
     public class IfNode : StatementNode
     {
         public LogicExprNode Expr { get; set; }
-        public StatementNode _IF { get; set; }
-        public StatementNode _ELSE { get; set; }
-        public IfNode(LogicExprNode Ex, StatementNode __IF, StatementNode __ELSE = null)
+        public StatementNode If { get; set; }
+        public StatementNode Else { get; set; }
+        public IfNode(LogicExprNode Expr, StatementNode If, StatementNode Else = null)
         {
-            Expr = Ex;
-            _IF = __IF;
-            _ELSE = __ELSE;
+            this.Expr = Expr;
+            this.If = If;
+            this.Else = Else;
         }
         public override void Visit(Visitor v)
         {
@@ -172,9 +192,9 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            string res = "if ( " + Expr.ToString() + " )\n\t" + _IF.ToString();
-            if (_ELSE != null)
-                res += "\nelse\n\t" + _ELSE.ToString();
+            string res = "if (" + Expr.ToString() + ")\n" + If.ToString();
+            if (Else != null)
+                res += "\nelse\n" + Else.ToString();
             return res;
         }
     }
@@ -194,7 +214,7 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            return "while ( " + Expr.ToString() + " )\n\t" + Stat.ToString();
+            return "while (" + Expr.ToString() + ")\n" + Stat.ToString();
         }
     }
     public class ForNode : StatementNode
@@ -216,7 +236,8 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            return "for ( " + ID.ToString() + " = " + StartValue.ToString() + " to " + End.ToString() + " )\n\t" + Stat.ToString();
+            return "for (" + ID.ToString() + " = " + StartValue.ToString()
+                + " to " + End.ToString() + ")\n" + Stat.ToString();
         }
     }
 
@@ -241,17 +262,17 @@ namespace ProgramTree
             string res = "{\n";
             foreach (var it in StList)
             {
-                res += "\t" + it.ToString() + "\n";
+                res += it.ToString() + "\n";
             }
-            res += "}\n";
+            res += "}";
             return res;
         }
     }
 
-    public class WriteNode : StatementNode
+    public class PrintlnNode : StatementNode
     {
         public ExprNode Expr { get; set; }
-        public WriteNode(ExprNode Expr)
+        public PrintlnNode(ExprNode Expr)
         {
             this.Expr = Expr;
         }
@@ -259,6 +280,7 @@ namespace ProgramTree
         {
             v.VisitWriteNode(this);
         }
+        public override string ToString() => $"println({Expr});";
     }
 
     public class EmptyNode : StatementNode
@@ -267,10 +289,7 @@ namespace ProgramTree
         {
             v.VisitEmptyNode(this);
         }
-        public override string ToString()
-        {
-            return "";
-        }
+        public override string ToString() => "";
     }
 
     public class VarDefNode : StatementNode
@@ -288,6 +307,15 @@ namespace ProgramTree
         public override void Visit(Visitor v)
         {
             v.VisitVarDefNode(this);
+        }
+        public override string ToString()
+        {
+            string s = "var " + vars[0].ToString();
+            for (int i = 1; i < vars.Count; ++i)
+                s += ", " + vars[i].ToString();
+            s += ";";
+
+            return s;            
         }
     }
 }

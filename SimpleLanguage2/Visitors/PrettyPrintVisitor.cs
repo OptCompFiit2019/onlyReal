@@ -72,7 +72,7 @@ namespace SimpleLang.Visitors
             IndentMinus();
             Text += Environment.NewLine + IndentStr() + "end";
         }
-        public override void VisitWriteNode(WriteNode w) 
+        public override void VisitWriteNode(PrintlnNode w) 
         {
             Text += IndentStr() + "write(";
             w.Expr.Visit(this);

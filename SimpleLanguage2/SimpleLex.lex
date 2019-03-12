@@ -8,7 +8,7 @@ Alpha   [a-zA-Z_]
 Digit   [0-9] 
 AlphaDigit {Alpha}|{Digit}
 INTNUM  {Digit}+
-REALNUM {INTNUM}\,{INTNUM}
+REALNUM {INTNUM}\.{INTNUM}
 ID {Alpha}{AlphaDigit}* 
 
 %%
@@ -19,7 +19,7 @@ ID {Alpha}{AlphaDigit}*
 }
 
 {REALNUM} { 
-  yylval.dVal = double.Parse(yytext); 
+  yylval.dVal = double.Parse(yytext, CultureInfo.InvariantCulture);
   return (int)Tokens.RNUM;
 }
 
@@ -32,8 +32,8 @@ ID {Alpha}{AlphaDigit}*
 
 "=" { return (int)Tokens.ASSIGN; }
 ";" { return (int)Tokens.SEMICOLON; }
-"(" {return (int) Tokens.SKOBKA_O; }
-")" {return (int) Tokens.SKOBKA_C; }
+"(" {return (int) Tokens.LPAREN; }
+")" {return (int) Tokens.RPAREN; }
 "," { return (int) Tokens.COLUMN; }
 "+" { return (int) Tokens.ADD; }
 "-" { return (int )Tokens.SUB; }
@@ -42,8 +42,14 @@ ID {Alpha}{AlphaDigit}*
 "{" { return (int) Tokens.BEGIN; }
 "}" { return (int) Tokens.END; }
 "==" { return (int) Tokens.EQUALS; }
+"!=" { return (int) Tokens.NEQ; }
+">" { return (int) Tokens.GTHAN; }
+"<" { return (int) Tokens.LTHAN; }
+">=" { return (int) Tokens.GEQ; }
+"<=" { return (int) Tokens.LEQ; }
 "&&" { return (int) Tokens.LOGIC_AND; }
 "||" { return (int) Tokens.LOGIC_OR; }
+"!" { return (int) Tokens.LOGIC_NOT; }
 
 [^ \r\n\t] {
     LexError();
@@ -78,7 +84,7 @@ class ScannerHelper
     keywords.Add("while", (int) Tokens.WHILE);
     keywords.Add("for", (int) Tokens.FOR);
     keywords.Add("to", (int) Tokens.TO);
-    keywords.Add("write", (int) Tokens.WRITE);
+    keywords.Add("println", (int) Tokens.PRINTLN);
     keywords.Add("if", (int) Tokens.IF);
     keywords.Add("then", (int) Tokens.THEN);
     keywords.Add("else", (int) Tokens.ELSE);

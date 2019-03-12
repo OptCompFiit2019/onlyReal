@@ -14,14 +14,15 @@ namespace SimpleLang.Visitors
         public virtual void VisitAssignNode(AssignNode a) { }
 		public virtual void VisitDoubleNumNode(DoubleNumNode dnum) { }
 		public virtual void VisitLogicNumNode(LogicNumNode lnum) { }
-		public virtual void VisitLogicIdNode(LogicIdNode lnum) { }
-		public virtual void VisitLogicOperationNode(LogicOperationNode lop) { }		
+		public virtual void VisitLogicIdNode(LogicIdNode lid) { }
+        public virtual void VisitLogicNotNode(LogicNotNode lnot) { }
+        public virtual void VisitLogicOperationNode(LogicOperationNode lop) { }		
 		public virtual void VisitWhileNode(WhileNode w) { }
 		public virtual void VisitForNode(ForNode f) { }
 		public virtual void VisitIfNode(IfNode ifn) { }
 		public virtual void VisitCycleNode(CycleNode c) { }
 		public virtual void VisitBlockNode(BlockNode bl) { }
-        public virtual void VisitWriteNode(WriteNode w) { }
+        public virtual void VisitWriteNode(PrintlnNode w) { }
         public virtual void VisitVarDefNode(VarDefNode w) { }		
 		public virtual void VisitEmptyNode(EmptyNode w) { }
     }

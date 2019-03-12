@@ -60,40 +60,26 @@ namespace SimpleLang.Visitors
             }
             return "UNKNOW";
         }
-        public static ThreeOperator ParseOperator(char c){
-            switch (c){
-                case '=':
-                    return ThreeOperator.Assign;
-                case '/':
-                    return ThreeOperator.Div;
-                case '-':
-                    return ThreeOperator.Minus;
-                case '+':
-                    return ThreeOperator.Plus;
-                case '*':
-                    return ThreeOperator.Mult;
-            }
-            return ThreeOperator.None;
-        }
-        public static ThreeOperator ParseOperator(SimpleParser.Tokens c)
+        public static ThreeOperator ParseOperator(char c) => ParseOperator(c.ToString());
+        public static ThreeOperator ParseOperator(string s)
         {
-            switch (c)
+            switch (s)
             {
-                case SimpleParser.Tokens.ASSIGN:
+                case "=":
                     return ThreeOperator.Assign;
-                case SimpleParser.Tokens.LOGIC_AND:
+                case "&&":
                     return ThreeOperator.Logic_and;
-                case SimpleParser.Tokens.LOGIC_OR:
+                case "||":
                     return ThreeOperator.Logic_or;
-                case SimpleParser.Tokens.DIV:
+                case "/":
                     return ThreeOperator.Div;
-                case SimpleParser.Tokens.SUB:
+                case "-":
                     return ThreeOperator.Minus;
-                case SimpleParser.Tokens.ADD:
+                case "+":
                     return ThreeOperator.Plus;
-                case SimpleParser.Tokens.MULT:
+                case "*":
                     return ThreeOperator.Mult;
-                case SimpleParser.Tokens.EQUALS:
+                case "==":
                     return ThreeOperator.Logic_equal;
             }
             return ThreeOperator.None;
@@ -179,7 +165,7 @@ namespace SimpleLang.Visitors
             throw new Exception("Logic error");
         }
 
-        public override void VisitWriteNode(WriteNode w) {
+        public override void VisitWriteNode(PrintlnNode w) {
             throw new Exception("Is not supported");
         }
         public override void VisitVarDefNode(VarDefNode w) {
@@ -234,18 +220,18 @@ namespace SimpleLang.Visitors
             string label_false = GenLabel();
             string label_end = GenLabel();
             string expr = GenVariable(ifn.Expr);
-            if (ifn._ELSE == null)
+            if (ifn.Else == null)
                 label_false = label_end;
             AddCode(new ThreeCode("", ThreeOperator.IfGoto, expr, label_true));
             AddCode(new ThreeCode("", ThreeOperator.Goto, label_false, ""));
 
             currentLabel = label_true;
-            ifn._IF.Visit(this);
+            ifn.If.Visit(this);
             AddCode(new ThreeCode("", ThreeOperator.Goto, label_end, ""));
 
-            if (ifn._ELSE != null){
+            if (ifn.Else != null){
                 currentLabel = label_false;
-                ifn._ELSE.Visit(this);
+                ifn.Else.Visit(this);
             }
             currentLabel = label_end;
         }
@@ -291,8 +277,8 @@ namespace SimpleLang.Visitors
             {
                 LogicOperationNode op = expr as LogicOperationNode;
                 string res = GenTempVariable();
-                string arg1 = GenVariable(op.Before);
-                string arg2 = GenVariable(op.After);
+                string arg1 = GenVariable(op.Left);
+                string arg2 = GenVariable(op.Right);
                 ThreeOperator p = ThreeCode.ParseOperator(op.Operation);
                 AddCode(new ThreeCode(res, p, arg1, arg2));
                 return res;
