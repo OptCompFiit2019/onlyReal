@@ -22,7 +22,7 @@ namespace SimpleLang.Visitors
             a.Id.Visit(this);
             a.Expr.Visit(this);
         }		
-		public override void VisitLogicOperationNode(LogicOperationNode lop)
+		public override void VisitLogicOperationNode(LogicOpNode lop)
 		{
 			lop.Left.Visit(this);
 			lop.Right.Visit(this);
@@ -45,7 +45,7 @@ namespace SimpleLang.Visitors
 		}
 		public override void VisitIfNode(IfNode ifn)
 		{
-			ifn.Expr.Visit(this);
+			ifn.Cond.Visit(this);
 			ifn.If.Visit(this);
 			ifn.Else?.Visit(this);
 		}

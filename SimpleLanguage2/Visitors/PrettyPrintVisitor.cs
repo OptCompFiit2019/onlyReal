@@ -52,7 +52,7 @@ namespace SimpleLang.Visitors
         {
             Text += dnum.Num.ToString(CultureInfo.InvariantCulture);
         }
-        public override void VisitLogicNumNode(BooleanNode lnum)
+        public override void VisitBooleanNode(BooleanNode lnum)
         {
             Text += lnum.Val.ToString().ToLower();
         }
@@ -65,7 +65,7 @@ namespace SimpleLang.Visitors
             Text += "!";
             lnot.LogExpr.Visit(this);
         }
-        public override void VisitLogicOperationNode(LogicOperationNode lop)
+        public override void VisitLogicOperationNode(LogicOpNode lop)
         {
             Text += "(";
             lop.Left.Visit(this);
@@ -87,7 +87,7 @@ namespace SimpleLang.Visitors
         }
         public override void VisitForNode(ForNode f)
         {
-            Text += IndentStr() + "for (" + f.Id.ToString() + " = ";
+            Text += IndentStr() + "for (" + f.Id.Name + " = ";
             f.StartValue.Visit(this);
             Text += " to ";
             f.End.Visit(this);
@@ -102,7 +102,7 @@ namespace SimpleLang.Visitors
         public override void VisitIfNode(IfNode ifn)
         {
             Text += IndentStr() + "if (";
-            ifn.Expr.Visit(this);
+            ifn.Cond.Visit(this);
             Text += ")\n";
 
             if (!(ifn.If is BlockNode))
@@ -113,7 +113,7 @@ namespace SimpleLang.Visitors
 
             if (ifn.Else != null)
             {
-                Text += "\nelse\n";
+                Text += "\n" + IndentStr() + "else\n";
 
                 if (!(ifn.Else is BlockNode))
                     IndentPlus();

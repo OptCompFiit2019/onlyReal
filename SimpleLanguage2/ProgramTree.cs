@@ -100,7 +100,7 @@ namespace ProgramTree
         public BooleanNode(bool val) { Val = val; }
         public override void Visit(Visitor v)
         {
-			v.VisitLogicNumNode(this);
+			v.VisitBooleanNode(this);
         }
         public override string ToString()
         {
@@ -121,12 +121,12 @@ namespace ProgramTree
         }
     }
 
-    public class LogicOperationNode : LogicExprNode
+    public class LogicOpNode : LogicExprNode
     {
         public LogicExprNode Left { get; set; }
         public LogicExprNode Right { get; set; }
         public string Operation { get; set; }
-        public LogicOperationNode(LogicExprNode Left, LogicExprNode Right, string op)
+        public LogicOpNode(LogicExprNode Left, LogicExprNode Right, string op)
         {
             this.Left = Left;
             this.Right = Right;
@@ -177,12 +177,12 @@ namespace ProgramTree
 
     public class IfNode : StatementNode
     {
-        public LogicExprNode Expr { get; set; }
+        public LogicExprNode Cond { get; set; }
         public StatementNode If { get; set; }
         public StatementNode Else { get; set; }
         public IfNode(LogicExprNode Expr, StatementNode If, StatementNode Else = null)
         {
-            this.Expr = Expr;
+            this.Cond = Expr;
             this.If = If;
             this.Else = Else;
         }
@@ -192,7 +192,7 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            string res = "if (" + Expr.ToString() + ")\n" + If.ToString();
+            string res = "if (" + Cond.ToString() + ")\n" + If.ToString();
             if (Else != null)
                 res += "\nelse\n" + Else.ToString();
             return res;

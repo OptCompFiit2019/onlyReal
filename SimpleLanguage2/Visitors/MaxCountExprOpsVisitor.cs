@@ -19,7 +19,7 @@ namespace SimpleLang.Visitors
 				Max = Current;
 			Current = 0;
 		}
-        public override void VisitLogicOperationNode(LogicOperationNode lop)
+        public override void VisitLogicOperationNode(LogicOpNode lop)
         {
             Current += 1;
             base.VisitLogicOperationNode(lop);

@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    public enum ThreeOperator {  None, Assign, Minus, Plus, Mult, Div, Goto, IfGoto, Logic_or, Logic_and, Logic_less, Logic_equal };
+    public enum ThreeOperator {  None, Assign, Minus, Plus, Mult, Div, Goto, IfGoto,
+        Logic_or, Logic_and, Logic_less, Logic_equal, Logic_greater, Logic_geq, Logic_leq,
+        Logic_not, Logic_neq };
     public class ThreeCode
     {
         public string label;
@@ -20,7 +23,7 @@ namespace SimpleLang.Visitors
             arg2 = a2;
             operation = op;
         }
-        public ThreeCode(string res, ThreeOperator op, string a1, string a2) { 
+        public ThreeCode(string res, ThreeOperator op, string a1, string a2 = "") { 
             label = "";
             result = res;
             arg1 = a1;
@@ -57,8 +60,18 @@ namespace SimpleLang.Visitors
                     return "||";
                 case ThreeOperator.Logic_equal:
                     return "==";
+                case ThreeOperator.Logic_greater:
+                    return ">";
+                case ThreeOperator.Logic_geq:
+                    return ">=";
+                case ThreeOperator.Logic_leq:
+                    return "<=";
+                case ThreeOperator.Logic_neq:
+                    return "!=";
+                case ThreeOperator.Logic_not:
+                    return "!";
             }
-            return "UNKNOW";
+            return "UNKNOWN";
         }
         public static ThreeOperator ParseOperator(char c) => ParseOperator(c.ToString());
         public static ThreeOperator ParseOperator(string s)
@@ -81,6 +94,18 @@ namespace SimpleLang.Visitors
                     return ThreeOperator.Mult;
                 case "==":
                     return ThreeOperator.Logic_equal;
+                case "<":
+                    return ThreeOperator.Logic_less;
+                case ">":
+                    return ThreeOperator.Logic_greater;
+                case ">=":
+                    return ThreeOperator.Logic_geq;
+                case "<=":
+                    return ThreeOperator.Logic_leq;
+                case "!=":
+                    return ThreeOperator.Logic_neq;
+                case "!":
+                    return ThreeOperator.Logic_not;
             }
             return ThreeOperator.None;
         }
@@ -88,9 +113,10 @@ namespace SimpleLang.Visitors
         public override string ToString()
         {
             string res = "";
+            string lbl = "";
             if (label.Length > 0)
-                res = label + ":";
-            res += "\t";
+                lbl = label + ":";
+            res += $"{lbl,-11}";
 
             if (operation == ThreeOperator.Goto) {
                 return res + "goto " + arg1;
@@ -100,9 +126,13 @@ namespace SimpleLang.Visitors
                 return res;
             }
 
-            res += result + " = " + arg1;
-            if (operation != ThreeOperator.Assign)
-                res += ThreeCode.GetOperatorString(operation) + arg2;
+            res += result + " = ";
+            if (operation == ThreeOperator.Logic_not)
+                return res + "!" + arg1;
+            if (operation == ThreeOperator.Assign)
+                res += arg1;
+            else
+                res += arg1 + " " + ThreeCode.GetOperatorString(operation) + " " + arg2;
 
             return res;
         }
@@ -116,18 +146,18 @@ namespace SimpleLang.Visitors
         private void AddStep() { currentStep++;  }
         private void SubStep() { currentStep--;  }*/
 
-        List<ThreeCode> program = new List<ThreeCode>();
+        LinkedList<ThreeCode> program = new LinkedList<ThreeCode>();
         private string currentLabel = "";
         private void AddCode(ThreeCode c) {
-            if (currentLabel.Length == 0 || currentLabel.Equals("")) {
-                program.Add(c);
+            if (currentLabel.Length == 0) {
+                program.AddLast(c);
                 return;
             }
-            if (c.label.Length != 0 && (!currentLabel.Equals(c.label)))
+            if (c.label.Length != 0 && currentLabel != c.label)
                 throw new Exception("Core error");
             c.label = currentLabel;
             currentLabel = "";
-            program.Add(c);
+            program.AddLast(c);
         }
         private int currentTempVarIndex = 0;
         private int currentLabelIndex = 0;
@@ -137,6 +167,8 @@ namespace SimpleLang.Visitors
             foreach (ThreeCode it in program)
                 res += it.ToString() + "\n";
 
+            if (currentLabel.Length > 0)
+                res += currentLabel + ":\n";
             return res;
         }
 
@@ -155,13 +187,13 @@ namespace SimpleLang.Visitors
         public override void VisitDoubleNumNode(DoubleNumNode dnum) {
             throw new Exception("Logic error");
         }
-        public override void VisitLogicNumNode(BooleanNode lnum) {
+        public override void VisitBooleanNode(BooleanNode lnum) {
             throw new Exception("Logic error");
         }
         public override void VisitLogicIdNode(LogicIdNode lnum) {
             throw new Exception("Logic error");
         }
-        public override void VisitLogicOperationNode(LogicOperationNode lop) {
+        public override void VisitLogicOperationNode(LogicOpNode lop) {
             throw new Exception("Logic error");
         }
 
@@ -180,7 +212,11 @@ namespace SimpleLang.Visitors
         public override void VisitWhileNode(WhileNode w) {
             string expr = GenTempVariable();
             string label_start = currentLabel.Length > 0 ? currentLabel : GenLabel();
-            AddCode(new ThreeCode(label_start, expr, ThreeOperator.Assign, GenVariable(w.Expr), ""));
+
+            currentLabel = label_start;
+            string val = GenVariable(w.Expr);
+
+            AddCode(new ThreeCode(expr, ThreeOperator.Assign, val, ""));
             string label_middle = GenLabel();
             string label_end = GenLabel();
             AddCode(new ThreeCode("", ThreeOperator.IfGoto, expr, label_middle));
@@ -217,22 +253,17 @@ namespace SimpleLang.Visitors
 
         public override void VisitIfNode(IfNode ifn) {
             string label_true = GenLabel();
-            string label_false = GenLabel();
             string label_end = GenLabel();
-            string expr = GenVariable(ifn.Expr);
-            if (ifn.Else == null)
-                label_false = label_end;
+            string expr = GenVariable(ifn.Cond);
             AddCode(new ThreeCode("", ThreeOperator.IfGoto, expr, label_true));
-            AddCode(new ThreeCode("", ThreeOperator.Goto, label_false, ""));
+            if (ifn.Else != null)
+                ifn.Else.Visit(this);
+
+            AddCode(new ThreeCode("", ThreeOperator.Goto, label_end, ""));            
 
             currentLabel = label_true;
             ifn.If.Visit(this);
-            AddCode(new ThreeCode("", ThreeOperator.Goto, label_end, ""));
 
-            if (ifn.Else != null){
-                currentLabel = label_false;
-                ifn.Else.Visit(this);
-            }
             currentLabel = label_end;
         }
 
@@ -250,7 +281,7 @@ namespace SimpleLang.Visitors
                 return (expr as IdNode).Name;
 
             if (expr is DoubleNumNode)
-                return (expr as DoubleNumNode).Num.ToString();
+                return (expr as DoubleNumNode).Num.ToString(CultureInfo.InvariantCulture);
             if (expr is IntNumNode)
                 return (expr as IntNumNode).Num.ToString();
 
@@ -264,18 +295,18 @@ namespace SimpleLang.Visitors
                 return res;
             }
 
-            return "UNKNOW";
+            return "UNKNOWN";
         }
         private string GenVariable(LogicExprNode expr)
         {
             if (expr is BooleanNode)
-                return (expr as BooleanNode).Val.ToString();
+                return (expr as BooleanNode).Val.ToString().ToLower();
             if (expr is LogicIdNode)
                 return (expr as LogicIdNode).Name.Name;
 
-            if (expr is LogicOperationNode)
+            if (expr is LogicOpNode)
             {
-                LogicOperationNode op = expr as LogicOperationNode;
+                LogicOpNode op = expr as LogicOpNode;
                 string res = GenTempVariable();
                 string arg1 = GenVariable(op.Left);
                 string arg2 = GenVariable(op.Right);
@@ -284,7 +315,16 @@ namespace SimpleLang.Visitors
                 return res;
             }
 
-            return "UNKNOW";
+            if (expr is LogicNotNode)
+            {
+                LogicNotNode lnot = expr as LogicNotNode;
+                string res = GenTempVariable();
+                string arg1 = GenVariable(lnot.LogExpr);
+                AddCode(new ThreeCode(res, ThreeOperator.Logic_not, arg1));
+                return res;
+            }
+
+            return "UNKNOWN";
         }
         private string GenTempVariable(){
             string res = "temp_" + currentTempVarIndex.ToString();
