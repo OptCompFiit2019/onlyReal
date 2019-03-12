@@ -13,7 +13,7 @@ namespace SimpleLang.Visitors
 		public virtual void VisitBinOpNode(BinOpNode binop) { }
         public virtual void VisitAssignNode(AssignNode a) { }
 		public virtual void VisitDoubleNumNode(DoubleNumNode dnum) { }
-		public virtual void VisitLogicNumNode(LogicNumNode lnum) { }
+		public virtual void VisitLogicNumNode(BooleanNode lnum) { }
 		public virtual void VisitLogicIdNode(LogicIdNode lid) { }
         public virtual void VisitLogicNotNode(LogicNotNode lnot) { }
         public virtual void VisitLogicOperationNode(LogicOperationNode lop) { }		
@@ -22,7 +22,7 @@ namespace SimpleLang.Visitors
 		public virtual void VisitIfNode(IfNode ifn) { }
 		public virtual void VisitCycleNode(CycleNode c) { }
 		public virtual void VisitBlockNode(BlockNode bl) { }
-        public virtual void VisitWriteNode(PrintlnNode w) { }
+        public virtual void VisitPrintlnNode(PrintlnNode w) { }
         public virtual void VisitVarDefNode(VarDefNode w) { }		
 		public virtual void VisitEmptyNode(EmptyNode w) { }
     }

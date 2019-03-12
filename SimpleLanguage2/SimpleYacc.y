@@ -115,8 +115,8 @@ logic_E     :   logic_D { $$ = $1 as LogicExprNode; }
             ;
 
 logic_D		:   ident {$$ = new LogicIdNode($1 as IdNode); }
-            |   TRUE { $$ = new LogicNumNode(true); }
-            |   FALSE { $$ = new LogicNumNode(false); }
+            |   TRUE { $$ = new BooleanNode(true); }
+            |   FALSE { $$ = new BooleanNode(false); }
             |   LPAREN logic_expr RPAREN { $$ = $2 as LogicExprNode; }
             ;
 

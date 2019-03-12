@@ -24,13 +24,17 @@ namespace SimpleLang.Visitors
 		}
 		public override void VisitWhileNode(WhileNode w)
 		{
-			base.VisitWhileNode(w);
-		}
+            WithinCycle = true;
+            base.VisitWhileNode(w);
+            WithinCycle = false;
+        }
 		public override void VisitForNode(ForNode f)
 		{
-			base.VisitForNode(f);
-		}
-		public override void VisitWriteNode(WriteNode w)
+            WithinCycle = true;
+            base.VisitForNode(f);
+            WithinCycle = false;
+        }
+		public override void VisitPrintlnNode(PrintlnNode w)
 		{
 		}
 		public override void VisitVarDefNode(VarDefNode w)

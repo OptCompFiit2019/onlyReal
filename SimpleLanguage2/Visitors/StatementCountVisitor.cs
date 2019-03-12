@@ -42,7 +42,7 @@ namespace SimpleLang.Visitors
 		{
 			Count += 1;
 		}
-		public override void VisitWriteNode(PrintlnNode w)
+		public override void VisitPrintlnNode(PrintlnNode w)
 		{
 			Count += 1;
 		}

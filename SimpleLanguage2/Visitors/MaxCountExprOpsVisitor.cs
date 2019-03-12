@@ -19,7 +19,16 @@ namespace SimpleLang.Visitors
 				Max = Current;
 			Current = 0;
 		}
-		public override void VisitWriteNode(PrintlnNode w)
+        public override void VisitLogicOperationNode(LogicOperationNode lop)
+        {
+            Current += 1;
+            base.VisitLogicOperationNode(lop);
+
+            if (Current > Max)
+                Max = Current;
+            Current = 0;
+        }
+        public override void VisitPrintlnNode(PrintlnNode w)
 		{
 		}
 		public override void VisitVarDefNode(VarDefNode w)

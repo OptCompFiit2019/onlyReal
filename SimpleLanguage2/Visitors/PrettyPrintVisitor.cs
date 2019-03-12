@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,11 +18,11 @@ namespace SimpleLang.Visitors
         }
         private void IndentPlus()
         {
-            Indent += 2;
+            Indent += 4;
         }
         private void IndentMinus()
         {
-            Indent -= 2;
+            Indent -= 4;
         }
         public override void VisitIdNode(IdNode id) 
         {
@@ -43,46 +44,126 @@ namespace SimpleLang.Visitors
         {
             Text += IndentStr();
             a.Id.Visit(this);
-            Text += " := ";
+            Text += " = ";
             a.Expr.Visit(this);
+            Text += ";";
+        }
+        public override void VisitDoubleNumNode(DoubleNumNode dnum)
+        {
+            Text += dnum.Num.ToString(CultureInfo.InvariantCulture);
+        }
+        public override void VisitLogicNumNode(BooleanNode lnum)
+        {
+            Text += lnum.Val.ToString().ToLower();
+        }
+        public override void VisitLogicIdNode(LogicIdNode lid)
+        {
+            Text += lid.Name;
+        }
+        public override void VisitLogicNotNode(LogicNotNode lnot)
+        {
+            Text += "!";
+            lnot.LogExpr.Visit(this);
+        }
+        public override void VisitLogicOperationNode(LogicOperationNode lop)
+        {
+            Text += "(";
+            lop.Left.Visit(this);
+            Text += " " + lop.Operation + " ";
+            lop.Right.Visit(this);
+            Text += ")";
+        }
+        public override void VisitWhileNode(WhileNode w)
+        {
+            Text += IndentStr() + "while (";
+            w.Expr.Visit(this);
+            Text += ")\n";
+
+            if (!(w.Stat is BlockNode))
+                IndentPlus();
+            w.Stat.Visit(this);
+            if (!(w.Stat is BlockNode))
+                IndentMinus();
+        }
+        public override void VisitForNode(ForNode f)
+        {
+            Text += IndentStr() + "for (" + f.Id.ToString() + " = ";
+            f.StartValue.Visit(this);
+            Text += " to ";
+            f.End.Visit(this);
+            Text += ")\n";
+
+            if (!(f.Stat is BlockNode))
+                IndentPlus();
+            f.Stat.Visit(this);
+            if (!(f.Stat is BlockNode))
+                IndentMinus();
+        }
+        public override void VisitIfNode(IfNode ifn)
+        {
+            Text += IndentStr() + "if (";
+            ifn.Expr.Visit(this);
+            Text += ")\n";
+
+            if (!(ifn.If is BlockNode))
+                IndentPlus();
+            ifn.If.Visit(this);
+            if (!(ifn.If is BlockNode))
+                IndentMinus();
+
+            if (ifn.Else != null)
+            {
+                Text += "\nelse\n";
+
+                if (!(ifn.Else is BlockNode))
+                    IndentPlus();
+                ifn.Else.Visit(this);
+                if (!(ifn.Else is BlockNode))
+                    IndentMinus();
+            }
         }
         public override void VisitCycleNode(CycleNode c) 
         {
             Text += IndentStr() + "cycle ";
             c.Expr.Visit(this);
             Text += Environment.NewLine;
+
+            if (!(c.Stat is BlockNode))
+                IndentPlus();
             c.Stat.Visit(this);
+            if (!(c.Stat is BlockNode))
+                IndentMinus();
         }
         public override void VisitBlockNode(BlockNode bl) 
         {
-            Text += IndentStr() + "begin" + Environment.NewLine;
+            Text += IndentStr() + "{" + Environment.NewLine;
             IndentPlus();
 
             var Count = bl.StList.Count;
 
-            if (Count>0)
+            if (Count > 0)
                 bl.StList[0].Visit(this);
             for (var i = 1; i < Count; i++)
             {
-                Text += ';';
                 if (!(bl.StList[i] is EmptyNode))
                     Text += Environment.NewLine;
                 bl.StList[i].Visit(this);
             }
             IndentMinus();
-            Text += Environment.NewLine + IndentStr() + "end";
+            Text += Environment.NewLine + IndentStr() + "}";
         }
-        public override void VisitWriteNode(PrintlnNode w) 
+        public override void VisitPrintlnNode(PrintlnNode w) 
         {
-            Text += IndentStr() + "write(";
+            Text += IndentStr() + "println(";
             w.Expr.Visit(this);
-            Text += ")";
+            Text += ");";
         }
         public override void VisitVarDefNode(VarDefNode w) 
         {
             Text += IndentStr() + "var " + w.vars[0].Name;
             for (int i = 1; i < w.vars.Count; i++)
                 Text += ',' + w.vars[i].Name;
+            Text += ";";
         }
     }
 }

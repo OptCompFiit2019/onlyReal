@@ -30,9 +30,12 @@ namespace SimpleCompiler
                 {
                     Console.WriteLine("Синтаксическое дерево построено");
                     var r = parser.root;
-                    Console.WriteLine(r.ToString());
+                    //Console.WriteLine(r.ToString());
+                    PrettyPrintVisitor ppvis = new PrettyPrintVisitor();
+                    r.Visit(ppvis);
+                    Console.WriteLine(ppvis.Text);
 
-					Console.WriteLine("\nMaxCountExprOpsVisitor");
+                    Console.WriteLine("\nMaxCountExprOpsVisitor");
 					MaxCountExprOpsVisitor mceoVis = new MaxCountExprOpsVisitor();
 					r.Visit(mceoVis);
 					Console.WriteLine(mceoVis.Max);

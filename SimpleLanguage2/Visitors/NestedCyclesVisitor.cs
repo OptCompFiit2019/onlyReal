@@ -35,7 +35,7 @@ namespace SimpleLang.Visitors
 			if (CycleDepth > 1)
 				HasNestedCycles = true;
 		}
-		public override void VisitWriteNode(PrintlnNode w)
+		public override void VisitPrintlnNode(PrintlnNode w)
 		{
 		}
 		public override void VisitVarDefNode(VarDefNode w)

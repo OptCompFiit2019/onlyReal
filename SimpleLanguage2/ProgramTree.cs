@@ -65,7 +65,7 @@ namespace ProgramTree
         }
         public override string ToString()
         {
-            return Left.ToString() + " " + Op + " " + Right.ToString();
+            return "(" + Left.ToString() + " " + Op + " " + Right.ToString() + ")";
         }
     }
 
@@ -94,30 +94,30 @@ namespace ProgramTree
         }
     }
     public abstract class LogicExprNode : Node { }
-    public class LogicNumNode : LogicExprNode
+    public class BooleanNode : LogicExprNode
     {
         public bool Val { get; set; }
-        public LogicNumNode(bool val) { Val = val; }
+        public BooleanNode(bool val) { Val = val; }
         public override void Visit(Visitor v)
         {
 			v.VisitLogicNumNode(this);
         }
         public override string ToString()
         {
-            return Val.ToString();
+            return Val.ToString().ToLower();
         }
     }
     public class LogicIdNode : LogicExprNode
     {
-        public IdNode Val { get; set; }
-        public LogicIdNode(IdNode val) { Val = val; }
+        public IdNode Name { get; set; }
+        public LogicIdNode(IdNode val) { Name = val; }
         public override void Visit(Visitor v)
         {
 			v.VisitLogicIdNode(this);
         }
         public override string ToString()
         {
-            return Val.ToString();
+            return Name.ToString();
         }
     }
 
@@ -138,7 +138,7 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            return Left.ToString() + " " + Operation + " " + Right.ToString();
+            return "(" + Left.ToString() + " " + Operation + " " + Right.ToString() + ")";
         }
     }
 
@@ -220,13 +220,13 @@ namespace ProgramTree
     public class ForNode : StatementNode
     {
         public ExprNode StartValue { get; set; }
-        public IdNode ID { get; set; }
+        public IdNode Id { get; set; }
         public ExprNode End { get; set; }
         public StatementNode Stat { get; set; }
         public ForNode(AssignNode start, ExprNode end, StatementNode stat)
         {
             StartValue = start.Expr;
-            ID = start.Id;
+            Id = start.Id;
             End = end;
             Stat = stat;
         }
@@ -236,7 +236,7 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            return "for (" + ID.ToString() + " = " + StartValue.ToString()
+            return "for (" + Id.ToString() + " = " + StartValue.ToString()
                 + " to " + End.ToString() + ")\n" + Stat.ToString();
         }
     }
@@ -278,7 +278,7 @@ namespace ProgramTree
         }
         public override void Visit(Visitor v)
         {
-            v.VisitWriteNode(this);
+            v.VisitPrintlnNode(this);
         }
         public override string ToString() => $"println({Expr});";
     }

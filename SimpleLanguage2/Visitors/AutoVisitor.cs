@@ -39,7 +39,7 @@ namespace SimpleLang.Visitors
 		public override void VisitForNode(ForNode f)
 		{
 			f.StartValue.Visit(this);
-			f.ID.Visit(this);
+			f.Id.Visit(this);
 			f.End.Visit(this);
 			f.Stat.Visit(this);
 		}
@@ -59,7 +59,7 @@ namespace SimpleLang.Visitors
             foreach (var st in bl.StList)
                 st.Visit(this);
         }
-        public override void VisitWriteNode(PrintlnNode w) 
+        public override void VisitPrintlnNode(PrintlnNode w) 
         {
             w.Expr.Visit(this);
         }

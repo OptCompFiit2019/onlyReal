@@ -155,7 +155,7 @@ namespace SimpleLang.Visitors
         public override void VisitDoubleNumNode(DoubleNumNode dnum) {
             throw new Exception("Logic error");
         }
-        public override void VisitLogicNumNode(LogicNumNode lnum) {
+        public override void VisitLogicNumNode(BooleanNode lnum) {
             throw new Exception("Logic error");
         }
         public override void VisitLogicIdNode(LogicIdNode lnum) {
@@ -165,7 +165,7 @@ namespace SimpleLang.Visitors
             throw new Exception("Logic error");
         }
 
-        public override void VisitWriteNode(PrintlnNode w) {
+        public override void VisitPrintlnNode(PrintlnNode w) {
             throw new Exception("Is not supported");
         }
         public override void VisitVarDefNode(VarDefNode w) {
@@ -194,7 +194,7 @@ namespace SimpleLang.Visitors
         }
         public override void VisitForNode(ForNode f) {
             string expr = GenVariable(f.StartValue);
-            AddCode(new ThreeCode(f.ID.Name, expr));
+            AddCode(new ThreeCode(f.Id.Name, expr));
             string label_start = GenLabel();
             string label_middle = GenLabel();
             string label_end = GenLabel();
@@ -203,14 +203,14 @@ namespace SimpleLang.Visitors
             currentLabel = label_start;
             string val = GenVariable(f.End);
 
-            AddCode(new ThreeCode(b, ThreeOperator.Logic_less, f.ID.Name, val));
+            AddCode(new ThreeCode(b, ThreeOperator.Logic_less, f.Id.Name, val));
             AddCode(new ThreeCode("", ThreeOperator.IfGoto, b, label_middle));
             AddCode(new ThreeCode("", ThreeOperator.Goto, label_end, ""));
 
             currentLabel = label_middle;
             f.Stat.Visit(this);
 
-            AddCode(new ThreeCode(f.ID.Name, ThreeOperator.Plus, f.ID.Name, "1"));
+            AddCode(new ThreeCode(f.Id.Name, ThreeOperator.Plus, f.Id.Name, "1"));
             AddCode(new ThreeCode("", ThreeOperator.Goto, label_start, ""));
             currentLabel = label_end;
         }
@@ -268,10 +268,10 @@ namespace SimpleLang.Visitors
         }
         private string GenVariable(LogicExprNode expr)
         {
-            if (expr is LogicNumNode)
-                return (expr as LogicNumNode).Val.ToString();
+            if (expr is BooleanNode)
+                return (expr as BooleanNode).Val.ToString();
             if (expr is LogicIdNode)
-                return (expr as LogicIdNode).Val.Name;
+                return (expr as LogicIdNode).Name.Name;
 
             if (expr is LogicOperationNode)
             {
