@@ -92,22 +92,22 @@ varlist	: ident
 //      ;
 
 logic_expr  :   logic_T { $$ = $1; }
-            |   logic_expr LOGIC_OR logic_T { $$ = new LogicOperationNode($1, $3, "||"); }
+            |   logic_expr LOGIC_OR logic_T { $$ = new LogicOpNode($1, $3, "||"); }
             ;
             
             //logic_equals  : expr EQUALS expr { $$ = new EqualsNode($1, $3); }
 //        ;
 logic_T     :   logic_F { $$ = $1 as LogicExprNode; }
-            |   logic_T LOGIC_AND logic_F { $$ = new LogicOperationNode($1, $3, "&&"); }
+            |   logic_T LOGIC_AND logic_F { $$ = new LogicOpNode($1, $3, "&&"); }
             ;
             
 logic_F     :   logic_E { $$ = $1 as LogicExprNode; }
-            |   logic_E EQUALS logic_E  { $$ = new LogicOperationNode($1, $3, "=="); }
-            |   logic_E GTHAN logic_E  { $$ = new LogicOperationNode($1, $3, ">"); }
-            |   logic_E LTHAN logic_E  { $$ = new LogicOperationNode($1, $3, "<"); }
-            |   logic_E GEQ logic_E  { $$ = new LogicOperationNode($1, $3, ">="); }
-            |   logic_E LEQ logic_E  { $$ = new LogicOperationNode($1, $3, "<="); }
-            |   logic_E NEQ logic_E  { $$ = new LogicOperationNode($1, $3, "!="); }
+            |   logic_E EQUALS logic_E  { $$ = new LogicOpNode($1, $3, "=="); }
+            |   logic_E GTHAN logic_E  { $$ = new LogicOpNode($1, $3, ">"); }
+            |   logic_E LTHAN logic_E  { $$ = new LogicOpNode($1, $3, "<"); }
+            |   logic_E GEQ logic_E  { $$ = new LogicOpNode($1, $3, ">="); }
+            |   logic_E LEQ logic_E  { $$ = new LogicOpNode($1, $3, "<="); }
+            |   logic_E NEQ logic_E  { $$ = new LogicOpNode($1, $3, "!="); }
             ;
 
 logic_E     :   logic_D { $$ = $1 as LogicExprNode; }
