@@ -20,7 +20,8 @@ namespace SimpleLang.Visitors
         {
             Node parent = st.Pop();
             st.Push(parent);
-            a.Parent = parent;
+			if (a != null)
+				a.Parent = parent;
             st.Push(a);
             base.VisitAssignNode(a);
             st.Pop();
@@ -69,5 +70,45 @@ namespace SimpleLang.Visitors
             base.VisitForNode(f);
             st.Pop();
         }
-    }
+		public override void VisitIfNode(IfNode ifn)
+		{
+			Node parent = st.Pop();
+			st.Push(parent);
+			if (ifn != null)
+				ifn.Parent = parent;
+			st.Push(ifn);
+			base.VisitIfNode(ifn);
+			st.Pop();
+		}
+		public override void VisitBlockNode(BlockNode bl)
+		{
+			Node parent = st.Pop();
+			st.Push(parent);
+			if (bl != null)
+				bl.Parent = parent;
+			st.Push(bl);
+			base.VisitBlockNode(bl);
+			st.Pop();
+		}
+		public override void VisitPrintlnNode(PrintlnNode p)
+		{
+			Node parent = st.Pop();
+			st.Push(parent);
+			if (p != null)
+				p.Parent = parent;
+			st.Push(p);
+			base.VisitPrintlnNode(p);
+			st.Pop();
+		}
+		public override void VisitVarDefNode(VarDefNode w)
+		{
+			Node parent = st.Pop();
+			st.Push(parent);
+			if (w != null)
+				w.Parent = parent;
+			st.Push(w);
+			base.VisitVarDefNode(w);
+			st.Pop();
+		}
+	}
 }

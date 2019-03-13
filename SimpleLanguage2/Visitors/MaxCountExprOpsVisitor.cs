@@ -52,7 +52,12 @@ namespace SimpleLang.Visitors
             ++Current;
             base.VisitLogicOpNode(lop);
         }
-        public override void VisitPrintlnNode(PrintlnNode p)
+		public override void VisitLogicNotNode(LogicNotNode lnot)
+		{
+			++Current;
+			base.VisitLogicNotNode(lnot);
+		}
+		public override void VisitPrintlnNode(PrintlnNode p)
 		{
             base.VisitPrintlnNode(p);
             if (Current > Max)
