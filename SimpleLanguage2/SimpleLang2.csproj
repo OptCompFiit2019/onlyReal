@@ -50,6 +50,7 @@
     <Compile Include="Visitors\MaxCountExprOpsVisitor.cs" />
     <Compile Include="Visitors\MaxDepthOfNestedCyclesVisitor.cs" />
     <Compile Include="Visitors\NestedCyclesVisitor.cs" />
+    <Compile Include="Visitors\Opt2Visitor.cs" />
     <Compile Include="Visitors\PrettyPrintVisitor.cs" />
     <Compile Include="Visitors\StatementCountVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
