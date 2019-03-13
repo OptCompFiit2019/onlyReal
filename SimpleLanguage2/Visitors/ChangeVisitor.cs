@@ -64,13 +64,18 @@ namespace SimpleLang.Visitors
 				else if (ifn.Else == from)
 					ifn.Else = to;
 			}
-			/*else if (p is ForNode forn)
-			{
-				if (forn.Start == from) // Поиск подузла в Parent
-					forn.If = to;
-				else if (forn.Else == from)
-					forn.Else = to;
-			}*/
-		}
+            else if (p is ForNode forn)
+            {
+                forn.Stat = to;
+            }
+            else if (p is WhileNode wh)
+            {
+                wh.Stat = to;
+            }
+            else
+            {
+                throw new Exception("Родительский узел не содержит операторов");
+            }
+        }
 	}
 }
