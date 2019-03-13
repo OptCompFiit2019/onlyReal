@@ -85,6 +85,7 @@ namespace SimpleCompiler
                     Console.WriteLine(treeCode.ToString());
 
                     Opt11Visitor opt11vis = new Opt11Visitor();
+                    ppvis.Text = "";
                     r.Visit(opt11vis);
                     r.Visit(ppvis);
                     Console.WriteLine(ppvis.Text);

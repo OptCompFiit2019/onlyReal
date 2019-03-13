@@ -53,7 +53,7 @@ namespace SimpleLang.Visitors
 				to.Parent = p;
 			if (p is BlockNode bln) // Можно переложить этот код на узлы!
 			{
-				for (var i = 0; i < bln.StList.Count - 1; i++)
+				for (var i = 0; i < bln.StList.Count; i++)
 					if (bln.StList[i] == from)
 						bln.StList[i] = to;
 			}
