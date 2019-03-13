@@ -79,7 +79,13 @@ namespace SimpleCompiler
                     r.Visit(treeCode);
                     Console.WriteLine(treeCode.ToString());
 
-					/*var avis = new AssignCountVisitor();
+                    Opt11Visitor opt11vis = new Opt11Visitor();
+                    r.Visit(opt11vis);
+                    r.Visit(ppvis);
+                    Console.WriteLine(ppvis.Text);
+
+
+                    /*var avis = new AssignCountVisitor();
                     parser.root.Visit(avis);
                     Console.WriteLine("Количество присваиваний = {0}", avis.Count);
                     Console.WriteLine("-------------------------------");
@@ -87,7 +93,7 @@ namespace SimpleCompiler
                     var pp = new PrettyPrintVisitor();
                     parser.root.Visit(pp);
                     Console.WriteLine(pp.Text);*/
-				}
+                }
             }
             catch (FileNotFoundException)
             {
