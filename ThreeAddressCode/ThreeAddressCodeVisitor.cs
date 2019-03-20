@@ -151,6 +151,10 @@ namespace SimpleLang.Visitors
         private void SubStep() { currentStep--;  }*/
 
         LinkedList<ThreeCode> program = new LinkedList<ThreeCode>();
+
+        public LinkedList<ThreeCode> GetCode(){
+            return program;
+        }
         private string currentLabel = "";
         private void AddCode(ThreeCode c) {
             if (currentLabel.Length == 0) {
