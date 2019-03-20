@@ -65,6 +65,12 @@
     <Compile Include="Visitors\ChangeVisitor.cs" />
     <Compile Include="Visitors\Opt11Visitor.cs" />
     <Compile Include="Visitors\FillParentVisitor.cs" />
+    <Compile Include="ThreeOptimize\ApplyConst.cs" />
+    <Compile Include="ThreeOptimize\ThreeCodeApplyer.cs" />
+    <Compile Include="ThreeOptimize\ApplyConstExpr.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ThreeOptimize\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

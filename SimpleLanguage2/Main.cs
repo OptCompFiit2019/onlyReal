@@ -37,7 +37,7 @@ namespace SimpleCompiler
 
 					//Console.WriteLine(r.ToString());
 
-					Opt2Visitor opt2 = new Opt2Visitor();
+					/*Opt2Visitor opt2 = new Opt2Visitor();
 					r.Visit(opt2);
 
                     PrettyPrintVisitor ppvis = new PrettyPrintVisitor();
@@ -77,18 +77,29 @@ namespace SimpleCompiler
                     Console.WriteLine("\nMaxDepthOfNestedCyclesVisitor");
                     MaxDepthOfNestedCyclesVisitor vis7 = new MaxDepthOfNestedCyclesVisitor();
                     r.Visit(vis7);
-                    Console.WriteLine(vis7.Max);
+                    Console.WriteLine(vis7.Max);*/
 
                     Console.WriteLine("\nGenerate Three address code");
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
                     Console.WriteLine(treeCode.ToString());
 
-                    Opt11Visitor opt11vis = new Opt11Visitor();
+                    Console.WriteLine("\n\tConst inside");
+                    SimpleLang.ThreeOptimize.ApplyConst appco = new SimpleLang.ThreeOptimize.ApplyConst();
+                    var code = treeCode.GetCode();
+                    appco.Apply(code);
+
+                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(code));
+
+                    SimpleLang.ThreeOptimize.ApplyConstExpr appco2 = new SimpleLang.ThreeOptimize.ApplyConstExpr();
+                    appco2.Apply(code);
+                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(code));
+
+                    /*Opt11Visitor opt11vis = new Opt11Visitor();
                     ppvis.Text = "";
                     r.Visit(opt11vis);
                     r.Visit(ppvis);
-                    Console.WriteLine(ppvis.Text);
+                    Console.WriteLine(ppvis.Text);*/
 
 
                     /*var avis = new AssignCountVisitor();
