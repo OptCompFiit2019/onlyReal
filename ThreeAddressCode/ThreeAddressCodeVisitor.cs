@@ -5,10 +5,14 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
+    //Operations
+
     public enum ThreeOperator {  None, Assign, Minus, Plus, Mult, Div, Goto, IfGoto,
         Logic_or, Logic_and, Logic_less, Logic_equal, Logic_greater, Logic_geq, Logic_leq,
         Logic_not, Logic_neq };
 
+
+    // Value Types
     public class ThreeAddressValueType{
         public override string ToString() => "UNKNOW TYPE";
     }
@@ -16,26 +20,48 @@ namespace SimpleLang.Visitors
         public string Value { get; set; }
         public ThreeAddressStringValue(string val = "") { Value = val; }
         public override string ToString() => Value;
+        public override bool Equals(object obj){
+            if (obj is ThreeAddressStringValue val)
+                return Value.Equals(val.Value);
+            return false;
+        }
+        public override int GetHashCode() => Value.GetHashCode();
     }
     public class ThreeAddressIntValue : ThreeAddressValueType{
         public int Value { get; set; }
         public ThreeAddressIntValue(int val = 0) { Value = val; }
         public override string ToString() => Value.ToString();
+        public override bool Equals(object obj) {
+            if (obj is ThreeAddressIntValue val)
+                return Value == val.Value;
+            return false;
+        }
+        public override int GetHashCode() => Value.GetHashCode();
     }
     public class ThreeAddressLogicValue : ThreeAddressValueType{
         public bool Value { get; set; }
         public ThreeAddressLogicValue(bool val = false) { Value = val; }
         public override string ToString() => Value.ToString();
+        public override bool Equals(object obj){
+            if (obj is ThreeAddressLogicValue val)
+                return Value == val.Value;
+            return false;
+        }
+        public override int GetHashCode() => Value.GetHashCode();
     }
-    public class ThreeAddressDoubleValue : ThreeAddressValueType
-    {
+    public class ThreeAddressDoubleValue : ThreeAddressValueType{
         public double Value { get; set; }
         public ThreeAddressDoubleValue(double val = 0) { Value = val; }
         public override string ToString() => Value.ToString();
+        public override bool Equals(object obj) {
+            if (obj is ThreeAddressDoubleValue val)
+                return (Math.Abs(Value - val.Value)) < 0.000001;
+            return false;
+        }
+        public override int GetHashCode() => Value.GetHashCode();
     }
 
-    public class ThreeCode
-    {
+    public class ThreeCode {
         public string label;
         public ThreeOperator operation = ThreeOperator.None;
         public string result;
@@ -56,8 +82,7 @@ namespace SimpleLang.Visitors
             arg2 = a2;
             operation = op;
         }
-        public ThreeCode(string res, ThreeAddressValueType a1)
-        {
+        public ThreeCode(string res, ThreeAddressValueType a1) {
             label = "";
             result = res;
             arg1 = a1;
@@ -66,8 +91,7 @@ namespace SimpleLang.Visitors
         }
 
         public static string GetOperatorString(ThreeOperator op) {
-            switch (op)
-            {
+            switch (op) {
                 case ThreeOperator.Assign:
                     return "=";
                 case ThreeOperator.Div:
@@ -100,10 +124,8 @@ namespace SimpleLang.Visitors
             return "UNKNOWN";
         }
         public static ThreeOperator ParseOperator(char c) => ParseOperator(c.ToString());
-        public static ThreeOperator ParseOperator(string s)
-        {
-            switch (s)
-            {
+        public static ThreeOperator ParseOperator(string s) {
+            switch (s) {
                 case "=":
                     return ThreeOperator.Assign;
                 case "&&":
@@ -136,8 +158,7 @@ namespace SimpleLang.Visitors
             return ThreeOperator.None;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             string res = "";
             string lbl = "";
             if (label.Length > 0)
@@ -147,9 +168,9 @@ namespace SimpleLang.Visitors
             if (operation == ThreeOperator.None)
                 return res;
 
-            if (operation == ThreeOperator.Goto) {
+            if (operation == ThreeOperator.Goto)
                 return res + "goto " + arg1.ToString();
-            }
+
             if (operation == ThreeOperator.IfGoto) {
                 res += "if " + arg1.ToString() + " goto " + arg2.ToString();
                 return res;
@@ -166,15 +187,10 @@ namespace SimpleLang.Visitors
             return res;
         }
     }
-    public class ThreeAddressCodeVisitor : Visitor
-    {
-        /*private int currentStep = 0;
-        private string CurrentTab() {
-            return new string('\t', currentStep);
-        }
-        private void AddStep() { currentStep++;  }
-        private void SubStep() { currentStep--;  }*/
 
+
+    //Visitor
+    public class ThreeAddressCodeVisitor : Visitor {
         LinkedList<ThreeCode> program = new LinkedList<ThreeCode>();
 
         public LinkedList<ThreeCode> GetCode(){
