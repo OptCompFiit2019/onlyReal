@@ -9,34 +9,59 @@ namespace SimpleLang.Visitors
         Logic_or, Logic_and, Logic_less, Logic_equal, Logic_greater, Logic_geq, Logic_leq,
         Logic_not, Logic_neq };
 
+    public class ThreeAddressValueType{
+        public override string ToString() => "UNKNOW TYPE";
+    }
+    public class ThreeAddressStringValue : ThreeAddressValueType {
+        public string Value { get; set; }
+        public ThreeAddressStringValue(string val = "") { Value = val; }
+        public override string ToString() => Value;
+    }
+    public class ThreeAddressIntValue : ThreeAddressValueType{
+        public int Value { get; set; }
+        public ThreeAddressIntValue(int val = 0) { Value = val; }
+        public override string ToString() => Value.ToString();
+    }
+    public class ThreeAddressLogicValue : ThreeAddressValueType{
+        public bool Value { get; set; }
+        public ThreeAddressLogicValue(bool val = false) { Value = val; }
+        public override string ToString() => Value.ToString();
+    }
+    public class ThreeAddressDoubleValue : ThreeAddressValueType
+    {
+        public double Value { get; set; }
+        public ThreeAddressDoubleValue(double val = 0) { Value = val; }
+        public override string ToString() => Value.ToString();
+    }
+
     public class ThreeCode
     {
         public string label;
         public ThreeOperator operation = ThreeOperator.None;
         public string result;
-        public string arg1;
-        public string arg2;
+        public ThreeAddressValueType arg1;
+        public ThreeAddressValueType arg2;
 
-        public ThreeCode(string l, string res, ThreeOperator op, string a1, string a2){
+        public ThreeCode(string l, string res, ThreeOperator op, ThreeAddressValueType a1, ThreeAddressValueType a2){
             label = l;
             result = res;
             arg1 = a1;
             arg2 = a2;
             operation = op;
         }
-        public ThreeCode(string res, ThreeOperator op, string a1, string a2 = "") { 
+        public ThreeCode(string res, ThreeOperator op, ThreeAddressValueType a1, ThreeAddressValueType a2 = null) { 
             label = "";
             result = res;
             arg1 = a1;
             arg2 = a2;
             operation = op;
         }
-        public ThreeCode(string res, string a1)
+        public ThreeCode(string res, ThreeAddressValueType a1)
         {
             label = "";
             result = res;
             arg1 = a1;
-            arg2 = "";
+            arg2 = null;
             operation = ThreeOperator.Assign;
         }
 
@@ -123,20 +148,20 @@ namespace SimpleLang.Visitors
                 return res;
 
             if (operation == ThreeOperator.Goto) {
-                return res + "goto " + arg1;
+                return res + "goto " + arg1.ToString();
             }
             if (operation == ThreeOperator.IfGoto) {
-                res += "if " + arg1 + " goto " + arg2;
+                res += "if " + arg1.ToString() + " goto " + arg2.ToString();
                 return res;
             }
 
             res += result + " = ";
             if (operation == ThreeOperator.Logic_not)
-                return res + "!" + arg1;
+                return res + "!" + arg1.ToString();
             if (operation == ThreeOperator.Assign)
-                res += arg1;
+                res += arg1.ToString();
             else
-                res += arg1 + " " + ThreeCode.GetOperatorString(operation) + " " + arg2;
+                res += arg1.ToString() + " " + ThreeCode.GetOperatorString(operation) + " " + arg2.ToString();
 
             return res;
         }
@@ -155,6 +180,7 @@ namespace SimpleLang.Visitors
         public LinkedList<ThreeCode> GetCode(){
             return program;
         }
+
         private string currentLabel = "";
         private void AddCode(ThreeCode c) {
             if (currentLabel.Length == 0) {
@@ -179,6 +205,15 @@ namespace SimpleLang.Visitors
                 res += currentLabel + ":\n";
             return res;
         }
+
+        public static string ToString(LinkedList<ThreeCode> code){
+            string res = "";
+
+            foreach (ThreeCode it in code)
+                res += it.ToString() + "\n";
+
+            return res;
+        } 
 
         public override void VisitIdNode(IdNode id) {
             throw new Exception("Logic error");
@@ -222,22 +257,22 @@ namespace SimpleLang.Visitors
             string label_start = currentLabel.Length > 0 ? currentLabel : GenLabel();
 
             currentLabel = label_start;
-            string val = GenVariable(w.Expr);
+            ThreeAddressValueType val = GenVariable(w.Expr);
 
-            AddCode(new ThreeCode(expr, ThreeOperator.Assign, val, ""));
+            AddCode(new ThreeCode(expr, ThreeOperator.Assign, val, null));
             string label_middle = GenLabel();
             string label_end = GenLabel();
-            AddCode(new ThreeCode("", ThreeOperator.IfGoto, expr, label_middle));
-            AddCode(new ThreeCode("", ThreeOperator.Goto, label_end, ""));
+            AddCode(new ThreeCode("", ThreeOperator.IfGoto, new ThreeAddressStringValue(expr), new ThreeAddressStringValue(label_middle)));
+            AddCode(new ThreeCode("", ThreeOperator.Goto, new ThreeAddressStringValue(label_end), null));
 
             currentLabel = label_middle;
             w.Stat.Visit(this);
 
-            AddCode(new ThreeCode("", ThreeOperator.Goto, label_start, ""));
+            AddCode(new ThreeCode("", ThreeOperator.Goto, new ThreeAddressStringValue(label_start), null));
             currentLabel = label_end;
         }
         public override void VisitForNode(ForNode f) {
-            string expr = GenVariable(f.Start);
+            ThreeAddressValueType expr = GenVariable(f.Start);
             AddCode(new ThreeCode(f.Id.Name, expr));
             string label_start = GenLabel();
             string label_middle = GenLabel();
@@ -245,29 +280,29 @@ namespace SimpleLang.Visitors
             string b = GenTempVariable();
 
             currentLabel = label_start;
-            string val = GenVariable(f.End);
+            ThreeAddressValueType val = GenVariable(f.End);
 
-            AddCode(new ThreeCode(b, ThreeOperator.Logic_less, f.Id.Name, val));
-            AddCode(new ThreeCode("", ThreeOperator.IfGoto, b, label_middle));
-            AddCode(new ThreeCode("", ThreeOperator.Goto, label_end, ""));
+            AddCode(new ThreeCode(b, ThreeOperator.Logic_less, new ThreeAddressStringValue(f.Id.Name), val));
+            AddCode(new ThreeCode("", ThreeOperator.IfGoto, new ThreeAddressStringValue(b), new ThreeAddressStringValue(label_middle)));
+            AddCode(new ThreeCode("", ThreeOperator.Goto, new ThreeAddressStringValue(label_end), null));
 
             currentLabel = label_middle;
             f.Stat.Visit(this);
 
-            AddCode(new ThreeCode(f.Id.Name, ThreeOperator.Plus, f.Id.Name, "1"));
-            AddCode(new ThreeCode("", ThreeOperator.Goto, label_start, ""));
+            AddCode(new ThreeCode(f.Id.Name, ThreeOperator.Plus, new ThreeAddressStringValue(f.Id.Name), new ThreeAddressIntValue(1)));
+            AddCode(new ThreeCode("", ThreeOperator.Goto, new ThreeAddressStringValue(label_start), null));
             currentLabel = label_end;
         }
 
         public override void VisitIfNode(IfNode ifn) {
             string label_true = GenLabel();
             string label_end = GenLabel();
-            string expr = GenVariable(ifn.Cond);
-            AddCode(new ThreeCode("", ThreeOperator.IfGoto, expr, label_true));
+            ThreeAddressValueType expr = GenVariable(ifn.Cond);
+            AddCode(new ThreeCode("", ThreeOperator.IfGoto, expr, new ThreeAddressStringValue(label_true)));
             if (ifn.Else != null)
                 ifn.Else.Visit(this);
 
-            AddCode(new ThreeCode("", ThreeOperator.Goto, label_end, ""));            
+            AddCode(new ThreeCode("", ThreeOperator.Goto, new ThreeAddressStringValue(label_end), null));            
 
             currentLabel = label_true;
             ifn.If.Visit(this);
@@ -283,56 +318,56 @@ namespace SimpleLang.Visitors
        
 
 
-        private string GenVariable(ExprNode expr) {
+        private ThreeAddressValueType GenVariable(ExprNode expr) {
 
             if (expr is IdNode)
-                return (expr as IdNode).Name;
+                return new ThreeAddressStringValue((expr as IdNode).Name);
 
             if (expr is DoubleNumNode)
-                return (expr as DoubleNumNode).Num.ToString(CultureInfo.InvariantCulture);
+                return new ThreeAddressDoubleValue((expr as DoubleNumNode).Num);
             if (expr is IntNumNode)
-                return (expr as IntNumNode).Num.ToString();
+                return new ThreeAddressIntValue((expr as IntNumNode).Num);
 
             if (expr is BinOpNode) {
                 BinOpNode op = expr as BinOpNode;
                 string res = GenTempVariable();
-                string arg1 = GenVariable(op.Left);
-                string arg2 = GenVariable(op.Right);
+                ThreeAddressValueType arg1 = GenVariable(op.Left);
+                ThreeAddressValueType arg2 = GenVariable(op.Right);
                 ThreeOperator p = ThreeCode.ParseOperator(op.Op);
                 AddCode(new ThreeCode(res, p, arg1, arg2));
-                return res;
+                return new ThreeAddressStringValue(res);
             }
 
-            return "UNKNOWN";
+            throw new Exception("UNKNOW VALUE. Send autors of ThreeAddressCode");
         }
-        private string GenVariable(LogicExprNode expr)
+        private ThreeAddressValueType GenVariable(LogicExprNode expr)
         {
             if (expr is BooleanNode)
-                return (expr as BooleanNode).Val.ToString().ToLower();
+                return new ThreeAddressLogicValue((expr as BooleanNode).Val);
             if (expr is LogicIdNode)
-                return (expr as LogicIdNode).Name.Name;
+                return new ThreeAddressStringValue((expr as LogicIdNode).Name.Name);
 
             if (expr is LogicOpNode)
             {
                 LogicOpNode op = expr as LogicOpNode;
                 string res = GenTempVariable();
-                string arg1 = GenVariable(op.Left);
-                string arg2 = GenVariable(op.Right);
+                ThreeAddressValueType arg1 = GenVariable(op.Left);
+                ThreeAddressValueType arg2 = GenVariable(op.Right);
                 ThreeOperator p = ThreeCode.ParseOperator(op.Operation);
                 AddCode(new ThreeCode(res, p, arg1, arg2));
-                return res;
+                return new ThreeAddressStringValue(res);
             }
 
             if (expr is LogicNotNode)
             {
                 LogicNotNode lnot = expr as LogicNotNode;
                 string res = GenTempVariable();
-                string arg1 = GenVariable(lnot.LogExpr);
+                ThreeAddressValueType arg1 = GenVariable(lnot.LogExpr);
                 AddCode(new ThreeCode(res, ThreeOperator.Logic_not, arg1));
-                return res;
+                return new ThreeAddressStringValue(res);
             }
 
-            return "UNKNOWN";
+            throw new Exception("UNKNOW VALUE. Send autors of ThreeAddressCode");
         }
         private string GenTempVariable(){
             string res = "temp_" + currentTempVarIndex.ToString();
