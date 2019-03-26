@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
+using SimpleLang.Block;
 
 namespace SimpleCompiler
 {
@@ -38,7 +39,16 @@ namespace SimpleCompiler
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
                     Console.WriteLine(treeCode.ToString());
-
+                    var blocks = new Block(treeCode).GenerateBlocks();
+                    
+                    int i = 1;
+                    foreach (var block in blocks)
+                    {
+                        Console.WriteLine("Block " + i.ToString());
+                        foreach (var line in block)
+                            Console.WriteLine(line);
+                        i += 1;
+                    }
                 }
             }
             catch (FileNotFoundException)
@@ -50,7 +60,7 @@ namespace SimpleCompiler
                 Console.WriteLine("{0}", e);
             }
 
-            Console.ReadLine();
+            // Console.ReadLine();
         }
 
     }
