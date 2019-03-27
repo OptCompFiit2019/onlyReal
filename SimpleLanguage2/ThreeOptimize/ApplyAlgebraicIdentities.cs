@@ -28,7 +28,9 @@ namespace SimpleLang.ThreeOptimize
 
 		public void Apply(LinkedList<ThreeCode> program)
 		{
-			for (var it = program.First; it != null; it = it.Next)
+            _apply = false;
+
+            for (var it = program.First; it != null; it = it.Next)
 			{
 				if (it.Value.operation == ThreeOperator.Plus &&
 					it.Value.arg1 != null && it.Value.arg1 is ThreeAddressIntValue &&

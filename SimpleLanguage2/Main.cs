@@ -85,16 +85,14 @@ namespace SimpleCompiler
                     r.Visit(treeCode);
                     Console.WriteLine(treeCode.ToString());
 
-                    SimpleLang.ThreeOptimize.Applyer app = new SimpleLang.ThreeOptimize.Applyer();
-                    app.Add(new SimpleLang.ThreeOptimize.ApplyConst());
-                    app.Add(new SimpleLang.ThreeOptimize.ApplyConstExpr());
+                    Applyer app = new Applyer();
+                    app.Add(new ApplyConst());
+                    app.Add(new ApplyConstExpr());
+                    app.Add(new ApplyAlgebraicIdentities());
                     var code = treeCode.GetCode();
                     app.Apply(code);
                     Console.WriteLine(ThreeAddressCodeVisitor.ToString(code));
 
-					ApplyAlgebraicIdentities appaids = new ApplyAlgebraicIdentities();
-					appaids.Apply(code);
-					Console.WriteLine(ThreeAddressCodeVisitor.ToString(code));
 
                     /*Opt11Visitor opt11vis = new Opt11Visitor();
                     ppvis.Text = "";
