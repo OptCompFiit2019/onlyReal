@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
+using SimpleLang.ThreeOptimize;
 
 namespace SimpleCompiler
 {
@@ -13,7 +14,7 @@ namespace SimpleCompiler
     {
         public static void Main()
         {
-            string FileName = @"../../a.txt";
+            string FileName = @"../../a6.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -94,6 +95,10 @@ namespace SimpleCompiler
                     SimpleLang.ThreeOptimize.ApplyConstExpr appco2 = new SimpleLang.ThreeOptimize.ApplyConstExpr();
                     appco2.Apply(code);
                     Console.WriteLine(ThreeAddressCodeVisitor.ToString(code));
+
+					ApplyAlgebraicIdentities appaids = new ApplyAlgebraicIdentities();
+					appaids.Apply(code);
+					Console.WriteLine(ThreeAddressCodeVisitor.ToString(code));
 
                     /*Opt11Visitor opt11vis = new Opt11Visitor();
                     ppvis.Text = "";
