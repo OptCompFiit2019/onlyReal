@@ -18,10 +18,12 @@ namespace SimpleLang.ThreeOptimize
             // разбиения на базовые блоки
             System.Collections.Generic.Dictionary<String, Visitors.ThreeAddressValueType> replace = new System.Collections.Generic.Dictionary<string, Visitors.ThreeAddressValueType>();
             for (var it = program.First; it != null; it = it.Next){
+
                 if (it.Value.operation == Visitors.ThreeOperator.Assign){
                     replace[it.Value.result] = it.Value.arg1;
                     continue;
                 }
+
                 if (it.Value.arg1 is Visitors.ThreeAddressStringValue name && replace.ContainsKey(name.Value)){
                     it.Value.arg1 = replace[name.Value];
                     _apply = true;
@@ -29,6 +31,9 @@ namespace SimpleLang.ThreeOptimize
                 if (it.Value.arg2 is Visitors.ThreeAddressStringValue name2 && replace.ContainsKey(name2.Value)){
                     it.Value.arg2 = replace[name2.Value];
                     _apply = true;
+                }
+                if (replace.ContainsKey(it.Value.result)) {
+                    replace.Remove(it.Value.result);
                 }
             }
         }
