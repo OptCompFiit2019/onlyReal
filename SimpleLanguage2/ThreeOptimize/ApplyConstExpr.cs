@@ -24,9 +24,10 @@ namespace SimpleLang.ThreeOptimize
         }
         public void Apply(System.Collections.Generic.LinkedList<Visitors.ThreeCode> program)
         {
-            //ToDO
-            //код оптимизирует for, что неправильно. Нужнообновить код после добавления 
-            // разбиения на базовые блоки
+            _apply = false;
+            // ToDO
+            // Оптимизировать для базовых блоков.
+            // Работать будет и без базовых блоков, но нужно под базовые блоки переделть
             for (var it = program.First; it != null; it = it.Next) {
                 int iarg1 = 0;
                 bool iarg1val = false;
@@ -74,8 +75,11 @@ namespace SimpleLang.ThreeOptimize
                 if (it.Value.operation == Visitors.ThreeOperator.Logic_less && iarg1val && iarg2val){
                     Set(it, iarg1 < iarg2);
                 }
-                if (it.Value.operation == Visitors.ThreeOperator.Logic_equal) {
-                    Set(it, it.Value.arg1.Equals(it.Value.arg2));
+                if (it.Value.operation == Visitors.ThreeOperator.Logic_equal && iarg1val && iarg2val) {
+                    Set(it, iarg1 == iarg2);
+                }
+                if (it.Value.operation == Visitors.ThreeOperator.Logic_equal && barg1val && barg2val) {
+                    Set(it, barg1 == barg2);
                 }
                 if (it.Value.operation == Visitors.ThreeOperator.Logic_greater && iarg1val && iarg2val) {
                     Set(it, iarg1 > iarg2);

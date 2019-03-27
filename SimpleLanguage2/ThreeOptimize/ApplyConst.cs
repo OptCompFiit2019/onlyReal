@@ -13,13 +13,26 @@ namespace SimpleLang.ThreeOptimize
             return _apply;
         }
         public void Apply(System.Collections.Generic.LinkedList<Visitors.ThreeCode> program){
+            _apply = false;
             //ToDO
             //код оптимизирует for, что неправильно. Нужнообновить код после добавления 
             // разбиения на базовые блоки
             System.Collections.Generic.Dictionary<String, Visitors.ThreeAddressValueType> replace = new System.Collections.Generic.Dictionary<string, Visitors.ThreeAddressValueType>();
             for (var it = program.First; it != null; it = it.Next){
 
+                if (replace.ContainsKey(it.Value.result)) {
+                    replace.Remove(it.Value.result);
+                }
+
+
                 if (it.Value.operation == Visitors.ThreeOperator.Assign){
+                    if (it.Value.arg1 is Visitors.ThreeAddressStringValue val) {
+                        if (replace.ContainsKey(val.Value)) {
+                            it.Value.arg1 = replace[val.Value];
+                            _apply = true;
+                        }
+                        continue;
+                    }
                     replace[it.Value.result] = it.Value.arg1;
                     continue;
                 }
@@ -32,9 +45,7 @@ namespace SimpleLang.ThreeOptimize
                     it.Value.arg2 = replace[name2.Value];
                     _apply = true;
                 }
-                if (replace.ContainsKey(it.Value.result)) {
-                    replace.Remove(it.Value.result);
-                }
+
             }
         }
     }
