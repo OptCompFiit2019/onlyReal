@@ -41,22 +41,22 @@ namespace SimpleLang.Block
             return Liders;
         }
 
-        public List<List<ThreeCode>> GenerateBlocks()
+        public List<LinkedList<ThreeCode>> GenerateBlocks()
         {
             var Liders = FindLiders();
             int i = 1;
             int LiderInd = 0;
             
-            var Blocks = new List<List<ThreeCode>>();
+            var Blocks = new List<LinkedList<ThreeCode>>();
 
             foreach (var line in this.code)
             {
                 if (i == Liders[LiderInd])
                 {
-                    Blocks.Add(new List<ThreeCode>());
+                    Blocks.Add(new LinkedList<ThreeCode>());
                     LiderInd += 1;
                 }
-                Blocks.Last().Add(line);
+                Blocks.Last().AddLast(line);
                 i += 1;
             }
 
