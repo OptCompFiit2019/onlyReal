@@ -68,6 +68,7 @@
     <Compile Include="ThreeOptimize\ApplyConst.cs" />
     <Compile Include="ThreeOptimize\ThreeCodeApplyer.cs" />
     <Compile Include="ThreeOptimize\ApplyConstExpr.cs" />
+    <Compile Include="ThreeOptimize\Applyer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ThreeOptimize\" />

@@ -84,15 +84,11 @@ namespace SimpleCompiler
                     r.Visit(treeCode);
                     Console.WriteLine(treeCode.ToString());
 
-                    Console.WriteLine("\n\tConst inside");
-                    SimpleLang.ThreeOptimize.ApplyConst appco = new SimpleLang.ThreeOptimize.ApplyConst();
+                    SimpleLang.ThreeOptimize.Applyer app = new SimpleLang.ThreeOptimize.Applyer();
+                    app.Add(new SimpleLang.ThreeOptimize.ApplyConst());
+                    app.Add(new SimpleLang.ThreeOptimize.ApplyConstExpr());
                     var code = treeCode.GetCode();
-                    appco.Apply(code);
-
-                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(code));
-
-                    SimpleLang.ThreeOptimize.ApplyConstExpr appco2 = new SimpleLang.ThreeOptimize.ApplyConstExpr();
-                    appco2.Apply(code);
+                    app.Apply(code);
                     Console.WriteLine(ThreeAddressCodeVisitor.ToString(code));
 
                     /*Opt11Visitor opt11vis = new Opt11Visitor();
