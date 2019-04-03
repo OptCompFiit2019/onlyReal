@@ -49,9 +49,10 @@ namespace SimpleLang.Block
 
             var Blocks = new List<LinkedList<ThreeCode>>();
 
+
             foreach (var line in this.code)
             {
-                if (i == Liders[LiderInd])
+                if (LiderInd  < Liders.Count && i == Liders[LiderInd])
                 {
                     Blocks.Add(new LinkedList<ThreeCode>());
                     LiderInd += 1;

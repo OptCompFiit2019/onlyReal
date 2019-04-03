@@ -14,7 +14,7 @@ namespace SimpleCompiler
     {
         public static void Main()
         {
-            string FileName = @"../../a6.txt";
+            string FileName = @"../../a.txt";
             try
             {
                 string Text = File.ReadAllText(FileName);
