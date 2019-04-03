@@ -194,6 +194,10 @@ namespace SimpleLang.Visitors
         LinkedList<ThreeCode> program = new LinkedList<ThreeCode>();
 
         public LinkedList<ThreeCode> GetCode(){
+            if (currentLabel.Length > 0) {
+                program.AddLast(new ThreeCode(currentLabel, "", ThreeOperator.None, null, null));
+                currentLabel = "";
+            }
             return program;
         }
 
@@ -234,7 +238,7 @@ namespace SimpleLang.Visitors
             string res = "";
 
             foreach (LinkedList<ThreeCode> it in code)
-                res += ToString(it);
+                res += ToString(it) + "\n";
 
             return res;
         }
