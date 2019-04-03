@@ -229,7 +229,15 @@ namespace SimpleLang.Visitors
                 res += it.ToString() + "\n";
 
             return res;
-        } 
+        }
+        public static string ToString(List<LinkedList<ThreeCode>> code){
+            string res = "";
+
+            foreach (LinkedList<ThreeCode> it in code)
+                res += ToString(it);
+
+            return res;
+        }
 
         public override void VisitIdNode(IdNode id) {
             throw new Exception("Logic error");

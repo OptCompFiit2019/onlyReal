@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using SimpleLang.Visitors;
+using SimpleLang.Block;
 namespace SimpleLang.ThreeOptimize
 {
     public class Applyer: ThreeCodeApplyer
@@ -21,6 +23,16 @@ namespace SimpleLang.ThreeOptimize
                     }
                 }
             }
+        }
+        public List<LinkedList<ThreeCode>> Apply(ThreeAddressCodeVisitor visit) {
+            SimpleLang.Block.Block bl = new SimpleLang.Block.Block(visit);
+            List<LinkedList<ThreeCode>> res = bl.GenerateBlocks();
+
+            for (int i = 0; i < res.Count; i++) {
+                Apply(res[i]);
+            }
+
+            return res;
         }
         public bool Applyed() {
             return b;

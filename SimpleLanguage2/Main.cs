@@ -89,9 +89,13 @@ namespace SimpleCompiler
                     app.Add(new ApplyConst());
                     app.Add(new ApplyConstExpr());
                     app.Add(new ApplyAlgebraicIdentities());
+
+                    var blocks = app.Apply(treeCode);
+                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(blocks));
+
                     var code = treeCode.GetCode();
                     app.Apply(code);
-                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(code));
+
 
 
                     /*Opt11Visitor opt11vis = new Opt11Visitor();

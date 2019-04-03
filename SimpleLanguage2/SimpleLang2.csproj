@@ -70,6 +70,7 @@
     <Compile Include="ThreeOptimize\ThreeCodeApplyer.cs" />
     <Compile Include="ThreeOptimize\ApplyConstExpr.cs" />
     <Compile Include="ThreeOptimize\Applyer.cs" />
+    <Compile Include="Block.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
