@@ -3,9 +3,9 @@
 // (see accompanying GPPGcopyright.rtf)
 
 // GPPG version 1.3.6
-// Machine:  MacBook-Pro.local
-// DateTime: 26.03.2019 20:30:36
-// UserName: alexey
+// Machine:  dp
+// DateTime: 4/10/2019 12:41:38 PM
+// UserName: diman-pro
 // Input file <SimpleYacc.y>
 
 // options: no-lines gplex
