@@ -101,9 +101,9 @@ namespace SimpleLang.ControlFlowGraph
                 else
                     {
                         int bi = 0;
-                        int bj = 0;
                         foreach (var line1 in this.blocks[i])
                         {
+                            int bj = 0;
                             foreach (var line2 in this.blocks[j])
                             {
                                 if (line1.operation == ThreeOperator.Goto ||
