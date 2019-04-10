@@ -7,6 +7,8 @@ using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
 using SimpleLang.Block;
+using SimpleLang.Optimisations;
+using SimpleLang.ControlFlowGraph;
 
 namespace SimpleCompiler
 {
@@ -35,6 +37,11 @@ namespace SimpleCompiler
                     FillParentVisitor generateParrent = new FillParentVisitor();
                     r.Visit(generateParrent);
 
+                    var opt_sim_diff = new OptSimilarDifference();
+                    r.Visit(opt_sim_diff);
+                    var opt_sim_assignments = new OptSimilarAssignment();
+                    r.Visit(opt_sim_assignments);
+                    
                     Console.WriteLine("\nGenerate Three address code");
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
@@ -49,6 +56,10 @@ namespace SimpleCompiler
                             Console.WriteLine(line);
                         i += 1;
                     }
+
+                    var cfg = new ControlFlowGraph(treeCode);
+                    cfg.GenerateCFG();
+                    Console.WriteLine(cfg.GetAsGraph());
                 }
             }
             catch (FileNotFoundException)

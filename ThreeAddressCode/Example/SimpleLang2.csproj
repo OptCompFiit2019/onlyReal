@@ -44,9 +44,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Visitor.cs" />
+    <Compile Include="Block\Block.cs" />
+    <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AutoVisitor.cs" />
     <Compile Include="FillParentVisitor.cs" />
+    <Compile Include="Optimisations\Optimisations.cs" />
     <Compile Include="ParserHelper.cs" />
     <Compile Include="ProgramTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
