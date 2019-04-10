@@ -49,13 +49,18 @@
     <Compile Include="Main.cs" />
     <Compile Include="Visitor\AutoVisitor.cs" />
     <Compile Include="Visitor\FillParentVisitor.cs" />
-    <Compile Include="Optimisations\Optimisations.cs" />
+    <Compile Include="AstOptimisations\Optimisations.cs" />
     <Compile Include="Syntax\ParserHelper.cs" />
     <Compile Include="Syntax\ProgramTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Syntax\ShiftReduceParserCode.cs" />
     <Compile Include="Syntax\SimpleLex.cs" />
     <Compile Include="Syntax\SimpleYacc.cs" />
+    <Compile Include="TreeCodeOptimisations\ThreeCodeOptimiser.cs" />
+    <Compile Include="TreeCodeOptimisations\AutoThreeCodeOptimiser.cs" />
+    <Compile Include="TreeCodeOptimisations\EvalConstExpr.cs" />
+    <Compile Include="TreeCodeOptimisations\DistributionOfConstants.cs" />
+    <Compile Include="TreeCodeOptimisations\ApplyAlgebraicIdentities.cs" />
     <Compile Include="ThreeAddressCode\ThreeAddressCodeVisitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

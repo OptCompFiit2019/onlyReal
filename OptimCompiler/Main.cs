@@ -9,6 +9,7 @@ using SimpleLang.Visitors;
 using SimpleLang.Block;
 using SimpleLang.Optimisations;
 using SimpleLang.ControlFlowGraph;
+using SimpleLang.ThreeCodeOptimisations;
 
 namespace SimpleCompiler
 {
@@ -16,10 +17,10 @@ namespace SimpleCompiler
     {
         public static void Main(string[] args)
         {
-            // string FileName = @"../../../data/a.txt";
-            string FileName = args[0];
-            try
-            {
+            string FileName = @"../../../data/a.txt";
+            if (args.Length > 0)
+                FileName = args[0];
+            try {
                 string Text = File.ReadAllText(FileName);
 
                 Scanner scanner = new Scanner();
@@ -47,8 +48,18 @@ namespace SimpleCompiler
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
                     Console.WriteLine(treeCode.ToString());
-                    var blocks = new Block(treeCode).GenerateBlocks();
-                    
+
+
+                    AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
+                    app.Add(new EvalConstExpr());
+                    app.Add(new DistributionOfConstants());
+                    app.Add(new ApplyAlgebraicIdentities());
+                    //ToDo Add new threeCodeOptimisations
+
+                    var blocks = app.Apply(treeCode);
+                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(blocks));
+
+
                     int i = 1;
                     foreach (var block in blocks)
                     {

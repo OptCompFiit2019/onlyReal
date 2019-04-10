@@ -1,33 +1,34 @@
 ﻿using System;
-using System.Globalization;
 using System.Collections.Generic;
 using ProgramTree;
 
-namespace SimpleLang.Visitors
-{
+namespace SimpleLang.Visitors {
     //Operations
 
-    public enum ThreeOperator {  None, Assign, Minus, Plus, Mult, Div, Goto, IfGoto,
+    public enum ThreeOperator {
+        None, Assign, Minus, Plus, Mult, Div, Goto, IfGoto,
         Logic_or, Logic_and, Logic_less, Logic_equal, Logic_greater, Logic_geq, Logic_leq,
-        Logic_not, Logic_neq };
+        Logic_not, Logic_neq
+    };
 
 
     // Value Types
-    public class ThreeAddressValueType{
+    public class ThreeAddressValueType {
         public override string ToString() => "UNKNOW TYPE";
     }
+
     public class ThreeAddressStringValue : ThreeAddressValueType {
         public string Value { get; set; }
         public ThreeAddressStringValue(string val = "") { Value = val; }
         public override string ToString() => Value;
-        public override bool Equals(object obj){
+        public override bool Equals(object obj) {
             if (obj is ThreeAddressStringValue val)
                 return Value.Equals(val.Value);
             return false;
         }
         public override int GetHashCode() => Value.GetHashCode();
     }
-    public class ThreeAddressIntValue : ThreeAddressValueType{
+    public class ThreeAddressIntValue : ThreeAddressValueType {
         public int Value { get; set; }
         public ThreeAddressIntValue(int val = 0) { Value = val; }
         public override string ToString() => Value.ToString();
@@ -38,18 +39,18 @@ namespace SimpleLang.Visitors
         }
         public override int GetHashCode() => Value.GetHashCode();
     }
-    public class ThreeAddressLogicValue : ThreeAddressValueType{
+    public class ThreeAddressLogicValue : ThreeAddressValueType {
         public bool Value { get; set; }
         public ThreeAddressLogicValue(bool val = false) { Value = val; }
         public override string ToString() => Value.ToString();
-        public override bool Equals(object obj){
+        public override bool Equals(object obj) {
             if (obj is ThreeAddressLogicValue val)
                 return Value == val.Value;
             return false;
         }
         public override int GetHashCode() => Value.GetHashCode();
     }
-    public class ThreeAddressDoubleValue : ThreeAddressValueType{
+    public class ThreeAddressDoubleValue : ThreeAddressValueType {
         public double Value { get; set; }
         public ThreeAddressDoubleValue(double val = 0) { Value = val; }
         public override string ToString() => Value.ToString();
@@ -68,14 +69,14 @@ namespace SimpleLang.Visitors
         public ThreeAddressValueType arg1;
         public ThreeAddressValueType arg2;
 
-        public ThreeCode(string l, string res, ThreeOperator op, ThreeAddressValueType a1, ThreeAddressValueType a2){
+        public ThreeCode(string l, string res, ThreeOperator op, ThreeAddressValueType a1, ThreeAddressValueType a2) {
             label = l;
             result = res;
             arg1 = a1;
             arg2 = a2;
             operation = op;
         }
-        public ThreeCode(string res, ThreeOperator op, ThreeAddressValueType a1, ThreeAddressValueType a2 = null) { 
+        public ThreeCode(string res, ThreeOperator op, ThreeAddressValueType a1, ThreeAddressValueType a2 = null) {
             label = "";
             result = res;
             arg1 = a1;
@@ -193,7 +194,11 @@ namespace SimpleLang.Visitors
     public class ThreeAddressCodeVisitor : Visitor {
         LinkedList<ThreeCode> program = new LinkedList<ThreeCode>();
 
-        public LinkedList<ThreeCode> GetCode(){
+        public LinkedList<ThreeCode> GetCode() {
+            if (currentLabel.Length > 0) {
+                program.AddLast(new ThreeCode(currentLabel, "", ThreeOperator.None, null, null));
+                currentLabel = "";
+            }
             return program;
         }
 
@@ -222,14 +227,22 @@ namespace SimpleLang.Visitors
             return res;
         }
 
-        public static string ToString(LinkedList<ThreeCode> code){
+        public static string ToString(LinkedList<ThreeCode> code) {
             string res = "";
 
             foreach (ThreeCode it in code)
                 res += it.ToString() + "\n";
 
             return res;
-        } 
+        }
+        public static string ToString(List<LinkedList<ThreeCode>> code) {
+            string res = "";
+
+            foreach (LinkedList<ThreeCode> it in code)
+                res += ToString(it) + "\n";
+
+            return res;
+        }
 
         public override void VisitIdNode(IdNode id) {
             throw new Exception("Logic error");
@@ -245,7 +258,7 @@ namespace SimpleLang.Visitors
 
         public override void VisitDoubleNumNode(DoubleNumNode dnum) {
             throw new Exception("Logic error");
-        }
+        } 
         public override void VisitBooleanNode(BooleanNode lnum) {
             throw new Exception("Logic error");
         }
@@ -260,7 +273,7 @@ namespace SimpleLang.Visitors
             throw new Exception("Is not supported");
         }
         public override void VisitVarDefNode(VarDefNode w) {
-            // В трехадресном коде нет операции создания переменной
+            // ToDo В трехадресном коде нет операции создания переменной
         }
 
 
@@ -318,7 +331,7 @@ namespace SimpleLang.Visitors
             if (ifn.Else != null)
                 ifn.Else.Visit(this);
 
-            AddCode(new ThreeCode("", ThreeOperator.Goto, new ThreeAddressStringValue(label_end), null));            
+            AddCode(new ThreeCode("", ThreeOperator.Goto, new ThreeAddressStringValue(label_end), null));
 
             currentLabel = label_true;
             ifn.If.Visit(this);
@@ -331,11 +344,9 @@ namespace SimpleLang.Visitors
                 st.Visit(this);
         }
 
-       
 
 
         private ThreeAddressValueType GenVariable(ExprNode expr) {
-
             if (expr is IdNode)
                 return new ThreeAddressStringValue((expr as IdNode).Name);
 
@@ -356,15 +367,13 @@ namespace SimpleLang.Visitors
 
             throw new Exception("UNKNOW VALUE. Send autors of ThreeAddressCode");
         }
-        private ThreeAddressValueType GenVariable(LogicExprNode expr)
-        {
+        private ThreeAddressValueType GenVariable(LogicExprNode expr) {
             if (expr is BooleanNode)
                 return new ThreeAddressLogicValue((expr as BooleanNode).Val);
             if (expr is LogicIdNode)
                 return new ThreeAddressStringValue((expr as LogicIdNode).Name.Name);
 
-            if (expr is LogicOpNode)
-            {
+            if (expr is LogicOpNode) {
                 LogicOpNode op = expr as LogicOpNode;
                 string res = GenTempVariable();
                 ThreeAddressValueType arg1 = GenVariable(op.Left);
@@ -374,8 +383,7 @@ namespace SimpleLang.Visitors
                 return new ThreeAddressStringValue(res);
             }
 
-            if (expr is LogicNotNode)
-            {
+            if (expr is LogicNotNode) {
                 LogicNotNode lnot = expr as LogicNotNode;
                 string res = GenTempVariable();
                 ThreeAddressValueType arg1 = GenVariable(lnot.LogExpr);
@@ -385,12 +393,14 @@ namespace SimpleLang.Visitors
 
             throw new Exception("UNKNOW VALUE. Send autors of ThreeAddressCode");
         }
-        private string GenTempVariable(){
+
+        private string GenTempVariable() {
             string res = "temp_" + currentTempVarIndex.ToString();
             currentTempVarIndex++;
             return res;
         }
-        private string GenLabel(){
+
+        private string GenLabel() {
             string res = "label_" + currentLabelIndex.ToString();
             currentLabelIndex++;
             return res;
