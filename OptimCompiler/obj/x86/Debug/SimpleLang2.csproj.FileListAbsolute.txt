@@ -1,0 +1,6 @@
+C:\Compilers\16.04\onlyReal\OptimCompiler\bin\Debug\SimpleLang.exe
+C:\Compilers\16.04\onlyReal\OptimCompiler\bin\Debug\SimpleLang.pdb
+C:\Compilers\16.04\onlyReal\OptimCompiler\obj\x86\Debug\SimpleLang2.csprojAssemblyReference.cache
+C:\Compilers\16.04\onlyReal\OptimCompiler\obj\x86\Debug\SimpleLang2.csproj.CoreCompileInputs.cache
+C:\Compilers\16.04\onlyReal\OptimCompiler\obj\x86\Debug\SimpleLang.exe
+C:\Compilers\16.04\onlyReal\OptimCompiler\obj\x86\Debug\SimpleLang.pdb
