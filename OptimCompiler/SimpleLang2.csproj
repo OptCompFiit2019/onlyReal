@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AstOptimisations\OptMulDivOneVisitor.cs" />
+    <Compile Include="AstOptimisations\OptWhileVisitor.cs" />
+    <Compile Include="AstOptimisations\PrettyPrintVisitor.cs" />
     <Compile Include="Visitor\Visitor.cs" />
     <Compile Include="Block\Block.cs" />
     <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />

@@ -17,7 +17,7 @@ namespace SimpleCompiler
     {
         public static void Main(string[] args)
         {
-            string FileName = @"../../../data/a.txt";
+            string FileName = @"../../../data/DeadOrAliveOptimization.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -84,7 +84,7 @@ namespace SimpleCompiler
                 Console.WriteLine("{0}", e);
             }
 
-            // Console.ReadLine();
+            //Console.ReadLine();
         }
 
     }
