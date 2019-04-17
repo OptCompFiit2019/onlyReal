@@ -6,15 +6,17 @@ using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
-using SimpleLang.ThreeOptimize;
+using SimpleLang.ThreeCodeOptimisations;
 
 namespace SimpleCompiler
 {
     public class SimpleCompilerMain
     {
-        public static void Main()
+        public static void Main(string[] args)
         {
-            string FileName = @"../../a.txt";
+            string FileName = @"../../../data/a.txt";
+            if (args.Length > 0)
+                FileName = args[0];
             try
             {
                 string Text = File.ReadAllText(FileName);
@@ -85,9 +87,9 @@ namespace SimpleCompiler
                     r.Visit(treeCode);
                     Console.WriteLine(treeCode.ToString());
 
-                    Applyer app = new Applyer();
-                    app.Add(new ApplyConst());
-                    app.Add(new ApplyConstExpr());
+                    AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
+                    app.Add(new DistributionOfConstants());
+                    app.Add(new EvalConstExpr());
                     app.Add(new ApplyAlgebraicIdentities());
 
                     var blocks = app.Apply(treeCode);
