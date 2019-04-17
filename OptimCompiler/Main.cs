@@ -6,19 +6,20 @@ using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
 using SimpleLang.Visitors;
+
+using SimpleLang.Block;
+using SimpleLang.ControlFlowGraph;
 using SimpleLang.ThreeCodeOptimisations;
 
 namespace SimpleCompiler
 {
     public class SimpleCompilerMain
     {
-        public static void Main(string[] args)
-        {
+        public static void Main(string[] args) {
             string FileName = @"../../../data/a.txt";
             if (args.Length > 0)
                 FileName = args[0];
-            try
-            {
+            try {
                 string Text = File.ReadAllText(FileName);
 
                 Scanner scanner = new Scanner();
@@ -36,7 +37,6 @@ namespace SimpleCompiler
 
                     FillParentVisitor generateParrent = new FillParentVisitor();
                     r.Visit(generateParrent);
-
 
 					//Console.WriteLine(r.ToString());
 
