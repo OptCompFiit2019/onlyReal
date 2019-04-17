@@ -32,18 +32,28 @@ namespace SimpleLang
                     .SelectMany(e => e).Where(tc_cur => tc_cur.result == tc.result))
             ).ToList();
 
-        public HashSet<ThreeCode> Kill(BasicBlock bb)
-            => InstructionKills(bb).Aggregate((s1, s2) =>
-                new HashSet<ThreeCode>(s1.Union(s2))
-            );
+		public HashSet<ThreeCode> Kill(BasicBlock bb)
+		{
+			var kills = InstructionKills(bb);
+			if (kills.Count == 0)
+				return new HashSet<ThreeCode>();
+			else
+				return kills.Aggregate((s1, s2) =>
+					new HashSet<ThreeCode>(s1.Union(s2))
+			);
+		}
 
         public HashSet<ThreeCode> Gen(BasicBlock bb)
         {
-            var gens = InstructionGens(bb);
+            var gens = InstructionGens(new LinkedList<ThreeCode>
+				(bb.GroupBy(tc => tc.result, (tc, e) => e.Last())));
             var kills = InstructionKills(bb);
 
             int n = gens.Count;
-            HashSet<ThreeCode> gen = gens[n];
+			if (n <= 0)
+				return new HashSet<ThreeCode>();
+
+            HashSet<ThreeCode> gen = gens[n - 1];
             for (int i = n - 2; i >= 0; --i)
             {
                 var gen_cur = gens[i];
