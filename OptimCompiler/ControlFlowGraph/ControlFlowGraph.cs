@@ -72,6 +72,24 @@ namespace SimpleLang.ControlFlowGraph
 
             return result;
         }
+
+        public List<int> GetInputNodes(int node_id)
+        {
+            var res = new List<int>();
+            for (var i = 0; i < this.n; ++i)
+                if (this.g[i * this.n + node_id] == 1)
+                    res.Add(i);
+            return res;
+        }
+        
+        public List<int> GetOutputNodes(int node_id)
+        {
+            var res = new List<int>();
+            for (var j = 0; j < this.n; ++j)
+                if (this.g[node_id * this.n + j] == 1)
+                    res.Add(j);
+            return res;
+        }
     }
     
     public class ControlFlowGraph
@@ -92,7 +110,7 @@ namespace SimpleLang.ControlFlowGraph
             cfg = new Graph(this.blocks.Count);
         }
 
-        public void GenerateCFG()
+        public ControlFlowGraph GenerateCFG()
         {
             for (var i = 0; i < this.blocks.Count; ++i)
                 for (var j = 0; j < this.blocks.Count; ++j)
@@ -116,6 +134,8 @@ namespace SimpleLang.ControlFlowGraph
                             bi++;
                         }
                     }
+
+            return this;
         }
 
         public int[,] GetAsAdjacencyMatrix()
