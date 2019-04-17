@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TreeCodeOptimisations\DAG.cs" />
+    <Compile Include="TreeCodeOptimisations\PullCopies.cs" />
     <Compile Include="Visitor\Visitor.cs" />
     <Compile Include="Block\Block.cs" />
     <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />
