@@ -1,7 +1,9 @@
 {
-	x = x;
-	b = 5;
-	a = b - b;
+	b= 123;
+	c = 321;
+	b = b + 321;
+	c = c+b - 321;
+	d = c + b;
 
 	if ((a==true) && (b == false))
 	{
@@ -10,13 +12,6 @@
 			h = 1;
 	}
 
-
-
-	for (i=1 to 100){
-		for(j=1 to 100){
-			a = a + b;
-		}
-	}
 
 	while (gg) {
 		hh=23;
