@@ -56,23 +56,23 @@
     <Compile Include="Visitors\StatementCountVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="ControlFlowGraph/ControlFlowGraph.cs" />
+    <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />
     <Compile Include="TransferFunction.cs" />
-    <Compile Include="ParserHelper.cs" />
-    <Compile Include="ProgramTree.cs" />
+    <Compile Include="Syntax\ParserHelper.cs" />
+    <Compile Include="Syntax\ProgramTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShiftReduceParserCode.cs" />
-    <Compile Include="SimpleLex.cs" />
-    <Compile Include="SimpleYacc.cs" />
+    <Compile Include="Syntax\ShiftReduceParserCode.cs" />
+    <Compile Include="Syntax\SimpleLex.cs" />
+    <Compile Include="Syntax\SimpleYacc.cs" />
     <Compile Include="Visitors\ThreeAddressCodeVisitor.cs" />
     <Compile Include="Visitors\ChangeVisitor.cs" />
     <Compile Include="Visitors\Opt11Visitor.cs" />
     <Compile Include="Visitors\FillParentVisitor.cs" />
-    <Compile Include="ThreeOptimize\ApplyConst.cs" />
-    <Compile Include="ThreeOptimize\ThreeCodeApplyer.cs" />
-    <Compile Include="ThreeOptimize\ApplyConstExpr.cs" />
-    <Compile Include="ThreeOptimize\Applyer.cs" />
-    <Compile Include="Block.cs" />
+    <Compile Include="ThreeOptimize\EvalConstExpr.cs" />
+    <Compile Include="ThreeOptimize\ThreeCodeOptimiser.cs" />
+    <Compile Include="ThreeOptimize\DistributionOfConstants.cs" />
+    <Compile Include="ThreeOptimize\AutoThreeCodeOptimiser.cs" />
+    <Compile Include="Block\Block.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

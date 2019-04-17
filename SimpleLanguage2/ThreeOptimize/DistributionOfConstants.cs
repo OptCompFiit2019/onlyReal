@@ -1,23 +1,23 @@
 ﻿using System;
-namespace SimpleLang.ThreeOptimize
+using System.Collections.Generic;
+
+namespace SimpleLang.ThreeCodeOptimisations
 {
-    public class ApplyConst: ThreeCodeApplyer
+    public class DistributionOfConstants : ThreeCodeOptimiser
     {
         private bool _apply = false;
 
-        public ApplyConst()
+        public DistributionOfConstants()
         {
         }
         public bool Applyed()
         {
             return _apply;
         }
-        public void Apply(System.Collections.Generic.LinkedList<Visitors.ThreeCode> program){
+        public void Apply(LinkedList<Visitors.ThreeCode> program){
             _apply = false;
-            //ToDO
-            //код оптимизирует for, что неправильно. Нужнообновить код после добавления 
-            // разбиения на базовые блоки
-            System.Collections.Generic.Dictionary<String, Visitors.ThreeAddressValueType> replace = new System.Collections.Generic.Dictionary<string, Visitors.ThreeAddressValueType>();
+
+            Dictionary<String, Visitors.ThreeAddressValueType> replace = new Dictionary<string, Visitors.ThreeAddressValueType>();
             for (var it = program.First; it != null; it = it.Next){
 
                 if (replace.ContainsKey(it.Value.result)) {

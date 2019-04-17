@@ -1,33 +1,29 @@
 ﻿using System;
-namespace SimpleLang.ThreeOptimize
-{
-    public class ApplyConstExpr : ThreeCodeApplyer
-    {
+using System.Collections.Generic;
+
+namespace SimpleLang.ThreeCodeOptimisations{
+
+    public class EvalConstExpr : ThreeCodeOptimiser{
         private bool _apply = false;
 
-        public ApplyConstExpr()
+        public EvalConstExpr()
         {
         }
-        public bool Applyed()
-        {
-            return _apply;
-        }
-        private void Set(System.Collections.Generic.LinkedListNode<Visitors.ThreeCode> it, int res) {
+        public bool Applyed() => _apply;
+
+        private void Set(LinkedListNode<Visitors.ThreeCode> it, int res) {
             it.Value.operation = Visitors.ThreeOperator.Assign;
             it.Value.arg1 = new Visitors.ThreeAddressIntValue(res);
             _apply = true;
         }
-        private void Set(System.Collections.Generic.LinkedListNode<Visitors.ThreeCode> it, bool res){
+        private void Set(LinkedListNode<Visitors.ThreeCode> it, bool res){
             it.Value.operation = Visitors.ThreeOperator.Assign;
             it.Value.arg1 = new Visitors.ThreeAddressLogicValue(res);
             _apply = true;
         }
-        public void Apply(System.Collections.Generic.LinkedList<Visitors.ThreeCode> program)
-        {
+        public void Apply(LinkedList<Visitors.ThreeCode> program) {
             _apply = false;
-            // ToDO
-            // Оптимизировать для базовых блоков.
-            // Работать будет и без базовых блоков, но нужно под базовые блоки переделть
+
             for (var it = program.First; it != null; it = it.Next) {
                 int iarg1 = 0;
                 bool iarg1val = false;

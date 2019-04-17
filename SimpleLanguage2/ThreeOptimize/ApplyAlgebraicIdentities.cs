@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using SimpleLang.Visitors;
 
-namespace SimpleLang.ThreeOptimize
+namespace SimpleLang.ThreeCodeOptimisations
 {
-	class ApplyAlgebraicIdentities : ThreeCodeApplyer
-	{
+	class ApplyAlgebraicIdentities : ThreeCodeOptimiser
+    {
 		private bool _apply = false;
 
 		public ApplyAlgebraicIdentities()

@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using SimpleLang.Visitors;
 using SimpleLang.Block;
-namespace SimpleLang.ThreeOptimize
-{
-    public class Applyer: ThreeCodeApplyer
-    {
-        private List<ThreeCodeApplyer> dd = new List<ThreeCodeApplyer>();
+
+namespace SimpleLang.ThreeCodeOptimisations{
+
+    public class AutoThreeCodeOptimiser: ThreeCodeOptimiser{
+        private List<ThreeCodeOptimiser> dd = new List<ThreeCodeOptimiser>();
         private bool b = false;
-        public Applyer() { }
-        public void Add(ThreeCodeApplyer a) { dd.Add(a);  }
-        public void Apply(System.Collections.Generic.LinkedList<Visitors.ThreeCode> program) {
+
+        public void Add(ThreeCodeOptimiser a) { dd.Add(a);  }
+        public void Apply(LinkedList<ThreeCode> program) {
             bool need = true;
             while (need) {
                 need = false;
@@ -25,7 +25,7 @@ namespace SimpleLang.ThreeOptimize
             }
         }
         public List<LinkedList<ThreeCode>> Apply(ThreeAddressCodeVisitor visit) {
-            SimpleLang.Block.Block bl = new SimpleLang.Block.Block(visit);
+            Block.Block bl = new Block.Block(visit);
             List<LinkedList<ThreeCode>> res = bl.GenerateBlocks();
 
             for (int i = 0; i < res.Count; i++) {
