@@ -192,7 +192,7 @@ namespace SimpleLang.Visitors {
 
     //Visitor
     public class ThreeAddressCodeVisitor : Visitor {
-        LinkedList<ThreeCode> program = new LinkedList<ThreeCode>();
+        public LinkedList<ThreeCode> program = new LinkedList<ThreeCode>();
 
         public LinkedList<ThreeCode> GetCode() {
             if (currentLabel.Length > 0) {
