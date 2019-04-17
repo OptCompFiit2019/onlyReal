@@ -5,18 +5,18 @@ using System.Reflection;
 using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
+using SimpleLang;
 using SimpleLang.Visitors;
 
-using SimpleLang.Block;
-using SimpleLang.ControlFlowGraph;
-using SimpleLang.ThreeCodeOptimisations;
+using SimpleLang.ThreeOptimize;
+using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 
 namespace SimpleCompiler
 {
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
-            string FileName = @"../../../data/a.txt";
+            string FileName = @"../../../data/a7.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -95,7 +95,24 @@ namespace SimpleCompiler
                     var blocks = app.Apply(treeCode);
                     Console.WriteLine(ThreeAddressCodeVisitor.ToString(blocks));
 
-                    var code = treeCode.GetCode();
+					CFG cfg = new CFG(blocks);
+					TransferFunction tf = new TransferFunction(cfg);
+					Console.WriteLine("\nGen 1");
+					foreach (var d in tf.Gen(blocks[0]))
+						Console.WriteLine(d);
+					Console.WriteLine("\nGen");
+					foreach (var d in tf.Gen(blocks[3]))
+						Console.WriteLine(d);
+					Console.WriteLine("\nKill");
+					foreach (var d in tf.Kill(blocks[3]))
+						Console.WriteLine(d);
+
+					Console.WriteLine("\nTransfer function");
+					var f = tf.BlockTransferFunction(blocks[3]);
+					foreach (var d in f(tf.Gen(blocks[0])))
+						Console.WriteLine(d);
+
+					var code = treeCode.GetCode();
                     app.Apply(code);
 
 
