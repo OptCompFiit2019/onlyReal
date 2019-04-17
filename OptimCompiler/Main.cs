@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Reflection;
@@ -7,8 +7,7 @@ using SimpleScanner;
 using SimpleParser;
 using SimpleLang;
 using SimpleLang.Visitors;
-
-using SimpleLang.ThreeOptimize;
+using SimpleLang.ThreeCodeOptimisations;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 
 namespace SimpleCompiler
