@@ -34,7 +34,8 @@ namespace SimpleLang.Optimisations
             if (p is AssignNode || p is ExprNode) {
                 throw new Exception("Родительский узел не содержит операторов");
             }
-            to.Parent = p;
+            if(to != null)
+                to.Parent = p;
             if (p is BlockNode bln) // Можно переложить этот код на узлы!
             {
                 for (var i=0; i<bln.StList.Count-1; i++)

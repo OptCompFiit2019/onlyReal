@@ -1,0 +1,8 @@
+{
+	a = 2;
+	while (false)
+	{
+		println(b);
+		a = 1;
+	}
+}
