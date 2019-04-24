@@ -69,10 +69,9 @@ namespace SimpleCompiler
                         i += 1;
                     }
 
-                    var cfg = new ControlFlowGraph(treeCode);
-                    cfg.GenerateCFG();
+                    var cfg = new ControlFlowGraph(treeCode).GenerateCFG().GetAsGraph();
                     Console.WriteLine("\nControl flow graph:");
-                    Console.WriteLine(cfg.GetAsGraph());
+                    Console.WriteLine(cfg);
                 }
             }
             catch (FileNotFoundException)
