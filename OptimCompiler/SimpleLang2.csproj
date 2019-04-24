@@ -45,10 +45,12 @@
   <ItemGroup>
     <Compile Include="AstOptimisations\OptMulDivOneVisitor.cs" />
     <Compile Include="AstOptimisations\OptWhileVisitor.cs" />
+    <Compile Include="AstOptimisations\PlusNonZero.cs" />
     <Compile Include="AstOptimisations\PrettyPrintVisitor.cs" />
     <Compile Include="TreeCodeOptimisations\DAG.cs" />
     <Compile Include="TreeCodeOptimisations\DeadOrAliveOptimization.cs" />
     <Compile Include="TreeCodeOptimisations\LVNOptimization.cs" />
+    <Compile Include="TreeCodeOptimisations\NonZeroOperator.cs" />
     <Compile Include="TreeCodeOptimisations\PullCopies.cs" />
     <Compile Include="Visitor\Visitor.cs" />
     <Compile Include="Block\Block.cs" />
