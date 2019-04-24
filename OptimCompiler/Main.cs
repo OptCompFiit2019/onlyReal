@@ -84,7 +84,7 @@ namespace SimpleCompiler
                 Console.WriteLine("{0}", e);
             }
 
-            // Console.ReadLine();
+            Console.ReadLine();
         }
 
     }
