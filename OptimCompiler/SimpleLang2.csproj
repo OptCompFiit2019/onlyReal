@@ -73,6 +73,8 @@
     <Compile Include="ThreeOptimize\DistributionOfConstants.cs" />
     <Compile Include="ThreeOptimize\AutoThreeCodeOptimiser.cs" />
     <Compile Include="Block\Block.cs" />
+    <Compile Include="Compiler\ILCodeGenerator.cs" />
+    <Compile Include="Compiler\GenCodeCreator.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
