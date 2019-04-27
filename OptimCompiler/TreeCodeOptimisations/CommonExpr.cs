@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SimpleLang.Visitors
 {
-    class PullCopiesBlocks
+    class CommonExprBlocks
     {
         private LinkedList<ThreeCode> program;
         public LinkedList<ThreeCode> Program
@@ -15,7 +15,7 @@ namespace SimpleLang.Visitors
         }
         public ThreeAddressCodeVisitor treecode;
 
-        public PullCopiesBlocks(ThreeAddressCodeVisitor code)
+        public CommonExprBlocks(ThreeAddressCodeVisitor code)
         {
             treecode = code;
             Program = code.program;
@@ -29,7 +29,7 @@ namespace SimpleLang.Visitors
             {
                 if (blocks[i].Count > 1)
                 {
-                    var graph = new PullCopies(blocks[i].ToList());
+                    var graph = new CommonExpr(blocks[i].ToList());
                     var prog = graph.Optimize();
                     foreach (var cmd in prog)
                         result.Add(cmd);
@@ -41,11 +41,12 @@ namespace SimpleLang.Visitors
         }
     }
 
-    class PullCopies
+
+    class CommonExpr 
     {
         public List<ThreeCode> program;
 
-        public PullCopies(List<ThreeCode> prog)
+        public CommonExpr(List<ThreeCode> prog)
         {
             program = MakeProgram(prog);
         }
@@ -74,29 +75,41 @@ namespace SimpleLang.Visitors
 
         public LinkedList<ThreeCode> Optimize()
         {
-            for (int i = 0; i < program.Count - 1; i++)
-            {
-                string def;
-                ThreeAddressValueType newArg;
-                if (program[i].arg2 == null)
-                {
-                    def = program[i].result;
-                    newArg = program[i].arg1;
-                }
-                else
-                    continue;
-                for (int j = i + 1; j < program.Count; j++)
-                {
-                    if (program[j].result == def)
-                        break;
-                    if (program[j].arg1 != null && program[j].arg1.ToString() == def)
-                        program[j].arg1 = newArg;
+            var result = new List<ThreeCode>();
 
-                    if (program[j].arg2 != null && program[j].arg2.ToString() == def)
-                        program[j].arg2 = newArg;
+            //идем по каждой команде в блоке
+            for (int j = 0; j < program.Count; j++)
+            {
+                var mainCommand = program[j];
+                result.Add(mainCommand);
+                //использовалась ли раньше такая команда в этом блоке?
+                for (int k = j - 1; k >= 0; k--)
+                {
+                    var flag = false;
+                    var tempCommand = program[k];
+                    if (mainCommand.arg2 != null && tempCommand.arg2 != null &&
+                        mainCommand.arg1.Equals(tempCommand.arg1) && mainCommand.operation.Equals(tempCommand.operation) && mainCommand.arg2.Equals(tempCommand.arg2))
+                    {
+                        //если да, то в промежутке между этими определениями менялись ли arg1 или arg2?
+                        for (int m = k + 1; m < j; m++)
+                        {
+                            var def = program[m];
+                            if (!(def.result == tempCommand.arg1.ToString() || def.result == tempCommand.arg2.ToString()))
+                            {
+                                result[result.Count - 1] = new ThreeCode(mainCommand.result, new ThreeAddressStringValue(tempCommand.result));//какой тип должен быть??????
+                                flag = true;
+                                break;
+                            }
+                        }
+                        //если вдруг одинаковые команды идут друг за другом
+                        if (k + 1 == j)
+                            result[result.Count - 1] = new ThreeCode(mainCommand.result, new ThreeAddressStringValue(tempCommand.result));
+                    }
+                    if (flag) break;
                 }
             }
-            return new LinkedList<ThreeCode>(program);
+            
+            return new LinkedList<ThreeCode>(result);
         }
     }
 }
