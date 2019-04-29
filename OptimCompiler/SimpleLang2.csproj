@@ -47,6 +47,8 @@
     <Compile Include="AstOptimisations\OptWhileVisitor.cs" />
     <Compile Include="AstOptimisations\PlusNonZero.cs" />
     <Compile Include="AstOptimisations\PrettyPrintVisitor.cs" />
+    <Compile Include="TransmissionFunction\TransmissionsChain.cs" />
+    <Compile Include="TransmissionFunction\TransmissionFunction.cs" />
     <Compile Include="TreeCodeOptimisations\DAG.cs" />
     <Compile Include="TreeCodeOptimisations\DeadOrAliveOptimization.cs" />
     <Compile Include="TreeCodeOptimisations\LVNOptimization.cs" />
