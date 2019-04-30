@@ -86,6 +86,15 @@ namespace SimpleCompiler
                     r.Visit(treeCode);
                     Console.WriteLine(treeCode.ToString());
 
+                    SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                    gen.Generate(treeCode.GetCode());
+                    var lst = gen.GetGenerator().commands;
+                    foreach(string cmd in lst)
+                    {
+                        Console.WriteLine(cmd);
+                    }
+                    return;
+
                     AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
                     app.Add(new DistributionOfConstants());
                     app.Add(new EvalConstExpr());
