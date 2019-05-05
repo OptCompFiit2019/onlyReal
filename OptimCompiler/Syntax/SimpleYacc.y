@@ -14,23 +14,23 @@
             public Node nVal;
             public ExprNode eVal;
             public StatementNode stVal;
-            public LogicExprNode logVal;
             public BlockNode blVal;
+			public type tVal;
        }
 
 %using ProgramTree;
 
 %namespace SimpleParser
 
-%token BEGIN END ASSIGN SEMICOLON WHILE FOR TO PRINTLN PRINTLN LPAREN RPAREN IF THEN ELSE VAR COLUMN ADD SUB MULT DIV LOGIC_AND LOGIC_OR LOGIC_NOT TRUE FALSE EQUALS GTHAN LTHAN GEQ LEQ NEQ
+%token BEGIN END ASSIGN SEMICOLON COLON WHILE FOR TO PRINTLN PRINTLN LPAREN RPAREN IF THEN ELSE VAR COLUMN ADD SUB MULT DIV LOGIC_AND LOGIC_OR LOGIC_NOT TRUE FALSE EQUALS GTHAN LTHAN GEQ LEQ NEQ TINT TDOUBLE TBOOL
 %token <iVal> INUM 
 %token <dVal> RNUM 
 %token <sVal> ID
 
-%type <eVal> expr ident T F
-%type <logVal> logic_expr logic_T  logic_F logic_E logic_D
+%type <eVal> expr ident LT LF E T F
 %type <stVal> assign statement while for println if var varlist
 %type <blVal> stlist block
+%type <tVal> type_
 
 %%
 
@@ -57,20 +57,37 @@ statement: assign SEMICOLON { $$ = $1; }
         | block   { $$ = $1; }
     ;
 
-ident   : ID { $$ = new IdNode($1); }   
+ident   : ID
+            {
+				$$ = new IdNode($1);
+                if (!InDefSect)
+				{
+                    if (!SymbolTable.vars.ContainsKey($1))
+                        throw new Exception("("+@1.StartLine+","+@1.StartColumn+"): Переменная "+$1+" не описана");
+					$$.Type = SymbolTable.vars[$1];
+                }
+            }   
         ;
 
 println   : PRINTLN LPAREN expr RPAREN { $$ = new PrintlnNode($3); }
         ;
     
-assign  : ident ASSIGN expr { $$ = new AssignNode($1 as IdNode, $3); }
+assign  : ident ASSIGN expr { $$ = new AssignNode($1 as IdNode, $3, @3); }
         ;
         
+type_   : TINT { $$ = type.tint; }
+        | TDOUBLE { $$ = type.tdouble; }
+		| TBOOL { $$ = type.tbool; }
+		;
         
-var		: VAR { InDefSect = true; } varlist 
+var		: VAR { InDefSect = true; } varlist COLON type_
 		{ 
 			foreach (var v in ($3 as VarDefNode).vars)
-				SymbolTable.NewVarDef(v.Name, type.tint);
+			{
+				SymbolTable.NewVarDef(v.Name, $5);
+				v.Type = $5;
+			}
+			$$ = $3;
 			InDefSect = false;	
 		}
 		;
@@ -86,53 +103,39 @@ varlist	: ident
 		}
 		;
 
+expr    : LT { $$ = $1; }
+        | expr EQUALS LT { $$ = new LogicOpNode($1, $3, "==", @2); }
+        | expr GTHAN LT { $$ = new LogicOpNode($1, $3, ">", @2); }
+        | expr LTHAN LT { $$ = new LogicOpNode($1, $3, "<", @2); }
+        | expr GEQ LT { $$ = new LogicOpNode($1, $3, ">=", @2); }
+        | expr LEQ LT { $$ = new LogicOpNode($1, $3, "<=", @2); }
+        | expr NEQ LT { $$ = new LogicOpNode($1, $3, "!=", @2); }
+        ;
 
-//expr  : ident  { $$ = $1 as IdNode; }
-//      | INUM { $$ = new IntNumNode($1); }
-//      ;
+LT      : LF { $$ = $1; }
+        | LT LOGIC_OR LF { $$ = new BinOpNode($1, $3, "||", @2); }
+        ;
 
-logic_expr  :   logic_T { $$ = $1; }
-            |   logic_expr LOGIC_OR logic_T { $$ = new LogicOpNode($1, $3, "||"); }
-            ;
-            
-            //logic_equals  : expr EQUALS expr { $$ = new EqualsNode($1, $3); }
-//        ;
-logic_T     :   logic_F { $$ = $1 as LogicExprNode; }
-            |   logic_T LOGIC_AND logic_F { $$ = new LogicOpNode($1, $3, "&&"); }
-            ;
-            
-logic_F     :   logic_E { $$ = $1 as LogicExprNode; }
-            |   logic_E EQUALS logic_E  { $$ = new LogicOpNode($1, $3, "=="); }
-            |   logic_E GTHAN logic_E  { $$ = new LogicOpNode($1, $3, ">"); }
-            |   logic_E LTHAN logic_E  { $$ = new LogicOpNode($1, $3, "<"); }
-            |   logic_E GEQ logic_E  { $$ = new LogicOpNode($1, $3, ">="); }
-            |   logic_E LEQ logic_E  { $$ = new LogicOpNode($1, $3, "<="); }
-            |   logic_E NEQ logic_E  { $$ = new LogicOpNode($1, $3, "!="); }
-            ;
+LF      : E { $$ = $1; }
+        | LF LOGIC_AND E { $$ = new BinOpNode($1, $3, "&&", @2); }
+        ;
 
-logic_E     :   logic_D { $$ = $1 as LogicExprNode; }
-            |   LOGIC_NOT logic_D { $$ = new LogicNotNode($2); }
-            ;
-
-logic_D		:   ident {$$ = new LogicIdNode($1 as IdNode); }
-            |   TRUE { $$ = new BooleanNode(true); }
-            |   FALSE { $$ = new BooleanNode(false); }
-            |   LPAREN logic_expr RPAREN { $$ = $2 as LogicExprNode; }
-            ;
-
-expr    : T { $$ = $1; }
-        | expr ADD T { $$ = new BinOpNode($1, $3, '+'/*SimpleParser.Tokens.ADD*/); }
-        | expr SUB T { $$ = new BinOpNode($1, $3, '-'/*SimpleParser.Tokens.SUB*/); }
+E       : T { $$ = $1; }
+        | E ADD T { $$ = new BinOpNode($1, $3, "+"/*SimpleParser.Tokens.ADD*/, @2); }
+        | E SUB T { $$ = new BinOpNode($1, $3, "-"/*SimpleParser.Tokens.SUB*/, @2); }
         ;
         
-T       : F { $$ = $1 as ExprNode; }
-        | T MULT F { $$ = new BinOpNode ( $1, $3, '*'/*SimpleParser.Tokens.MULT*/); }
-        | T DIV F { $$ = new BinOpNode ($1, $3, '/'/*SimpleParser.Tokens.DIV*/); }
+T       : F { $$ = $1; }
+        | T MULT F { $$ = new BinOpNode ( $1, $3, "*"/*SimpleParser.Tokens.MULT*/, @2); }
+        | T DIV F { $$ = new BinOpNode ($1, $3, "/"/*SimpleParser.Tokens.DIV*/, @2); }
+		| LOGIC_NOT F { $$ = new LogicNotNode($2, @1); }
         ;
-        
+
 F       : ident { $$ = $1 as IdNode; }
         | INUM { $$ = new IntNumNode($1); }
         | RNUM { $$ = new DoubleNumNode($1); }
+		| TRUE { $$ = new BooleanNode(true); }
+        | FALSE { $$ = new BooleanNode(false); }
         | LPAREN expr RPAREN { $$ = $2 as ExprNode; }
         ;
         
@@ -140,17 +143,16 @@ F       : ident { $$ = $1 as IdNode; }
   //      | params ZP expr {$$ = new ParamsNode($3, $1 as ParamsNode); }
     //    ;
         
-if      : IF LPAREN logic_expr RPAREN statement { $$ = new IfNode($3, $5); }
-        | IF LPAREN logic_expr RPAREN statement ELSE statement { $$ = new IfNode($3, $5, $7); }
+if      : IF LPAREN expr RPAREN statement { $$ = new IfNode($3, $5); }
+        | IF LPAREN expr RPAREN statement ELSE statement { $$ = new IfNode($3, $5, $7); }
         ;
 
 block   : BEGIN stlist END { $$ = $2; }
         ;
         
         
-while   : WHILE LPAREN logic_expr RPAREN statement { $$ = new WhileNode($3, $5); }
+while   : WHILE LPAREN expr RPAREN statement { $$ = new WhileNode($3, $5); }
         ;
-        
         
 for     : FOR LPAREN assign TO expr RPAREN statement { $$ = new ForNode($3 as AssignNode, $5, $7); }
         ;

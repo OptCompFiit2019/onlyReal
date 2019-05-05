@@ -4,7 +4,7 @@ using System;
 namespace SimpleParser
 {
 
-    public enum type { tint, tdouble };
+    public enum type { tint, tdouble, tbool };
 
     public static class SymbolTable // Таблица символов
     {
@@ -14,6 +14,17 @@ namespace SimpleParser
             if (vars.ContainsKey(name))
                 throw new Exception("Переменная " + name + " уже определена");
             else vars.Add(name, t);
+        }
+
+        public static string TypeName(type t)
+        {
+            switch (t)
+            {
+                case type.tint: return "int";
+                case type.tdouble: return "double";
+                case type.tbool: return "bool";
+                default: return null;
+            }
         }
     }
 

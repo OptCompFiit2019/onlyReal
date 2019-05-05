@@ -1,0 +1,19 @@
+{
+	var b: int;
+	b = b * 0;
+	b = 1 * b;
+	b = b * 1;
+	b = b + 0;
+	b = 0 + b;
+	b = b - 0;
+	b = b - b;
+	b = b / 1;
+	b = b / b;
+
+	var rel: bool;
+	rel = b + 1 < 5;
+	if (rel && rel)
+	{
+		b = 0;
+	}
+}

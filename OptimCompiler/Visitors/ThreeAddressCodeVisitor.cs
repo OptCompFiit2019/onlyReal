@@ -343,9 +343,6 @@ namespace SimpleLang.Visitors
                 st.Visit(this);
         }
 
-       
-
-
         private ThreeAddressValueType GenVariable(ExprNode expr) {
 
             if (expr is IdNode)
@@ -366,14 +363,8 @@ namespace SimpleLang.Visitors
                 return new ThreeAddressStringValue(res);
             }
 
-            throw new Exception("UNKNOW VALUE. Send autors of ThreeAddressCode");
-        }
-        private ThreeAddressValueType GenVariable(LogicExprNode expr)
-        {
             if (expr is BooleanNode)
                 return new ThreeAddressLogicValue((expr as BooleanNode).Val);
-            if (expr is LogicIdNode)
-                return new ThreeAddressStringValue((expr as LogicIdNode).Name.Name);
 
             if (expr is LogicOpNode)
             {
@@ -397,11 +388,13 @@ namespace SimpleLang.Visitors
 
             throw new Exception("UNKNOW VALUE. Send autors of ThreeAddressCode");
         }
+        
         private string GenTempVariable(){
             string res = "temp_" + currentTempVarIndex.ToString();
             currentTempVarIndex++;
             return res;
         }
+
         private string GenLabel(){
             string res = "label_" + currentLabelIndex.ToString();
             currentLabelIndex++;
