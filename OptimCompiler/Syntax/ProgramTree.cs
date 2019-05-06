@@ -34,7 +34,7 @@ namespace ProgramTree
     public class DoubleNumNode : ExprNode
     {
         public double Num { get; set; }
-        public DoubleNumNode(double num) { Num = num; Type = type.tdouble; }
+        public DoubleNumNode(double num) { Num = num; Type = type.treal; }
         public override void Visit(Visitor v)
         {
 			v.VisitDoubleNumNode(this);
@@ -72,8 +72,8 @@ namespace ProgramTree
             this.Left = Left;
             this.Right = Right;
             this.Op = op;
-            Type = Left.Type == type.tdouble || Right.Type == type.tdouble ?
-                type.tdouble :
+            Type = Left.Type == type.treal || Right.Type == type.treal ?
+                type.treal :
                 type.tint;
         }
         public override void Visit(Visitor v)
@@ -97,7 +97,8 @@ namespace ProgramTree
         public AssignType AssOp { get; set; }
         public AssignNode(IdNode id, ExprNode expr, LexLocation exprLoc, AssignType assop = AssignType.Assign)
         {
-            if (id.Type == type.tbool ^ expr.Type == type.tbool)
+            if (id.Type == type.tbool ^ expr.Type == type.tbool
+                    || id.Type == type.tint && expr.Type == type.treal)
                 throw new Exception($"({exprLoc.StartLine},{exprLoc.StartColumn}): Переменной типа " +
                     $"\"{TypeName(id.Type)}\" нельзя присвоить значение типа \"{TypeName(expr.Type)}\".");
             Id = id;

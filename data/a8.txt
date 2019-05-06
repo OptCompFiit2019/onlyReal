@@ -1,5 +1,5 @@
 {
-	var b: int;
+	int b;
 	b = b * 0;
 	b = 1 * b;
 	b = b * 1;
@@ -10,7 +10,7 @@
 	b = b / 1;
 	b = b / b;
 
-	var rel: bool;
+	bool rel;
 	rel = b + 1 < 5;
 	if (rel && rel)
 	{

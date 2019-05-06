@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using SimpleLang.Visitors;
+using SimpleParser;
 
 namespace SimpleLang.Compiler
 {
@@ -35,7 +36,7 @@ namespace SimpleLang.Compiler
                 case 2:
                     return genc.DeclareLocal(typeof(double));
                 default:
-                    throw new Exception("Unknow type.");
+                    throw new Exception("Unknown type");
             }
         }
 
@@ -67,7 +68,7 @@ namespace SimpleLang.Compiler
             if (val is ThreeAddressDoubleValue valueDouble)
                 return 2;
 
-            throw new Exception("Unknow type");
+            throw new Exception("Unknown type");
         }
         /// <summary>
         /// Создать переменную и добавить в список переменных
@@ -83,7 +84,7 @@ namespace SimpleLang.Compiler
             int type = DetectType(varTypes, val);
             if (varTypes.ContainsKey(name)) {
                 if (varTypes[name] != type)
-                    throw new Exception("Previus declaration is different");
+                    throw new Exception("Previous declaration is different");
                 return type;
             }
             var v = CreateVariable(type);
@@ -100,11 +101,10 @@ namespace SimpleLang.Compiler
         /// <param name="name">Имя создаваемой переменной</param>
         /// <param name="val1">Тип переменной 1 трехадресного кода</param>
         /// <param name="val2">Тип переменной 2 трехадресного кода</param>
-        private int AddVariable(ref Dictionary<string, int> varTypes, string name, ThreeAddressValueType val1, ThreeAddressValueType val2 ) {
+        private int AddVariable(ref Dictionary<string, int> varTypes, string name,
+                ThreeAddressValueType val1, ThreeAddressValueType val2, bool isLogic) {
             if (name == null || name.Length == 0)
                 throw new Exception("Variable name is null");
-            //if (variables.ContainsKey(name))
-             //   throw new Exception("Variable " + name + " allready exists.");
 
             int type1 = DetectType(varTypes, val1);
             int type2 = DetectType(varTypes, val2);
@@ -112,21 +112,23 @@ namespace SimpleLang.Compiler
             if (type1 == type2) {
                 if (varTypes.ContainsKey(name)) {
                     if (varTypes[name] != type1)
-                        throw new Exception("Previus declaration is different");
+                        throw new Exception("Previous declaration is different");
                     return type1;
                 }
 
-                var v = CreateVariable(type1);
+                int type = isLogic ? 1 : type1;
+
+                var v = CreateVariable(type);
                 variables.Add(name, v);
-                varTypes.Add(name, type1);
-                return type1;
+                varTypes.Add(name, type);
+                return type;
             }
 
             // int + double = double
             if ((type1 == 0 && type2 == 2) || (type1 == 2 && type2 == 0)) {
                 if (varTypes.ContainsKey(name)) {
                     if (varTypes[name] != 2)
-                        throw new Exception("Previus declaration is different");
+                        throw new Exception("Previous declaration is different");
                     return varTypes[name];
                 }
                 var v = CreateVariable(2);
@@ -137,34 +139,7 @@ namespace SimpleLang.Compiler
 
             //ToDo Подумать результаты операций
 
-            // int + bool = int
-            if ((type1 == 0 && type2 == 1) || (type1 == 1 && type2 == 0)) {
-                if (varTypes.ContainsKey(name)) {
-                    if (varTypes[name] != 0)
-                        throw new Exception("Previus declaration is different");
-                    return varTypes[name];
-                }
-
-                var v = CreateVariable(0);
-                variables.Add(name, v);
-                varTypes.Add(name, 0);
-                return 0;
-            }
-
-            // double + bool = double
-            if ((type1 == 1 && type2 == 2) || (type1 == 2 && type2 == 1)) {
-                if (varTypes.ContainsKey(name)) {
-                    if (varTypes[name] != 2)
-                        throw new Exception("Previus declaration is different");
-                    return varTypes[name]; 
-                }
-                var v = CreateVariable(2);
-                variables.Add(name, v);
-                varTypes.Add(name, 2);
-                return 2;
-            }
-
-            throw new Exception("Unknow situation");
+            throw new Exception("Unknown situation");
         }
 
         private void Init(LinkedList<ThreeCode> code) {
@@ -177,69 +152,52 @@ namespace SimpleLang.Compiler
             // 2 - real
             Dictionary<string, int> varTypes = new Dictionary<string, int>();
 
+            foreach (var v in SymbolTable.vars)
+            {
+                int type = (int)v.Value;
+                variables.Add(v.Key, CreateVariable(type));
+                varTypes.Add(v.Key, type);
+            }
+
             for (var it = code.First; it != null; it = it.Next) {
                 //ThreeOperator {  None, Assign, Minus, Plus, Mult, Div, Goto, IfGoto,
                 //Logic_or, Logic_and, Logic_less, Logic_equal, Logic_greater, Logic_leq,
-        //Logic_not, Logic_neq };
-                ThreeCode comand = it.Value;
-
+                //Logic_not, Logic_neq };
+                ThreeCode command = it.Value;
 
                 // Создание метки
-                if (comand.label != null && comand.label.Length > 0) {
-                    if (labels.ContainsKey(comand.label))
-                        throw new Exception("Duble label.");
+                if (command.label != null && command.label.Length > 0) {
+                    if (labels.ContainsKey(command.label))
+                        throw new Exception("Label already exists");
                     Label label = genc.DefineLabel();
-                    labels.Add(comand.label, label);
+                    labels.Add(command.label, label);
                 }
 
                 // Пропускаем операторы без создания переменных
-                if (comand.operation == ThreeOperator.None 
-                        || comand.operation == ThreeOperator.Goto
-                        || comand.operation == ThreeOperator.IfGoto)
+                if (command.operation == ThreeOperator.None 
+                        || command.operation == ThreeOperator.Goto
+                        || command.operation == ThreeOperator.IfGoto)
                     continue;
 
-                if (comand.result == null || comand.result.Length == 0)
+                if (command.result == null || command.result.Length == 0)
                     throw new Exception("Variable name is null");
 
                 // Если операция принимает 1 аргумент
-                if (comand.operation == ThreeOperator.Assign) {
-                    ThreeAddressValueType value = comand.arg1;
-
-                    int type = AddVariable(ref varTypes, comand.result, value);
-                    continue;
-                }
-                if (comand.operation == ThreeOperator.Logic_not) {
-                    var v = CreateVariable(1);
-                    variables.Add(comand.result, v);
-                    varTypes.Add(comand.result, 1);
-                    continue;
-                }
-
-                // Если операция принимает 2 аргумента
-
-                // Если логическая операция
-                if (comand.operation == ThreeOperator.Logic_and
-                        || comand.operation == ThreeOperator.Logic_or
-                        || comand.operation == ThreeOperator.Logic_geq
-                        || comand.operation == ThreeOperator.Logic_leq
-                        || comand.operation == ThreeOperator.Logic_neq
-                        || comand.operation == ThreeOperator.Logic_less
-                        || comand.operation == ThreeOperator.Logic_equal
-                        || comand.operation == ThreeOperator.Logic_greater)
+                if (command.operation == ThreeOperator.Assign
+                    || command.operation == ThreeOperator.Logic_not)
+                    AddVariable(ref varTypes, command.result, command.arg1);
+                else
                 {
-                    var v = CreateVariable(1);
-                    variables.Add(comand.result, v);
-                    varTypes.Add(comand.result, 1);
-                    continue;
-                }
+                    bool isLogic = command.operation == ThreeOperator.Logic_and
+                        || command.operation == ThreeOperator.Logic_or
+                        || command.operation == ThreeOperator.Logic_geq
+                        || command.operation == ThreeOperator.Logic_leq
+                        || command.operation == ThreeOperator.Logic_neq
+                        || command.operation == ThreeOperator.Logic_less
+                        || command.operation == ThreeOperator.Logic_equal
+                        || command.operation == ThreeOperator.Logic_greater;
 
-                if (comand.operation == ThreeOperator.Minus
-                        || comand.operation == ThreeOperator.Plus
-                        || comand.operation == ThreeOperator.Div
-                        || comand.operation == ThreeOperator.Mult)
-                {
-                    int type = AddVariable(ref varTypes, comand.result, comand.arg1, comand.arg2);
-                    continue;
+                    AddVariable(ref varTypes, command.result, command.arg1, command.arg2, isLogic);
                 }
             }
         }

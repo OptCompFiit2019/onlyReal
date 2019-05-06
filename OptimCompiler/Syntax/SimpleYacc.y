@@ -22,7 +22,7 @@
 
 %namespace SimpleParser
 
-%token BEGIN END ASSIGN SEMICOLON COLON WHILE FOR TO PRINTLN PRINTLN LPAREN RPAREN IF THEN ELSE VAR COLUMN ADD SUB MULT DIV LOGIC_AND LOGIC_OR LOGIC_NOT TRUE FALSE EQUALS GTHAN LTHAN GEQ LEQ NEQ TINT TDOUBLE TBOOL
+%token BEGIN END ASSIGN SEMICOLON WHILE FOR TO PRINTLN PRINTLN LPAREN RPAREN IF THEN ELSE COLUMN ADD SUB MULT DIV LOGIC_AND LOGIC_OR LOGIC_NOT TRUE FALSE EQUALS GTHAN LTHAN GEQ LEQ NEQ TINT TREAL TBOOL
 %token <iVal> INUM 
 %token <dVal> RNUM 
 %token <sVal> ID
@@ -76,16 +76,16 @@ assign  : ident ASSIGN expr { $$ = new AssignNode($1 as IdNode, $3, @3); }
         ;
         
 type_   : TINT { $$ = type.tint; }
-        | TDOUBLE { $$ = type.tdouble; }
+        | TREAL { $$ = type.treal; }
 		| TBOOL { $$ = type.tbool; }
 		;
         
-var		: VAR { InDefSect = true; } varlist COLON type_
+var		: type_ { InDefSect = true; } varlist
 		{ 
 			foreach (var v in ($3 as VarDefNode).vars)
 			{
-				SymbolTable.NewVarDef(v.Name, $5);
-				v.Type = $5;
+				SymbolTable.NewVarDef(v.Name, $1);
+				v.Type = $1;
 			}
 			$$ = $3;
 			InDefSect = false;	

@@ -4,7 +4,7 @@ using System;
 namespace SimpleParser
 {
 
-    public enum type { tint, tdouble, tbool };
+    public enum type { tint, tbool, treal };
 
     public static class SymbolTable // Таблица символов
     {
@@ -21,7 +21,7 @@ namespace SimpleParser
             switch (t)
             {
                 case type.tint: return "int";
-                case type.tdouble: return "double";
+                case type.treal: return "real";
                 case type.tbool: return "bool";
                 default: return null;
             }

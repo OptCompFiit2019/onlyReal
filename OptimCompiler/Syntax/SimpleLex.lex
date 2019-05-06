@@ -32,7 +32,6 @@ ID {Alpha}{AlphaDigit}*
 
 "=" { return (int)Tokens.ASSIGN; }
 ";" { return (int)Tokens.SEMICOLON; }
-":" { return (int)Tokens.COLON; }
 "(" {return (int) Tokens.LPAREN; }
 ")" {return (int) Tokens.RPAREN; }
 "," { return (int) Tokens.COLUMN; }
@@ -89,11 +88,10 @@ class ScannerHelper
     keywords.Add("if", (int) Tokens.IF);
     keywords.Add("then", (int) Tokens.THEN);
     keywords.Add("else", (int) Tokens.ELSE);
-    keywords.Add("var", (int) Tokens.VAR);
     keywords.Add("true", (int) Tokens.TRUE);
     keywords.Add("false", (int) Tokens.FALSE);
 	keywords.Add("int", (int) Tokens.TINT);
-	keywords.Add("double", (int) Tokens.TDOUBLE);
+	keywords.Add("real", (int) Tokens.TREAL);
 	keywords.Add("bool", (int) Tokens.TBOOL);
   }
   public static int GetIDToken(string s)

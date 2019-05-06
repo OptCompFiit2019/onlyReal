@@ -14,7 +14,7 @@ namespace SimpleLang.Visitors
 
     // Value Types
     public class ThreeAddressValueType{
-        public override string ToString() => "UNKNOW TYPE";
+        public override string ToString() => "UNKNOWN TYPE";
     }
     public class ThreeAddressStringValue : ThreeAddressValueType {
         public string Value { get; set; }
@@ -386,7 +386,7 @@ namespace SimpleLang.Visitors
                 return new ThreeAddressStringValue(res);
             }
 
-            throw new Exception("UNKNOW VALUE. Send autors of ThreeAddressCode");
+            throw new Exception("UNKNOWN VALUE. Send to authors of ThreeAddressCode");
         }
         
         private string GenTempVariable(){
