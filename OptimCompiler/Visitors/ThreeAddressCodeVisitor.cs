@@ -9,7 +9,7 @@ namespace SimpleLang.Visitors
 
     public enum ThreeOperator {  None, Assign, Minus, Plus, Mult, Div, Goto, IfGoto,
         Logic_or, Logic_and, Logic_less, Logic_equal, Logic_greater, Logic_geq, Logic_leq,
-        Logic_not, Logic_neq };
+        Logic_not, Logic_neq, Println };
 
 
     // Value Types
@@ -176,6 +176,9 @@ namespace SimpleLang.Visitors
                 return res;
             }
 
+            if (operation == ThreeOperator.Println)
+                return "println " + arg1.ToString();
+
             res += result + " = ";
             if (operation == ThreeOperator.Logic_not)
                 return res + "!" + arg1.ToString();
@@ -269,7 +272,7 @@ namespace SimpleLang.Visitors
         }
 
         public override void VisitPrintlnNode(PrintlnNode w) {
-            throw new Exception("Is not supported");
+            AddCode(new ThreeCode("", ThreeOperator.Println, GenVariable(w.Expr)));
         }
         public override void VisitVarDefNode(VarDefNode w) {
             // В трехадресном коде нет операции создания переменной

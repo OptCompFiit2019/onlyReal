@@ -93,9 +93,10 @@ namespace SimpleCompiler
                     {
                         Console.WriteLine(cmd);
                     }
-                    return;
+                    Console.WriteLine("\nExecute:");
+                    gen.Execute();
 
-                    AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
+                    /*AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
                     app.Add(new DistributionOfConstants());
                     app.Add(new EvalConstExpr());
                     app.Add(new ApplyAlgebraicIdentities());
@@ -121,7 +122,7 @@ namespace SimpleCompiler
 						Console.WriteLine(d);
 
 					var code = treeCode.GetCode();
-                    app.Apply(code);
+                    app.Apply(code);*/
 
 
 

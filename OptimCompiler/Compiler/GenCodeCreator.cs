@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection.Emit;
 using System.Reflection;
+using SimpleParser;
 
 namespace SimpleLang.Compiler
 {
@@ -12,14 +13,32 @@ namespace SimpleLang.Compiler
         private DynamicMethod dyn;
         private ILGenerator gen;
         private bool write_commands = true;
-        private static MethodInfo writeLineInt = typeof(Console).GetMethod("WriteLine", new Type[] { typeof(int) });
+        private static MethodInfo writeLineInt, writeLineDouble, writeLineBool;
 
         public List<string> commands = new List<string>();
 
         public GenCodeCreator()
         {
             dyn = new DynamicMethod("My", null, null, typeof(void));
-            gen = dyn.GetILGenerator();
+
+            Type tcons = typeof(Console);
+            string wl = "WriteLine";
+
+            writeLineInt = tcons.GetMethod(wl, new Type[] { typeof(int) });
+            writeLineDouble = tcons.GetMethod(wl, new Type[] { typeof(double) });
+            writeLineBool = tcons.GetMethod(wl, new Type[] { typeof(bool) });
+
+        gen = dyn.GetILGenerator();
+        }
+
+        private static MethodInfo WritelnMethod(type t)
+        {
+            switch (t)
+            {
+                case type.tbool: return writeLineBool;
+                case type.tint: return writeLineInt;
+                default: return writeLineDouble;
+            }
         }
 
         public void Emit(OpCode op)
@@ -30,6 +49,13 @@ namespace SimpleLang.Compiler
         }
 
         public void Emit(OpCode op, int num)
+        {
+            gen.Emit(op, num);
+            if (write_commands)
+                commands.Add(op.ToString() + " " + num);
+        }
+
+        public void Emit(OpCode op, double num)
         {
             gen.Emit(op, num);
             if (write_commands)
@@ -74,9 +100,9 @@ namespace SimpleLang.Compiler
                 commands.Add("MarkLabel" + " Label" + l.GetHashCode());
         }
 
-        public void EmitWriteLine()
+        public void EmitWriteLine(type t = type.tint)
         {
-            gen.Emit(OpCodes.Call, writeLineInt);
+            gen.Emit(OpCodes.Call, WritelnMethod(t));
             if (write_commands)
                 commands.Add("WriteLine");
         }

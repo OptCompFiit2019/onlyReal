@@ -97,8 +97,7 @@ namespace ProgramTree
         public AssignType AssOp { get; set; }
         public AssignNode(IdNode id, ExprNode expr, LexLocation exprLoc, AssignType assop = AssignType.Assign)
         {
-            if (id.Type == type.tbool ^ expr.Type == type.tbool
-                    || id.Type == type.tint && expr.Type == type.treal)
+            if (id.Type != expr.Type)
                 throw new Exception($"({exprLoc.StartLine},{exprLoc.StartColumn}): Переменной типа " +
                     $"\"{TypeName(id.Type)}\" нельзя присвоить значение типа \"{TypeName(expr.Type)}\".");
             Id = id;
