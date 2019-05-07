@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SimpleLang.Visitors
 {
-    class PullCopiesBlocks
+    class DefBUseBBlocks 
     {
         private LinkedList<ThreeCode> program;
         public LinkedList<ThreeCode> Program
@@ -14,40 +14,43 @@ namespace SimpleLang.Visitors
             get { return program; }
         }
         public ThreeAddressCodeVisitor treecode;
+        public List<HashSet<string>> DefBs;
+        public List<HashSet<string>> UseBs;
 
-        public PullCopiesBlocks(ThreeAddressCodeVisitor code)
+        public DefBUseBBlocks(ThreeAddressCodeVisitor code)
         {
             treecode = code;
-            Program = code.GetCode();
+            Program = code.program;
+            DefBs = new List<HashSet<string>>();
+            UseBs = new List<HashSet<string>>();
         }
 
-        public void Optimize()
+        public void MakeSets()
         {
             var blocks = new SimpleLang.Block.Block(treecode).GenerateBlocks();
-            var result = new List<ThreeCode>();
+
             for (int i = 0; i < blocks.Count; i++)
             {
-                if (blocks[i].Count > 1)
-                {
-                    var graph = new PullCopies(blocks[i].ToList());
-                    var prog = graph.Optimize();
-                    foreach (var cmd in prog)
-                        result.Add(cmd);
-                }
-                else
-                    result.Add(blocks[i].First.Value);
+                var graph = new DefBUseB(blocks[i].ToList());
+                graph.MakeSet();
+                DefBs.Add(graph.DefB);
+                UseBs.Add(graph.UseB);
             }
-            Program = new LinkedList<ThreeCode>(result);
         }
     }
 
-    class PullCopies
+    class DefBUseB
     {
         public List<ThreeCode> program;
+        public HashSet<string> DefB;
+        public HashSet<string> UseB;
 
-        public PullCopies(List<ThreeCode> prog)
+        public DefBUseB(List<ThreeCode> prog)
         {
             program = MakeProgram(prog);
+
+            DefB = new HashSet<string>();
+            UseB = new HashSet<string>();
         }
 
         public List<ThreeCode> MakeProgram(List<ThreeCode> prog)
@@ -72,31 +75,18 @@ namespace SimpleLang.Visitors
             return program;
         }
 
-        public LinkedList<ThreeCode> Optimize()
+        public void MakeSet()
         {
-            for (int i = 0; i < program.Count - 1; i++)
+            for (int i = 0; i < program.Count; i++)
             {
-                string def;
-                ThreeAddressValueType newArg;
-                if (program[i].arg2 == null)
-                {
-                    def = program[i].result;
-                    newArg = program[i].arg1;
-                }
-                else
-                    continue;
-                for (int j = i + 1; j < program.Count; j++)
-                {
-                    if (program[j].result == def)
-                        break;
-                    if (program[j].arg1 != null && program[j].arg1.ToString() == def)
-                        program[j].arg1 = newArg;
-
-                    if (program[j].arg2 != null && program[j].arg2.ToString() == def)
-                        program[j].arg2 = newArg;
-                }
+                var cmd = program[i];
+                if (cmd.arg1 != null && cmd.arg1 is ThreeAddressStringValue && !cmd.arg1.ToString().Contains("temp_") && !DefB.Contains(cmd.arg1.ToString()))
+                    UseB.Add(cmd.arg1.ToString());
+                if (cmd.arg2 != null && cmd.arg2 is ThreeAddressStringValue && !cmd.arg2.ToString().Contains("temp_") && !DefB.Contains(cmd.arg2.ToString()))
+                    UseB.Add(cmd.arg2.ToString());
+                if (!cmd.result.ToString().Contains("temp_"))
+                    DefB.Add(cmd.result);
             }
-            return new LinkedList<ThreeCode>(program);
         }
     }
 }

@@ -141,6 +141,7 @@ namespace SimpleCompiler
                     var pp = new PrettyPrintVisitor();
                     parser.root.Visit(pp);
                     Console.WriteLine(pp.Text);*/
+
                 }
             }
             catch (FileNotFoundException)

@@ -13,6 +13,14 @@
 	}
 
 
+
+
+	for (i=1 to 100){
+		for(j=1 to 100){
+			a = a + b;
+		}
+	}
+
 	while (gg) {
 		hh=23;
 	}

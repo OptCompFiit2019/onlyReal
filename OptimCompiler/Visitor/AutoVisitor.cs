@@ -57,10 +57,11 @@ namespace SimpleLang.Visitors
         public override void VisitBlockNode(BlockNode bl) 
         {
             for (int i = 0; i < bl.StList.Count; i++)
-                bl.StList[i].Visit(this);
+                bl.StList[i]?.Visit(this);
         }
         public override void VisitPrintlnNode(PrintlnNode w) 
         {
+            w.Expr.Visit(this);
             w.Expr.Visit(this);
         }
         public override void VisitVarDefNode(VarDefNode w) 
