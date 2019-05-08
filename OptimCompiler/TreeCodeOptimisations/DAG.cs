@@ -18,7 +18,7 @@ namespace SimpleLang.Visitors
         public DAGBlocks(ThreeAddressCodeVisitor code)
         {
             treecode = code;
-            Program = code.program;
+            Program = code.GetCode();
         }
 
         public void Optimize()
