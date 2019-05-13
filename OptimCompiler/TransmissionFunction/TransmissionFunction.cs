@@ -5,28 +5,53 @@ using System.Text;
 
 namespace SimpleLang.TransmissionFunction
 {
-
-    struct InOut
+    
+    /// <summary>
+    /// Класс, реализующий передаточную функцию
+    /// </summary>
+    class TransmissionFunction<T>
     {
-        public ISet<string> In;
-        public ISet<string> Out;
+        private List<Func<T, T>> algorithms;
 
-        public InOut(ISet<string> inSet, ISet<string> outSet)
+        /// <summary>
+        /// Конструктор. Просто конструктор.
+        /// </summary>
+        /// <param name="algorithm">Алгоритм передаточной функции.</param>
+        public TransmissionFunction(Func<T, T> algorithm)
         {
-            In = inSet;
-            Out = outSet;
+            algorithms = new List<Func<T, T>>();
+            algorithms.Add(algorithm);
         }
-    }
 
-    class TransmissionFunction
-    {
-        private Func<InOut, InOut> algorithm;
 
-        public TransmissionFunction(Func<InOut, InOut> algorithm)
+
+        public TransmissionFunction(List<Func<T, T>> algorithms)
         {
-            this.algorithm = algorithm;
-        } 
+            this.algorithms = algorithms;
+        }
 
-        public InOut Apply(InOut inOut) => algorithm.Invoke(inOut);        
+
+
+        public static TransmissionFunction<T> operator *(TransmissionFunction<T> leftFunc, TransmissionFunction<T> rightFunc)
+        {
+            return new TransmissionFunction<T>(leftFunc.algorithms.Concat(rightFunc.algorithms).ToList());
+        }
+
+        public T Apply(T set)
+        {
+            foreach (var a in algorithms)
+            {
+                if (a != null && set != null)
+                {
+                    set = a.Invoke(set);
+                }
+                else
+                {
+                    throw new ArgumentException("Some shit");
+                }
+            }
+
+            return set;
+        }
     }
 }

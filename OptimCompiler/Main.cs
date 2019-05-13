@@ -10,6 +10,7 @@ using SimpleLang.Block;
 using SimpleLang.Optimisations;
 using SimpleLang.ControlFlowGraph;
 using SimpleLang.ThreeCodeOptimisations;
+using SimpleLang.TransmissionFunction;
 
 namespace SimpleCompiler
 {
@@ -72,6 +73,18 @@ namespace SimpleCompiler
                     var cfg = new ControlFlowGraph(treeCode).GenerateCFG().GetAsGraph();
                     Console.WriteLine("\nControl flow graph:");
                     Console.WriteLine(cfg);
+
+
+
+
+
+
+                    var foo = new TransmissionFunction<Object>(a => a);
+                    var bar = new TransmissionFunction<Object>(a => a);
+
+                    var res = (foo * bar * foo * bar).Apply(null);
+                
+
                 }
             }
             catch (FileNotFoundException)
