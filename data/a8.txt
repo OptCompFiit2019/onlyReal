@@ -1,0 +1,27 @@
+{
+	int b;
+	b = b * 0;
+	b = 1 * b;
+	b = b * 1;
+	b = b + 0;
+	b = 0 + b;
+	b = b - 0;
+	b = b - b;
+	b = b / 1;
+	println(b);
+
+	bool rel;
+	rel = b + 5.0 <= 5;
+	if (rel && rel)
+	{
+		b = 0;
+		println(rel);
+		real x;
+		x = 3.14 + 1;
+		println(x + 1.5);
+	}
+	else
+	{
+		println(1);
+	}
+}

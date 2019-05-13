@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using SimpleLang.Visitors;
+using SimpleParser;
+using QUT.Gppg;
+using static SimpleParser.SymbolTable;
 
 namespace ProgramTree
 {
@@ -14,6 +18,7 @@ namespace ProgramTree
 
     public abstract class ExprNode : Node // базовый класс для всех выражений
     {
+        public type Type { get; set; }
     }
 
     public class IdNode : ExprNode
@@ -29,7 +34,7 @@ namespace ProgramTree
     public class DoubleNumNode : ExprNode
     {
         public double Num { get; set; }
-        public DoubleNumNode(double num) { Num = num; }
+        public DoubleNumNode(double num) { Num = num; Type = type.treal; }
         public override void Visit(Visitor v)
         {
 			v.VisitDoubleNumNode(this);
@@ -41,7 +46,7 @@ namespace ProgramTree
     public class IntNumNode : ExprNode
     {
         public int Num { get; set; }
-        public IntNumNode(int num) { Num = num; }
+        public IntNumNode(int num) { Num = num; Type = type.tint; }
         public override void Visit(Visitor v)
         {
             v.VisitIntNumNode(this);
@@ -53,12 +58,23 @@ namespace ProgramTree
     {
         public ExprNode Left { get; set; }
         public ExprNode Right { get; set; }
-        public char Op { get; set; }
-        public BinOpNode(ExprNode Left, ExprNode Right, char op) 
+        public string Op { get; set; }
+        public BinOpNode(ExprNode Left, ExprNode Right, string op, LexLocation opLoc) 
         {
+            var e = new Exception($"({opLoc.StartLine},{opLoc.StartColumn}): Оператор \"{op}\" нельзя " +
+                $"применить к операндам типа \"{TypeName(Left.Type)}\" и \"{TypeName(Right.Type)}\".");
+            bool lb = Left.Type == type.tbool,
+                 rb = Right.Type == type.tbool;
+
+            if (op == "&&" || op == "||") { if (!lb || !rb) throw e; }
+            else if (lb || rb) throw e;
+            
             this.Left = Left;
             this.Right = Right;
             this.Op = op;
+            Type = Left.Type == type.treal || Right.Type == type.treal ?
+                type.treal :
+                type.tint;
         }
         public override void Visit(Visitor v)
         {
@@ -79,8 +95,11 @@ namespace ProgramTree
         public IdNode Id { get; set; }
         public ExprNode Expr { get; set; }
         public AssignType AssOp { get; set; }
-        public AssignNode(IdNode id, ExprNode expr, AssignType assop = AssignType.Assign)
+        public AssignNode(IdNode id, ExprNode expr, LexLocation exprLoc, AssignType assop = AssignType.Assign)
         {
+            if (id.Type != expr.Type)
+                throw new Exception($"({exprLoc.StartLine},{exprLoc.StartColumn}): Переменной типа " +
+                    $"\"{TypeName(id.Type)}\" нельзя присвоить значение типа \"{TypeName(expr.Type)}\".");
             Id = id;
             Expr = expr;
             AssOp = assop;
@@ -94,8 +113,7 @@ namespace ProgramTree
             return Id.ToString() + " = " + Expr.ToString() + ";";
         }
     }
-    public abstract class LogicExprNode : Node { }
-    public class BooleanNode : LogicExprNode
+    public class BooleanNode : ExprNode
     {
         public bool Val { get; set; }
         public BooleanNode(bool val) { Val = val; }
@@ -108,7 +126,7 @@ namespace ProgramTree
             return Val.ToString().ToLower();
         }
     }
-    public class LogicIdNode : LogicExprNode
+    public class LogicIdNode : ExprNode
     {
         public IdNode Name { get; set; }
         public LogicIdNode(IdNode val) { Name = val; }
@@ -122,16 +140,20 @@ namespace ProgramTree
         }
     }
 
-    public class LogicOpNode : LogicExprNode
+    public class LogicOpNode : ExprNode
     {
-        public LogicExprNode Left { get; set; }
-        public LogicExprNode Right { get; set; }
+        public ExprNode Left { get; set; }
+        public ExprNode Right { get; set; }
         public string Operation { get; set; }
-        public LogicOpNode(LogicExprNode Left, LogicExprNode Right, string op)
+        public LogicOpNode(ExprNode Left, ExprNode Right, string op, LexLocation opLoc)
         {
+            if (Left.Type == type.tbool || Right.Type == type.tbool)
+                throw new Exception($"({opLoc.StartLine},{opLoc.StartColumn}): Оператор \"{op}\" нельзя " +
+                    $"применить к операндам типа \"{TypeName(Left.Type)}\" и \"{TypeName(Right.Type)}\".");
             this.Left = Left;
             this.Right = Right;
             Operation = op;
+            Type = type.tbool;
         }
         public override void Visit(Visitor v)
         {
@@ -143,13 +165,16 @@ namespace ProgramTree
         }
     }
 
-    public class LogicNotNode : LogicExprNode
+    public class LogicNotNode : ExprNode
     {
-        public LogicExprNode LogExpr { get; set; }
-        public SimpleParser.Tokens Operation { get; set; }
-        public LogicNotNode(LogicExprNode LogExpr)
+        public ExprNode LogExpr { get; set; }
+        public LogicNotNode(ExprNode LogExpr, LexLocation opLoc)
         {
+            if (LogExpr.Type != type.tbool)
+                throw new Exception($"({opLoc.StartLine},{opLoc.StartColumn}): Оператор \"!\" нельзя " +
+                    $"применить к операнду типа \"{TypeName(LogExpr.Type)}\".");
             this.LogExpr = LogExpr;
+            Type = type.tbool;
         }
         public override void Visit(Visitor v)
         {
@@ -178,10 +203,10 @@ namespace ProgramTree
 
     public class IfNode : StatementNode
     {
-        public LogicExprNode Cond { get; set; }
+        public ExprNode Cond { get; set; }
         public StatementNode If { get; set; }
         public StatementNode Else { get; set; }
-        public IfNode(LogicExprNode Expr, StatementNode If, StatementNode Else = null)
+        public IfNode(ExprNode Expr, StatementNode If, StatementNode Else = null)
         {
             this.Cond = Expr;
             this.If = If;
@@ -202,9 +227,9 @@ namespace ProgramTree
 
     public class WhileNode : StatementNode
     {
-        public LogicExprNode Expr { get; set; }
+        public ExprNode Expr { get; set; }
         public StatementNode Stat { get; set; }
-        public WhileNode(LogicExprNode expr, StatementNode stat)
+        public WhileNode(ExprNode expr, StatementNode stat)
         {
             Expr = expr;
             Stat = stat;

@@ -23,7 +23,7 @@ namespace SimpleLang.Optimisations
         public override void VisitBinOpNode(BinOpNode binop)
         {
             IsPerformed = false;
-            if (binop.Op == '*'
+            if (binop.Op[0] == '*'
                  && binop.Right is IntNumNode innRight
                  && innRight.Num == 1)
             {
@@ -31,7 +31,7 @@ namespace SimpleLang.Optimisations
                 ReplaceExpr(binop, binop.Left);
                 IsPerformed = true;
             }
-            else if (binop.Op == '*' 
+            else if (binop.Op[0] == '*' 
                 && binop.Left is IntNumNode innLeft
                 && innLeft.Num == 1)
             {
@@ -39,7 +39,7 @@ namespace SimpleLang.Optimisations
                 ReplaceExpr(binop, binop.Right);
                 IsPerformed = true;
             }
-            else if (binop.Op == '/'
+            else if (binop.Op[0] == '/'
                      && binop.Right is IntNumNode innRightDiv
                      && innRightDiv.Num == 1)
             {
