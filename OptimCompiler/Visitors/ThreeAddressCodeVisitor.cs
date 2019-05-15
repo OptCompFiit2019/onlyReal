@@ -177,7 +177,7 @@ namespace SimpleLang.Visitors
             }
 
             if (operation == ThreeOperator.Println)
-                return "println " + arg1.ToString();
+                return res + "println " + arg1.ToString();
 
             res += result + " = ";
             if (operation == ThreeOperator.Logic_not)

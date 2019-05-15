@@ -15,7 +15,7 @@ namespace SimpleCompiler
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
-            string FileName = @"../../../data/a8.txt";
+            string FileName = @"../../../data/fib.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
