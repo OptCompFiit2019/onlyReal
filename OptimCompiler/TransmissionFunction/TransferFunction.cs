@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace SimpleLang.TransmissionFunction
+namespace SimpleLang.TransferFunction
 {
     
     /// <summary>
@@ -13,6 +12,10 @@ namespace SimpleLang.TransmissionFunction
     {
         private List<Func<T, T>> algorithms;
 
+        /// <summary>
+        /// Создает объект передаточной функции по одному алгоритму
+        /// </summary>
+        /// <param name="algorithm"></param>
         public TransferFunction(Func<T, T> algorithm)
         {
             algorithms = new List<Func<T, T>>();
@@ -20,7 +23,7 @@ namespace SimpleLang.TransmissionFunction
         }
 
         /// <summary>
-        /// rr
+        /// Создает объект передаточной функции по множеству алгоритмов
         /// </summary>
         /// <param name="algorithms"></param>
         public TransferFunction(List<Func<T, T>> algorithms) =>
