@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlFlowOptimisations\DeadOrAliveForGraph.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
@@ -62,7 +63,7 @@
     <Compile Include="AstOptimisations\OptWhileVisitor.cs" />
     <Compile Include="AstOptimisations\PlusNonZero.cs" />
     <Compile Include="AstOptimisations\PrettyPrintVisitor.cs" />
-    <Compile Include="TransmissionFunction\TransferFunction.cs" />
+    <Compile Include="TransferFunction\TransferFunction.cs" />
     <Compile Include="TreeCodeOptimisations\DAG.cs" />
     <Compile Include="TreeCodeOptimisations\DeadOrAliveOptimization.cs" />
     <Compile Include="Main.cs" />

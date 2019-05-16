@@ -15,6 +15,7 @@ namespace SimpleCompiler
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
+            
             string FileName = @"../../../data/a8.txt";
             if (args.Length > 0)
                 FileName = args[0];
@@ -36,6 +37,7 @@ namespace SimpleCompiler
 
                     FillParentVisitor generateParrent = new FillParentVisitor();
                     r.Visit(generateParrent);
+
 
 					//Console.WriteLine(r.ToString());
 
@@ -141,7 +143,6 @@ namespace SimpleCompiler
                     var pp = new PrettyPrintVisitor();
                     parser.root.Visit(pp);
                     Console.WriteLine(pp.Text);*/
-
                 }
             }
             catch (FileNotFoundException)

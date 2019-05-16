@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleLang.TransferFunction
+namespace TransferFunction
 {
-    
     /// <summary>
     /// Класс, реализующий передаточную функцию
     /// </summary>
@@ -47,12 +46,10 @@ namespace SimpleLang.TransferFunction
         public T Apply(T set)
         {
             foreach (var a in algorithms)
-            {
                 if (a != null)
                     set = a.Invoke(set);
                 else
                     throw new ArgumentException("Transfer function must not be null");
-            }
 
             return set;
         }
