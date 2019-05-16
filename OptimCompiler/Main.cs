@@ -16,7 +16,7 @@ namespace SimpleCompiler
     {
         public static void Main(string[] args) {
             
-            string FileName = @"../../../data/a8.txt";
+            string FileName = @"../../../data/DeadOrAliveOptimization.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -86,17 +86,20 @@ namespace SimpleCompiler
                     Console.WriteLine("\nGenerate Three address code");
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
-                    Console.WriteLine(treeCode.ToString());
 
-                    SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
-                    gen.Generate(treeCode.GetCode());
-                    var lst = gen.GetGenerator().commands;
-                    foreach(string cmd in lst)
-                    {
-                        Console.WriteLine(cmd);
-                    }
-                    Console.WriteLine("\nExecute:");
-                    gen.Execute();
+                    Console.WriteLine(treeCode.ToString());
+                    DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
+                    Console.WriteLine("\nafter\n" + treeCode.ToString());
+
+                    //SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                    //gen.Generate(treeCode.GetCode());
+                    //var lst = gen.GetGenerator().commands;
+                    //foreach(string cmd in lst)
+                    //{
+                    //    Console.WriteLine(cmd);
+                    //}
+                    //Console.WriteLine("\nExecute:");
+                    //gen.Execute();
 
                     /*AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
                     app.Add(new DistributionOfConstants());
