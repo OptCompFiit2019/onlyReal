@@ -9,6 +9,8 @@ using SimpleLang;
 using SimpleLang.Visitors;
 using SimpleLang.ThreeCodeOptimisations;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
+using SimpleLang.Block;
+
 
 namespace SimpleCompiler
 {
@@ -39,9 +41,9 @@ namespace SimpleCompiler
                     r.Visit(generateParrent);
 
 
-					//Console.WriteLine(r.ToString());
+                    //Console.WriteLine(r.ToString());
 
-					/*Opt2Visitor opt2 = new Opt2Visitor();
+                    /*Opt2Visitor opt2 = new Opt2Visitor();
 					r.Visit(opt2);
 
                     PrettyPrintVisitor ppvis = new PrettyPrintVisitor();
@@ -84,12 +86,26 @@ namespace SimpleCompiler
                     Console.WriteLine(vis7.Max);*/
 
                     Console.WriteLine("\nGenerate Three address code");
+
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
-
+                    var blocks = new Block(treeCode).GenerateBlocks();
+                    var entryPoint = new LinkedList<ThreeCode>();
+                    entryPoint.AddLast(new ThreeCode("entry", null, ThreeOperator.None, null, null));
+                    var exitPoint = new LinkedList<ThreeCode>();
+                    exitPoint.AddLast(new ThreeCode("exit", null, ThreeOperator.None, null, null));
+                    blocks.Insert(0, entryPoint);
+                    blocks.Add(exitPoint);
+                    CFG controlFlowGraph = new CFG(blocks);
+                    var simpleGraph = controlFlowGraph.cfg;
                     Console.WriteLine(treeCode.ToString());
+                    controlFlowGraph.GenerateCFG();
                     DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
                     Console.WriteLine("\nafter\n" + treeCode.ToString());
+                    
+
+
+
 
                     //SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
                     //gen.Generate(treeCode.GetCode());
