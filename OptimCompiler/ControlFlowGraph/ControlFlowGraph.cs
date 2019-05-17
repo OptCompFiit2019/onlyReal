@@ -101,6 +101,7 @@ namespace SimpleLang.ControlFlowGraph
         {
             this.blocks = b;
             cfg = new Graph(this.blocks.Count);
+            GenerateCFG();
         }
 
         public ControlFlowGraph(ThreeAddressCodeVisitor code)
@@ -108,9 +109,10 @@ namespace SimpleLang.ControlFlowGraph
             var code_blocks = new Block.Block(code);
             this.blocks = code_blocks.GenerateBlocks();
             cfg = new Graph(this.blocks.Count);
+            GenerateCFG();
         }
 
-        public ControlFlowGraph GenerateCFG()
+        private ControlFlowGraph GenerateCFG()
         {
             //т.к. одна метка принадлежит лишь одному блоку, то составляется словарь, из которого
             //по имени метки можно получить индекс блока в графе
