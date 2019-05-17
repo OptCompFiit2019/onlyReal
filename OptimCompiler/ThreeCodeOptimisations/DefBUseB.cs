@@ -20,7 +20,7 @@ namespace SimpleLang.Visitors
         public DefBUseBBlocks(ThreeAddressCodeVisitor code)
         {
             treecode = code;
-            Program = code.program;
+            Program = code.GetCode();
             DefBs = new List<HashSet<string>>();
             UseBs = new List<HashSet<string>>();
         }

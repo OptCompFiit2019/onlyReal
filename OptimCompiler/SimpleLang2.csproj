@@ -44,6 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlFlowOptimisations\DeadOrAliveForGraph.cs" />
+    <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
+    <Compile Include="ThreeCodeOptimisations\DefBUseB.cs" />
+    <Compile Include="ThreeCodeOptimisations\IterAlgoActiveVariables.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
