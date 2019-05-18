@@ -1,44 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SimpleLang.Visitors;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class IterAlgoActiveVariables
+    class InOutActiveVariables
     {
+        public List<HashSet<string>> InBlocks { get; }
+        public List<HashSet<string>> OutBlocks { get; }
+
         /// <summary>
         /// Итерационный алгоритм для активных переменных. Находит для графа <paramref name="graph"/> множества
         /// IN (<paramref name="InBlocks"/>) и OUT (<paramref name="OutBlocks"/>) на основе ранее вычисленных
-        /// Def (<paramref name="DefBlocks"/>) и Use (<paramref name="UseBlocks"/>).
+        /// Def и Use (<paramref name="defUseBlocks"/>).IN и OUT сохраняются в объекте IterAlgoActiveVariables
         /// Граф должен содержать фиктивный узел ВЫХОД.
         /// </summary>
-        /// <param name="DefBlocks"></param>
-        /// <param name="UseBlocks"></param>
-        /// <param name="InBlocks"></param>
-        /// <param name="OutBlocks"></param>
+        /// <param name="defUseBlocks"></param>
         /// <param name="graph"></param>
-        public static void IterativeAlgorithm(DefUseBlocks defBUseBBlocks,
-            List<List<string>> InBlocks, List<List<string>> OutBlocks, ControlFlowGraph.ControlFlowGraph graph)
+        public InOutActiveVariables(DefUseBlocks defUseBlocks, ControlFlowGraph.ControlFlowGraph graph)
         {
-            bool isInChanged = true;
-            for (int i = 0; i < InBlocks.Count(); i++)
+            InBlocks = new List<HashSet<string>>();
+            OutBlocks = new List<HashSet<string>>();
+            for(int i = 0; i < defUseBlocks.DefBs.Count; i++)
             {
-                InBlocks[i] = new List<string>();
-                OutBlocks[i] = new List<string>();
+                InBlocks.Add(new HashSet<string>());
+                OutBlocks.Add(new HashSet<string>());
             }
+            bool isInChanged = true;
 
             while(isInChanged)
-                for(int i = 0; i < InBlocks.Count - 1; i++)
+            {
+                isInChanged = false;
+                for(int i = 0; i < defUseBlocks.DefBs.Count - 1; i++)
                 {
                     var previousIn = new string[InBlocks[i].Count];
                     InBlocks[i].CopyTo(previousIn);
-                    OutBlocks[i] = MeetOperator(graph, i, InBlocks);
-                    InBlocks[i] = defBUseBBlocks.UseBs[i].Union(OutBlocks[i].Except(defBUseBBlocks.DefBs[i])).ToList();
-                    if (!InBlocks[i].SequenceEqual(InBlocks[i]))
-                        isInChanged = false;
+                    OutBlocks[i] = MeetOperator(graph, i);
+                    var Except = new HashSet<string>(OutBlocks[i]);
+                    Except.ExceptWith(defUseBlocks.DefBs[i]);
+                    InBlocks[i].UnionWith(Except);
+                    InBlocks[i].UnionWith(defUseBlocks.UseBs[i]);
+                    isInChanged = isInChanged || !InBlocks[i].SetEquals(previousIn);
                 }
+            }
         }
 
         /// <summary>
@@ -46,14 +49,13 @@ namespace SimpleLang.ThreeCodeOptimisations
         /// </summary>
         /// <param name="graph">Граф потоков управления</param>
         /// <param name="index">Индекс анализируемого блока B</param>
-        /// <param name="InBlocks">Множества IN[B]</param>
         /// <returns></returns>
-        private static List<string> MeetOperator(ControlFlowGraph.ControlFlowGraph graph, int index, List<List<string>> InBlocks)
+        private HashSet<string> MeetOperator(ControlFlowGraph.ControlFlowGraph graph, int index)
         {
             var successors = graph.GetAsGraph().GetOutputNodes(index);
-            var OutBlock = new List<string>();
+            var OutBlock = new HashSet<string>();
             foreach (var i in successors)
-                OutBlock = OutBlock.Union(InBlocks[i]).ToList();
+                OutBlock.UnionWith(InBlocks[i]);
             return OutBlock;
         }
     }

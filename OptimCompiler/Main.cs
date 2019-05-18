@@ -83,7 +83,7 @@ namespace SimpleCompiler
                     Console.WriteLine("\nMaxDepthOfNestedCyclesVisitor");
                     MaxDepthOfNestedCyclesVisitor vis7 = new MaxDepthOfNestedCyclesVisitor();
                     r.Visit(vis7);
-                    Console.WriteLine(vis7.Max);*/
+                    Console.WriteLine(vis7.Max);*/    
 
                     Console.WriteLine("\nGenerate Three address code");
 
@@ -101,13 +101,19 @@ namespace SimpleCompiler
 
                     // построение CFG
                     CFG controlFlowGraph = new CFG(blocks);
-                    var simpleGraph = controlFlowGraph.cfg;
                     Console.WriteLine(treeCode.ToString());
                     // выполнение оптимизации для программы, не разбитой на блоки
                     //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
-                    //Console.WriteLine("\nafter DeleteDeadVariables for one block\n" + treeCode.ToString());
+                    // вычисление множеств Def и Use для всего графа потоков данных                    
                     var DefUse = new DefUseBlocks(controlFlowGraph);
 
+                    var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
+
+                    ControlFlowOptimisations.DeadOrAliveOnGraph(InOut, controlFlowGraph);
+                    Console.WriteLine("\nafter DeleteDeadVariables for graph\n");
+                    foreach (var block in controlFlowGraph.blocks)
+                        foreach (var line in block)
+                            Console.WriteLine(line);
                     Console.Write("");
                     //DeadOrAliveOptimization.
 

@@ -1,9 +1,10 @@
 {
 int a, b;
+b = a;
 a = 1;
 a=2;
 a=3;
-b = a;
+
 b=a+1;
 b=b+a;
 if(a)
@@ -14,5 +15,5 @@ else
 {b = 3;
 a = a + b;
 }
-a = 12;
+println(b);
 }
