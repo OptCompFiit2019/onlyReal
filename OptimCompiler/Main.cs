@@ -10,7 +10,7 @@ using SimpleLang.Visitors;
 using SimpleLang.ThreeCodeOptimisations;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 using SimpleLang.Block;
-
+using SimpleLang.ThreeCodeOptimisations;
 
 namespace SimpleCompiler
 {
@@ -90,20 +90,26 @@ namespace SimpleCompiler
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
                     var blocks = new Block(treeCode).GenerateBlocks();
+
+                    // добавление фиктивных блоков входа и выхода программы
                     var entryPoint = new LinkedList<ThreeCode>();
-                    entryPoint.AddLast(new ThreeCode("entry", null, ThreeOperator.None, null, null));
+                    entryPoint.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
                     var exitPoint = new LinkedList<ThreeCode>();
-                    exitPoint.AddLast(new ThreeCode("exit", null, ThreeOperator.None, null, null));
+                    exitPoint.AddLast(new ThreeCode("exit", "", ThreeOperator.None, null, null));
                     blocks.Insert(0, entryPoint);
                     blocks.Add(exitPoint);
+
+                    // построение CFG
                     CFG controlFlowGraph = new CFG(blocks);
                     var simpleGraph = controlFlowGraph.cfg;
                     Console.WriteLine(treeCode.ToString());
-                    controlFlowGraph.GenerateCFG();
-                    DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
-                    Console.WriteLine("\nafter\n" + treeCode.ToString());
-                    
+                    // выполнение оптимизации для программы, не разбитой на блоки
+                    //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
+                    //Console.WriteLine("\nafter DeleteDeadVariables for one block\n" + treeCode.ToString());
+                    var DefUse = new DefUseBlocks(controlFlowGraph);
 
+                    Console.Write("");
+                    //DeadOrAliveOptimization.
 
 
 
@@ -173,7 +179,7 @@ namespace SimpleCompiler
                 Console.WriteLine("{0}", e);
             }
 
-            Console.ReadLine();
+           Console.ReadLine();
         }
 
     }

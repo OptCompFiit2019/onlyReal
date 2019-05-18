@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SimpleLang.Visitors;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
@@ -18,7 +19,7 @@ namespace SimpleLang.ThreeCodeOptimisations
         /// <param name="InBlocks"></param>
         /// <param name="OutBlocks"></param>
         /// <param name="graph"></param>
-        public static void IterativeAlgorithm(List<HashSet<string>> DefBlocks, List<HashSet<string>> UseBlocks,
+        public static void IterativeAlgorithm(DefUseBlocks defBUseBBlocks,
             List<List<string>> InBlocks, List<List<string>> OutBlocks, ControlFlowGraph.ControlFlowGraph graph)
         {
             bool isInChanged = true;
@@ -34,7 +35,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                     var previousIn = new string[InBlocks[i].Count];
                     InBlocks[i].CopyTo(previousIn);
                     OutBlocks[i] = MeetOperator(graph, i, InBlocks);
-                    InBlocks[i] = UseBlocks[i].Union(OutBlocks[i].Except(DefBlocks[i])).ToList();
+                    InBlocks[i] = defBUseBBlocks.UseBs[i].Union(OutBlocks[i].Except(defBUseBBlocks.DefBs[i])).ToList();
                     if (!InBlocks[i].SequenceEqual(InBlocks[i]))
                         isInChanged = false;
                 }

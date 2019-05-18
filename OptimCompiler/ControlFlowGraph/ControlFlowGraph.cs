@@ -123,18 +123,24 @@ namespace SimpleLang.ControlFlowGraph
                 if (blocks[i].First.Value.label.Length > 0)
                     Labels[blocks[i].First.Value.label] = i;
 
-            // если последний оператор в блоке не является GOTO, то лишь 
+            // Если последний оператор в блоке не является GOTO, то лишь 
             // тогда из этого блока есть переход к блоку, следующему за ним по индексу
-            // иначе из этого блока переход по метке последнго оператора goto
-            // последний блок не анализируется, т.к. это выход из программы, если допустить,
+            // иначе из этого блока производится переход по метке последнго оператора goto.
+            // Последний блок не анализируется, т.к. это выход из программы. Если допустить,
             // что из него может быть переход по метке, то любой из блоков без перехода по метке 
             // из последнего оператора может быть выходом, что неверно для нашего языка
             for (int i = 0; i < blocks.Count-1; i++)
                 switch (blocks[i].Last.Value.operation)
                 {
-                    case ThreeOperator.Goto: cfg.AddArc(i, Labels[blocks[i].Last.Value.arg1.ToString()]); break;
-                    case ThreeOperator.IfGoto: cfg.AddArc(i, Labels[blocks[i].Last.Value.arg2.ToString()]); break;
-                    default: cfg.AddArc(i, i + 1);  break;
+                    case ThreeOperator.Goto:
+                        cfg.AddArc(i, Labels[blocks[i].Last.Value.arg1.ToString()]);
+                        break;
+                    case ThreeOperator.IfGoto:
+                        cfg.AddArc(i, Labels[blocks[i].Last.Value.arg2.ToString()]);
+                        break;
+                    default:
+                        cfg.AddArc(i, i + 1);
+                        break;
                 }
 
             //for (var i = 0; i < this.blocks.Count; ++i)
