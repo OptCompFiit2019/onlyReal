@@ -5,13 +5,13 @@ namespace SimpleLang.ThreeCodeOptimisations
 {
     class InOutActiveVariables
     {
-        public List<HashSet<string>> InBlocks { get; }
-        public List<HashSet<string>> OutBlocks { get; }
+        public List<HashSet<string>> InBlocks { get; } // множества IN для блоков
+        public List<HashSet<string>> OutBlocks { get; } // множества OUT для блоков
 
         /// <summary>
         /// Итерационный алгоритм для активных переменных. Находит для графа <paramref name="graph"/> множества
         /// IN (<paramref name="InBlocks"/>) и OUT (<paramref name="OutBlocks"/>) на основе ранее вычисленных
-        /// Def и Use (<paramref name="defUseBlocks"/>).IN и OUT сохраняются в объекте IterAlgoActiveVariables
+        /// Def и Use (<paramref name="defUseBlocks"/>). IN и OUT сохраняются в объекте IterAlgoActiveVariables
         /// Граф должен содержать фиктивный узел ВЫХОД.
         /// </summary>
         /// <param name="defUseBlocks"></param>
