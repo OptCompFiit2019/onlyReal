@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace SimpleLang.TransmissionFunction
+namespace TransferFunction
 {
-    
     /// <summary>
     /// Класс, реализующий передаточную функцию
     /// </summary>
@@ -13,6 +11,10 @@ namespace SimpleLang.TransmissionFunction
     {
         private List<Func<T, T>> algorithms;
 
+        /// <summary>
+        /// Создает объект передаточной функции по одному алгоритму
+        /// </summary>
+        /// <param name="algorithm"></param>
         public TransferFunction(Func<T, T> algorithm)
         {
             algorithms = new List<Func<T, T>>();
@@ -20,7 +22,7 @@ namespace SimpleLang.TransmissionFunction
         }
 
         /// <summary>
-        /// rr
+        /// Создает объект передаточной функции по множеству алгоритмов
         /// </summary>
         /// <param name="algorithms"></param>
         public TransferFunction(List<Func<T, T>> algorithms) =>
@@ -44,12 +46,10 @@ namespace SimpleLang.TransmissionFunction
         public T Apply(T set)
         {
             foreach (var a in algorithms)
-            {
                 if (a != null)
                     set = a.Invoke(set);
                 else
                     throw new ArgumentException("Transfer function must not be null");
-            }
 
             return set;
         }
