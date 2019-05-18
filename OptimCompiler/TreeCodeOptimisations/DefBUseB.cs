@@ -2,91 +2,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SimpleLang.Visitors;
+using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 
-namespace SimpleLang.Visitors
+namespace SimpleLang.ThreeCodeOptimisations
 {
-    class DefBUseBBlocks 
+    class DefUseBlocks
     {
-        private LinkedList<ThreeCode> program;
-        public LinkedList<ThreeCode> Program
-        {
-            set { program = value; }
-            get { return program; }
-        }
-        public ThreeAddressCodeVisitor treecode;
-        public List<HashSet<string>> DefBs;
-        public List<HashSet<string>> UseBs;
+        public List<HashSet<string>> DefBs { get; }
+        public List<HashSet<string>> UseBs { get; }
+        readonly CFG Graph;
 
-        public DefBUseBBlocks(ThreeAddressCodeVisitor code)
+        public DefUseBlocks(CFG graph)
         {
-            treecode = code;
-            Program = code.program;
             DefBs = new List<HashSet<string>>();
             UseBs = new List<HashSet<string>>();
+            Graph = graph;
+            MakeSets();
         }
 
-        public void MakeSets()
+        private void MakeSets()
         {
-            var blocks = new SimpleLang.Block.Block(treecode).GenerateBlocks();
-
-            for (int i = 0; i < blocks.Count; i++)
+            foreach (var block in Graph.blocks)
             {
-                var graph = new DefBUseB(blocks[i].ToList());
-                graph.MakeSet();
-                DefBs.Add(graph.DefB);
-                UseBs.Add(graph.UseB);
-            }
-        }
-    }
-
-    class DefBUseB
-    {
-        public List<ThreeCode> program;
-        public HashSet<string> DefB;
-        public HashSet<string> UseB;
-
-        public DefBUseB(List<ThreeCode> prog)
-        {
-            program = MakeProgram(prog);
-
-            DefB = new HashSet<string>();
-            UseB = new HashSet<string>();
-        }
-
-        public List<ThreeCode> MakeProgram(List<ThreeCode> prog)
-        {
-            var program = new List<ThreeCode>();
-            int i = 0;
-            for (i = 0; i < prog.Count - 1; i++)
-            {
-                if (prog[i + 1].arg1 != null && prog[i].result.Equals(prog[i + 1].arg1.ToString()) && prog[i].result.Contains("temp_") && prog[i + 1].arg2 == null)
+                var DefB = new HashSet<string>();
+                var UseB = new HashSet<string>();
+                foreach (var cmd in block)
                 {
-                    if (prog[i].label != "")
-                        program.Add(new ThreeCode(prog[i].label, prog[i + 1].result, prog[i].operation, prog[i].arg1, prog[i].arg2));
-                    else
-                        program.Add(new ThreeCode(prog[i + 1].result, prog[i].operation, prog[i].arg1, prog[i].arg2));
-                    i++;
+                    if (cmd.arg1 != null && cmd.arg1.ToString() != "" && cmd.arg1 is ThreeAddressStringValue
+                        && !cmd.arg1.ToString().StartsWith("temp_") && !cmd.arg1.ToString().StartsWith("label")
+                        && !DefB.Contains(cmd.arg1.ToString()))
+                        UseB.Add(cmd.arg1.ToString());
+                    if (cmd.arg2 != null && cmd.arg2.ToString() != "" && cmd.arg2 is ThreeAddressStringValue
+                        && !cmd.arg2.ToString().StartsWith("temp_") && !cmd.arg2.ToString().StartsWith("label")
+                        && !DefB.Contains(cmd.arg2.ToString()))
+                        UseB.Add(cmd.arg2.ToString());
+                    if (cmd.result != null && cmd.result.ToString() != "" && !cmd.result.ToString().StartsWith("temp_"))
+                        DefB.Add(cmd.result);
                 }
-                else
-                    program.Add(prog[i]);
-            }
-            if (i == prog.Count - 1)
-                program.Add(prog[i]);
-            return program;
-        }
-
-        public void MakeSet()
-        {
-            for (int i = 0; i < program.Count; i++)
-            {
-                var cmd = program[i];
-                if (cmd.arg1 != null && cmd.arg1 is ThreeAddressStringValue && !cmd.arg1.ToString().Contains("temp_") && !DefB.Contains(cmd.arg1.ToString()))
-                    UseB.Add(cmd.arg1.ToString());
-                if (cmd.arg2 != null && cmd.arg2 is ThreeAddressStringValue && !cmd.arg2.ToString().Contains("temp_") && !DefB.Contains(cmd.arg2.ToString()))
-                    UseB.Add(cmd.arg2.ToString());
-                if (!cmd.result.ToString().Contains("temp_"))
-                    DefB.Add(cmd.result);
+                DefBs.Add(DefB);
+                UseBs.Add(UseB);
             }
         }
     }
+
 }
