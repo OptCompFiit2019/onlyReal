@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TransferFunction
+namespace TransferFunctionGeneric
 {
     /// <summary>
     /// Класс, реализующий передаточную функцию
