@@ -190,22 +190,23 @@ namespace SimpleCompiler
            // ========
            // My part, don't touch !!!
 
+           // Sorry for this troubles, I deleted bad part
 
-           CFG controlFlowGraph = new CFG(blocks);
-           Console.WriteLine(treeCode.ToString());
-           // выполнение оптимизации для программы, не разбитой на блоки
-           //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
-           // вычисление множеств Def и Use для всего графа потоков данных
-           var DefUse = new DefUseBlocks(controlFlowGraph);
-
-           var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
-
-           ControlFlowOptimisations.DeadOrAliveOnGraph(InOut, controlFlowGraph);
-           Console.WriteLine("\nafter DeleteDeadVariables for graph\n");
-           foreach (var block in controlFlowGraph.blocks)
-               foreach (var line in block)
-                   Console.WriteLine(line);
-           Console.Write("");
+           // CFG controlFlowGraph = new CFG(blocks);
+           // Console.WriteLine(treeCode.ToString());
+           // // выполнение оптимизации для программы, не разбитой на блоки
+           // //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
+           // // вычисление множеств Def и Use для всего графа потоков данных
+           // var DefUse = new DefUseBlocks(controlFlowGraph);
+           //
+           // var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
+           //
+           // ControlFlowOptimisations.DeadOrAliveOnGraph(InOut, controlFlowGraph);
+           // Console.WriteLine("\nafter DeleteDeadVariables for graph\n");
+           // foreach (var block in controlFlowGraph.blocks)
+           //     foreach (var line in block)
+           //         Console.WriteLine(line);
+           // Console.Write("");
 
            // ========
         }
