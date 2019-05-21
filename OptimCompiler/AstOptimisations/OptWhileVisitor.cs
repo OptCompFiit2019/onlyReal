@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using SimpleLang.Visitors;
 
-namespace SimpleLang.Optimisations
+namespace SimpleLang.Visitors
 {
     /// <summary>
     /// Выполняет замену на null узла WhileNode в случае 

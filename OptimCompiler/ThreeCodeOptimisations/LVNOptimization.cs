@@ -10,17 +10,18 @@ namespace SimpleLang.ThreeCodeOptimisations
     class LVNOptimization
     {
         /// <summary>
-        /// Применяет к блоку block оптимизацию LVN, изменяя его содержимое
+        /// Возвращает результат применения к блоку <paramref name="sourceBlock"/> оптимизацию LVN как новый блок.
         /// </summary>
-        /// <param name="block"></param>
-        public static void LVNOptimize(Block.Block block)
+        /// <param name="sourceBlock"></param>
+        public static LinkedList<ThreeCode> LVNOptimize(LinkedList<ThreeCode> sourceBlock)
         {
+            var block = new LinkedList<ThreeCode>(sourceBlock);
             Dictionary<string, int> dict = new Dictionary<string, int>();
             Dictionary<int, LinkedListNode<ThreeCode>> ValueDict = new Dictionary<int, LinkedListNode<ThreeCode>>();
 
             int i = 1, n = 0, tmpNum = 1;
             string Key;
-            var strCode = block.code.First;
+            var strCode = block.First;
             while (strCode != null)
             {
                 n++;
@@ -28,7 +29,10 @@ namespace SimpleLang.ThreeCodeOptimisations
                 if (strCode.Value.operation == Visitors.ThreeOperator.None
                     || strCode.Value.operation == Visitors.ThreeOperator.IfGoto
                     || strCode.Value.operation == Visitors.ThreeOperator.Goto)
+                {
+                    strCode = strCode.Next;
                     continue;
+                }
 
                 if (!dict.Keys.Contains(strCode.Value.arg1.ToString()))
                     dict[strCode.Value.arg1.ToString()] = i++;
@@ -47,7 +51,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                 {
                     if (dict[ValueDict[dict[Key]].Value.result] != dict[Key])
                     {
-                        block.code.AddAfter(ValueDict[dict[Key]],
+                        block.AddAfter(ValueDict[dict[Key]],
                             new ThreeCode("t" + tmpNum++, ValueDict[dict[Key]].Value.arg1));
                         ValueDict[dict[Key]] = ValueDict[dict[Key]].Next;
                     }
@@ -60,6 +64,8 @@ namespace SimpleLang.ThreeCodeOptimisations
                 ValueDict[dict[Key]] = strCode;
                 strCode = strCode.Next;
             }
+
+            return block;
         }
     }
 }

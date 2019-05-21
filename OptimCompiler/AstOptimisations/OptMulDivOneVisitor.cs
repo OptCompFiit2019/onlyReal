@@ -5,7 +5,7 @@ using System.Text;
 using ProgramTree;
 using SimpleLang.Visitors;
 
-namespace SimpleLang.Optimisations
+namespace SimpleLang.Visitors
 {
     /// <summary>
     /// Выполняет оптимизации по удалению алгебраических выражений вида:

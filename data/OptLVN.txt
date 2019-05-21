@@ -1,6 +1,7 @@
 {
-	a = b + c + b;
-	b = a - d;
-	c = b + c;
-	d = a - d;
+int a, b,c,x,y;
+	a = x + y;
+	b = x + y;
+	a = 17;
+	c = x + y;
 }

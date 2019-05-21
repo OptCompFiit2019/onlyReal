@@ -4,16 +4,21 @@ b = a;
 a = 1;
 a=2;
 a=3;
-
 b=a+1;
 b=b+a;
 if(a)
 {
-b=2;
+a=0;
+a=1;
+b=2 * a;
+b=3;
 }
 else
-{b = 3;
+{
+b = 3;
 a = a + b;
+a = 1;
+b = 2;
 }
 println(b);
 }
