@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using TransferFunctionGeneric;
+using GenericTransferFunction;
 
 namespace SimpleLang.GenericIterativeAlgorithm
 {
@@ -57,7 +57,7 @@ namespace SimpleLang.GenericIterativeAlgorithm
 
     class IterativeAlgorithm
     {
-        // направление обхода
+        // направление обхода: true - прямой, false - обратный
         public bool IsForward { get;}
         public ControlFlowGraph.ControlFlowGraph Graph { get; }
         // информация о блоках. Каждому блоку с индексом i в графе соответствует экземпляр
@@ -82,7 +82,8 @@ namespace SimpleLang.GenericIterativeAlgorithm
             MeetOperator = meetOperator;
             IsForward = isForward;
             InitEntryExit = new HashSet<string>(initValueEntryExit);
-            InitOther = new HashSet<string>(InitOther);
+            InitOther = new HashSet<string>(initValueOthers);
+            Function = function;
         }
 
         /// <summary>
@@ -116,11 +117,36 @@ namespace SimpleLang.GenericIterativeAlgorithm
                     var prevFunctionResult = new BlockInfo(BlocksInfo[index]);
                     BlocksInfo[index] = MeetOperator(BlocksInfo, Graph, index);
                     BlocksInfo[index] = Function.Apply(BlocksInfo[index]);
-                    isChanged = isChanged || prevFunctionResult.Equals(BlocksInfo[index]);
+                    isChanged = isChanged || !prevFunctionResult.Equals(BlocksInfo[index]);
                 }
             }
             return BlocksInfo;
         }
+
+        /// <summary>
+        /// Возвращает список множеств OUT для блоков
+        /// </summary>
+        /// <returns></returns>
+        public List<HashSet<string>> GetOUTs()
+        {
+            var res = new List<HashSet<string>>();
+            foreach (var info in BlocksInfo)
+                res.Add(new HashSet<string>(info.OUT));
+            return res;
+        }
+
+        /// <summary>
+        /// Возвращает список множеств IN для блоков
+        /// </summary>
+        /// <returns></returns>
+        public List<HashSet<string>> GetINs()
+        {
+            var res = new List<HashSet<string>>();
+            foreach (var info in BlocksInfo)
+                res.Add(new HashSet<string>(info.IN));
+            return res;
+        }
+
     }
 
 }

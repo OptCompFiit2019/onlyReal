@@ -1,16 +1,14 @@
 using System;
 using System.IO;
-using System.Text;
-using System.Reflection;
 using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
-using SimpleLang;
 using SimpleLang.Visitors;
 using SimpleLang.ThreeCodeOptimisations;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 using SimpleLang.Block;
-using SimpleLang.ThreeCodeOptimisations;
+using SimpleLang.GenericIterativeAlgorithm;
+using GenericTransferFunction;
 
 namespace SimpleCompiler
 {
@@ -19,7 +17,7 @@ namespace SimpleCompiler
         public static void Main(string[] args)
         {
 
-            string FileName = @"../../../data/OptLVN.txt";
+            string FileName = @"../../../data/DeadOrAliveOptimization.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try
@@ -62,27 +60,60 @@ namespace SimpleCompiler
                     // построение CFG по блокам
                     CFG controlFlowGraph = new CFG(blocks);
 
-                    Console.WriteLine("Блоки трехадресного кода до оптимизации");
-                    foreach (var block in controlFlowGraph.blocks)
-                        foreach (var line in block)
-                            Console.WriteLine(line);
+                    Console.WriteLine("Блоки трехадресного кода до каскадного удаления мертвых переменных\n" + controlFlowGraph);
 
+                    // вычисление множеств Def и Use для всего графа потоков данных                    
+                    var DefUse = new DefUseBlocks(controlFlowGraph);
 
-                    foreach (var block in controlFlowGraph.blocks)
+                    // создание информации о блоках
+                    var blocksInfo = new List<BlockInfo>();
+                    for(int i = 0; i < DefUse.DefBs.Count; i++)
+                        blocksInfo.Add(new BlockInfo(DefUse.DefBs[i], DefUse.UseBs[i]));
+
+                    // оператор сбора для анализа активных переменных
+                    Func<List<BlockInfo>, CFG, int, BlockInfo> meetOperator = (blocksInfos, graph, index) =>
                     {
-                        var replace = LVNOptimization.LVNOptimize(block);
-                        block.Clear();
-                        foreach (var line in replace)
-                            block.AddLast(line);
-                    }
+                        var successorIndexes = graph.cfg.GetOutputNodes(index);
+                        var resInfo = new BlockInfo(blocksInfos[index]);
+                        foreach(var i in successorIndexes)
+                            resInfo.OUT.UnionWith(blocksInfos[i].IN);
+                        return resInfo;
+                    };
 
-                    controlFlowGraph = LVNOptimization.LVNOptimize(controlFlowGraph);
+                    // делегат передаточной функции для анализа активных переменных
+                    Func<BlockInfo, BlockInfo> tFunc1 = (blockInfo) =>
+                    {
+                        blockInfo.IN = new HashSet<string>();
+                        blockInfo.IN.UnionWith(blockInfo.OUT);
+                        return blockInfo;
+                    };
 
-                    Console.WriteLine("\nПосле применения LVN\n" + controlFlowGraph);
-                    
-                    //foreach (var block in controlFlowGraph.blocks)
-                    //    foreach (var line in block)
-                    //        Console.WriteLine(line);
+                    Func<BlockInfo, BlockInfo> tFunc2 = (blockInfo) =>
+                    {
+                        blockInfo.IN.ExceptWith(blockInfo.HelpFirst);
+                        blockInfo.IN.UnionWith(blockInfo.HelpSecond);
+                        return blockInfo;
+                    };
+
+                    var transferFunction1 = new TransferFunction<BlockInfo>(tFunc1);
+                    var transferFunction2 = new TransferFunction<BlockInfo>(tFunc2);
+
+                    // создание объекта итерационного алгоритма
+                    var iterativeAlgorithm = new IterativeAlgorithm(blocksInfo, controlFlowGraph, meetOperator,
+                        false, new HashSet<string>(), new HashSet<string>(), transferFunction1 * transferFunction2);
+
+                    // выполнение алгоритма
+                    iterativeAlgorithm.Perform();
+
+                    //var Out = new List<HashSet<string>>();
+                    //foreach(var OUT in iterativeAlgorithm.)
+
+                    // вычисление множеств IN, OUT на основе DefUse
+                    var Out = new InOutActiveVariables(DefUse, controlFlowGraph).OutBlocks;
+
+                    controlFlowGraph = ControlFlowOptimisations.DeadOrAliveOnGraph(iterativeAlgorithm.GetOUTs(), controlFlowGraph);
+
+                    Console.WriteLine("\nПосле каскадного удаления мертвых переменных для графа\n" + controlFlowGraph);
 
                     // полученный controlFlowGraph можно обратно преобразовывать в исходный код
                 }

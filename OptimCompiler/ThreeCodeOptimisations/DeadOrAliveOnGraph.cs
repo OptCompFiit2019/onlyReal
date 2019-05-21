@@ -14,18 +14,18 @@ namespace SimpleLang.ThreeCodeOptimisations
         /// <param name="InOut"></param>
         /// <param name="graph"></param>
         /// <returns></returns>
-        public static ControlFlowGraph.ControlFlowGraph DeadOrAliveOnGraph(InOutActiveVariables InOut, ControlFlowGraph.ControlFlowGraph graph)
+        public static ControlFlowGraph.ControlFlowGraph DeadOrAliveOnGraph(List<HashSet<string>> OutBlocks, ControlFlowGraph.ControlFlowGraph graph)
         {
             var resGraph = new ControlFlowGraph.ControlFlowGraph(
                 new List<LinkedList<Visitors.ThreeCode>>(graph.blocks));
 
-            if (InOut.OutBlocks.Count != resGraph.blocks.Count)
+            if (OutBlocks.Count != resGraph.blocks.Count)
                 throw new ArgumentException("The number of elements in the sets OUT, graph.blocks must be equal");
 
             for (int i = resGraph.blocks.Count-1; i >= 0; i--)
             {
                 var variables = new Dictionary<string, bool>();
-                foreach (var v in InOut.OutBlocks[i])
+                foreach (var v in OutBlocks[i])
                     variables[v] = true;
 
                 resGraph.blocks[i] = DeadOrAliveOptimization.DeleteDeadVariables(resGraph.blocks[i], variables);
