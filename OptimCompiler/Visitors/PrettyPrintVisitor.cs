@@ -147,7 +147,7 @@ namespace SimpleLang.Visitors
             {
                 if (!(bl.StList[i] is EmptyNode))
                     Text += Environment.NewLine;
-                bl.StList[i].Visit(this);
+                bl.StList[i]?.Visit(this);
             }
             IndentMinus();
             Text += Environment.NewLine + IndentStr() + "}";

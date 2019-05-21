@@ -10,7 +10,6 @@ using SimpleLang.Visitors;
 using SimpleLang.ThreeCodeOptimisations;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 using SimpleLang.Block;
-using SimpleLang.ThreeCodeOptimisations;
 
 namespace SimpleCompiler
 {
@@ -19,7 +18,7 @@ namespace SimpleCompiler
         public static void Main(string[] args)
         {
 
-            string FileName = @"../../../data/OptLVN.txt";
+            string FileName = @"../../../data/DeadOrAliveOptimization.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try
@@ -39,14 +38,8 @@ namespace SimpleCompiler
                     Console.WriteLine("Синтаксическое дерево построено");
                     var r = parser.root;
 
-                    FillParentVisitor generateParent = new FillParentVisitor();
-                    r.Visit(generateParent);
-
-                    Opt2Visitor opt2 = new Opt2Visitor();
-                    r.Visit(opt2);
-                    PrettyPrintVisitor ppvis = new PrettyPrintVisitor();
-                    r.Visit(ppvis);
-                    Console.WriteLine(ppvis.Text);
+                    FillParentVisitor generateParrent = new FillParentVisitor();
+                    r.Visit(generateParrent);
 
                     Console.WriteLine("\nGenerate Three address code");
 
@@ -68,25 +61,20 @@ namespace SimpleCompiler
                     // построение CFG по блокам
                     CFG controlFlowGraph = new CFG(blocks);
 
-                    Console.WriteLine("Блоки трехадресного кода до оптимизации");
-                    foreach (var block in controlFlowGraph.blocks)
-                        foreach (var line in block)
-                            Console.WriteLine(line);
+                    Console.WriteLine("Блоки трехадресного кода до каскадного удаления мертвых переменных");
+                    Console.WriteLine(controlFlowGraph);
+                    //foreach (var block in controlFlowGraph.blocks)
+                    //    foreach (var line in block)
+                    //        Console.WriteLine(line);
 
 
-                    foreach (var block in controlFlowGraph.blocks)
-                    {
-                        var replace = LVNOptimization.LVNOptimize(block);
-                        block.Clear();
-                        foreach (var line in replace)
-                            block.AddLast(line);
-                    }
+                    controlFlowGraph = DeadOrAliveOptimization.DeleteDeadVariables(controlFlowGraph);
 
-                    Console.WriteLine("\nПосле применения LVN\n");
-                    foreach (var block in controlFlowGraph.blocks)
-                        foreach (var line in block)
-                            Console.WriteLine(line);
-
+                    Console.WriteLine("\nПосле каскадного удаления мертвых переменных для блоков по-отдельности\n");
+                    //foreach (var block in controlFlowGraph.blocks)
+                    //    foreach (var line in block)
+                    //        Console.WriteLine(line);
+                    Console.WriteLine(controlFlowGraph);
                     // полученный controlFlowGraph можно обратно преобразовывать в исходный код
                 }
             }

@@ -67,5 +67,25 @@ namespace SimpleLang.ThreeCodeOptimisations
             if (line.arg2 != null && line.arg2 is ThreeAddressStringValue && line.arg2.ToString() != "")
                 variables[line.arg2.ToString()] = true;
         }
+
+        /// <summary>
+        /// Возвращает результат каскадного удаления живых и мертвых переменных,
+        /// выполненного над графом <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph"></param>
+        public static ControlFlowGraph.ControlFlowGraph DeleteDeadVariables(ControlFlowGraph.ControlFlowGraph graph)
+        {
+            var resGraph = new ControlFlowGraph.ControlFlowGraph(
+                new List<LinkedList<Visitors.ThreeCode>>(graph.blocks));
+            foreach (var block in resGraph.blocks)
+            {
+                var replace = DeadOrAliveOptimization.DeleteDeadVariables(block);
+                block.Clear();
+                foreach (var line in replace)
+                    block.AddLast(line);
+            }
+
+            return resGraph;
+        }
     }
 }

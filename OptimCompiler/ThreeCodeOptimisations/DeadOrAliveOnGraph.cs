@@ -16,7 +16,8 @@ namespace SimpleLang.ThreeCodeOptimisations
         /// <returns></returns>
         public static ControlFlowGraph.ControlFlowGraph DeadOrAliveOnGraph(InOutActiveVariables InOut, ControlFlowGraph.ControlFlowGraph graph)
         {
-            var resGraph = new ControlFlowGraph.ControlFlowGraph(new List<LinkedList<Visitors.ThreeCode>>(graph.blocks));
+            var resGraph = new ControlFlowGraph.ControlFlowGraph(
+                new List<LinkedList<Visitors.ThreeCode>>(graph.blocks));
 
             if (InOut.OutBlocks.Count != resGraph.blocks.Count)
                 throw new ArgumentException("The number of elements in the sets OUT, graph.blocks must be equal");

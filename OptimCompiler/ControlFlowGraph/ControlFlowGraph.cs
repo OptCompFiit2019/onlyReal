@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using ProgramTree;
 using SimpleLang.Visitors;
 using SimpleLang.Block;
+using System.Text;
 namespace SimpleLang.ControlFlowGraph
 {
     public class Graph
@@ -182,5 +183,13 @@ namespace SimpleLang.ControlFlowGraph
             return this.cfg;
         }
 
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var block in blocks)
+                foreach (var line in block)
+                    sb.Append(line.ToString() + "\n");
+            return sb.ToString();
+        }
     }
 }
