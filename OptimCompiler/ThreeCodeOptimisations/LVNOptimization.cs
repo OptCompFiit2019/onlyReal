@@ -67,5 +67,25 @@ namespace SimpleLang.ThreeCodeOptimisations
 
             return block;
         }
+
+        /// <summary>
+        /// Возвращает результат применения к графу <paramref name="graph"/> оптимизацию LVN как новый граф.
+        /// </summary>
+        /// <param name="graph"></param>
+        public static ControlFlowGraph.ControlFlowGraph LVNOptimize(ControlFlowGraph.ControlFlowGraph graph)
+        {
+            var resGraph = new ControlFlowGraph.ControlFlowGraph(
+                new List<LinkedList<Visitors.ThreeCode>>(graph.blocks));
+
+            foreach (var block in resGraph.blocks)
+            {
+                var replace = LVNOptimization.LVNOptimize(block);
+                block.Clear();
+                foreach (var line in replace)
+                    block.AddLast(line);
+            }
+
+            return resGraph;
+        }
     }
 }
