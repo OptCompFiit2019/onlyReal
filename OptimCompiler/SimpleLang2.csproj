@@ -43,6 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
+    <Compile Include="ThreeCodeOptimisations\DeadOrAliveOnGraph.cs" />
+    <Compile Include="ThreeCodeOptimisations\DefBUseB.cs" />
+    <Compile Include="ThreeCodeOptimisations\IterAlgoActiveVariables.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
@@ -55,15 +59,16 @@
     <Compile Include="Visitors\PrettyPrintVisitor.cs" />
     <Compile Include="Visitors\StatementCountVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
-    <Compile Include="TreeCodeOptimisations\PullCopies.cs" />
-    <Compile Include="TreeCodeOptimisations\LVNOptimization.cs" />
-    <Compile Include="TreeCodeOptimisations\NonZeroOperator.cs" />
+    <Compile Include="ThreeCodeOptimisations\PullCopies.cs" />
+    <Compile Include="ThreeCodeOptimisations\LVNOptimization.cs" />
+    <Compile Include="ThreeCodeOptimisations\NonZeroOperator.cs" />
     <Compile Include="AstOptimisations\OptMulDivOneVisitor.cs" />
     <Compile Include="AstOptimisations\OptWhileVisitor.cs" />
     <Compile Include="AstOptimisations\PlusNonZero.cs" />
     <Compile Include="AstOptimisations\PrettyPrintVisitor.cs" />
-    <Compile Include="TreeCodeOptimisations\DAG.cs" />
-    <Compile Include="TreeCodeOptimisations\DeadOrAliveOptimization.cs" />
+    <Compile Include="TransferFunction\TransferFunction.cs" />
+    <Compile Include="ThreeCodeOptimisations\DAG.cs" />
+    <Compile Include="ThreeCodeOptimisations\DeadOrAliveOptimization.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />
     <Compile Include="TransferFunction.cs" />

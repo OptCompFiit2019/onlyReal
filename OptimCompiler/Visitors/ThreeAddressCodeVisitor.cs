@@ -177,7 +177,7 @@ namespace SimpleLang.Visitors
             }
 
             if (operation == ThreeOperator.Println)
-                return "println " + arg1.ToString();
+                return res + "println " + arg1.ToString();
 
             res += result + " = ";
             if (operation == ThreeOperator.Logic_not)
@@ -336,6 +336,8 @@ namespace SimpleLang.Visitors
             AddCode(new ThreeCode("", ThreeOperator.Goto, new ThreeAddressStringValue(label_end), null));            
 
             currentLabel = label_true;
+
+            AddCode(new ThreeCode(currentLabel, "", ThreeOperator.None, null, null));
             ifn.If.Visit(this);
 
             currentLabel = label_end;
