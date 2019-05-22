@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +6,10 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    public class Task1
+    public class NonZero_JTJ
     {
         public LinkedList<ThreeCode> code;
-        public Task1(ThreeAddressCodeVisitor Code)
+        public NonZero_JTJ(ThreeAddressCodeVisitor Code)
         {
             this.code = Code.GetCode();
         }
@@ -43,35 +43,24 @@ namespace SimpleLang.Visitors
                     continue;
                 }
 
-                if (line.Value.label == lblNew)
-                {
-                    line.Value.label = "";
-                }
-
-                if (line.Value.label == lblOld)
-                {
-                    line.Value.label = lblNew;
-                }
-
                 if (line.Value.operation == ThreeOperator.IfGoto)
                 {
                     inIf = true;
+
                     var tmp = line.Value.arg1 as ThreeAddressLogicValue;
                     var t = !tmp.Value;
                     (line.Value.arg1 as ThreeAddressLogicValue).Value = t;
 
                     if (!string.IsNullOrEmpty(line.Value.arg2.ToString()))
                     {
+                        var ee = line.Value.arg2.ToString();
                         lblOld = line.Value.arg2.ToString();
-                        var fp = String.Concat(lblOld.TakeWhile(x => !char.IsDigit(x)));
-                        var spstr = String.Concat(lblOld.SkipWhile(x => !char.IsDigit(x)).TakeWhile(x => char.IsDigit(x)));
-                        var sp = (int.Parse(spstr) + 1).ToString();
-                        lblNew = fp + sp;
-                        (line.Value.arg2 as ThreeAddressStringValue).Value = lblNew;
-
+                        var nn = line.Next.Value.arg1;
+                        (line.Value.arg2 as ThreeAddressStringValue).Value = (line.Next.Value.arg1 as ThreeAddressStringValue).Value;
+                        code.Remove(line.Next);
+                        line = line.Next;                      
                     }
                     line = line.Next.Next;
-                    //code.Remove(line.Next);
 
                     continue;
                 }
