@@ -88,11 +88,7 @@ namespace SimpleCompiler
 
                     SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
                     gen.Generate(treeCode.GetCode());
-                    var lst = gen.GetGenerator().commands;
-                    foreach(string cmd in lst)
-                    {
-                        Console.WriteLine(cmd);
-                    }
+					gen.PrintCommands();
                     Console.WriteLine("\nExecute:");
                     gen.Execute();
 
