@@ -25,6 +25,7 @@ namespace SimpleLang.Visitors
 				else if (binopn.Right == from)
 					binopn.Right = to;
 			}
+
 			else if (p is ForNode forn)
 			{
 				if (forn.Start == from) // Поиск подузла в Parent
@@ -32,7 +33,14 @@ namespace SimpleLang.Visitors
 				else if (forn.End == from)
 					forn.End = to;
 			}
-			else if (p is PrintlnNode pn)
+            else if (p is LogicOpNode logopn)
+            {
+                if (logopn.Left == from) // Поиск подузла в Parent
+                    logopn.Left = to;
+                else if (logopn.Right == from)
+                    logopn.Right = to;
+            }
+            else if (p is PrintlnNode pn)
 			{
 				if (pn.Expr == from) // Поиск подузла в Parent
 					pn.Expr = to;

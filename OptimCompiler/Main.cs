@@ -45,6 +45,15 @@ namespace SimpleCompiler
                     ThreeAddressCodeVisitor threeCode = new ThreeAddressCodeVisitor();
                     r.Visit(threeCode);
 
+                    var pepeVisitor = new PrettyPrintVisitor();
+                    r.Visit(pepeVisitor);
+                    //var r = parser.root;    // корень AST
+                    Console.Write("Before:\n" + pepeVisitor.Text);
+                    r.Visit(new FillParentVisitor());   // установка ссылок на родителей на AST
+                    pepeVisitor.Text = "";
+                    r.Visit(new OptMulDivOneVisitor());	// выполнение текущей оптимизации
+                    r.Visit(pepeVisitor);
+                    Console.Write("After:\n" + pepeVisitor.Text);
 
                     var blocks = new Block(threeCode).GenerateBlocks();
 
@@ -59,6 +68,7 @@ namespace SimpleCompiler
 
                     // построение CFG по блокам
                     CFG controlFlowGraph = new CFG(blocks);
+
 
                     Console.WriteLine("Блоки трехадресного кода до каскадного удаления мертвых переменных\n" + controlFlowGraph);
 
