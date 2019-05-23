@@ -1,8 +1,24 @@
 {
-int a, b, c, d;
-
-if(a > 3 * 1)
+int a, b;
+bool c;
+c = b > 2;
+if(b > 2)
 {
+for (a =1 to 10)
+{
+println(b);
+}
+}
+else
+{
+for (a =1 to 10) {
+println(a);
+}
+
+for (a =1 to 10){
+println(a);
+}
 
 }
+a = 2;
 }

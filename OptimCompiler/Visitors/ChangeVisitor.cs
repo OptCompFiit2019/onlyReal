@@ -33,6 +33,12 @@ namespace SimpleLang.Visitors
 				else if (forn.End == from)
 					forn.End = to;
 			}
+
+            else if(p is WhileNode whil)
+            {
+                if (whil.Expr == from)
+                    whil.Expr = to;
+            }
             else if (p is LogicOpNode logopn)
             {
                 if (logopn.Left == from) // Поиск подузла в Parent
@@ -40,6 +46,7 @@ namespace SimpleLang.Visitors
                 else if (logopn.Right == from)
                     logopn.Right = to;
             }
+
             else if (p is PrintlnNode pn)
 			{
 				if (pn.Expr == from) // Поиск подузла в Parent

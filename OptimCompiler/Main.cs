@@ -49,11 +49,11 @@ namespace SimpleCompiler
                     r.Visit(pepeVisitor);
                     //var r = parser.root;    // корень AST
                     Console.Write("Before:\n" + pepeVisitor.Text);
-                    r.Visit(new FillParentVisitor());   // установка ссылок на родителей на AST
-                    pepeVisitor.Text = "";
-                    r.Visit(new OptMulDivOneVisitor());	// выполнение текущей оптимизации
-                    r.Visit(pepeVisitor);
-                    Console.Write("After:\n" + pepeVisitor.Text);
+                    //r.Visit(new FillParentVisitor());   // установка ссылок на родителей на AST
+                    //pepeVisitor.Text = "";
+                    //r.Visit(new OptWhileVisitor());	// выполнение текущей оптимизации
+                    //r.Visit(pepeVisitor);
+                    //Console.Write("After:\n" + pepeVisitor.Text);
 
                     var blocks = new Block(threeCode).GenerateBlocks();
 
@@ -72,8 +72,13 @@ namespace SimpleCompiler
 
                     Console.WriteLine("Блоки трехадресного кода до каскадного удаления мертвых переменных\n" + controlFlowGraph);
 
+                    Console.WriteLine("\nБлоки трехадресного кода после удаления мертвых переменных\n" + DeadOrAliveOptimization.DeleteDeadVariables(controlFlowGraph));
+
                     // вычисление множеств Def и Use для всего графа потоков данных                    
                     var DefUse = new DefUseBlocks(controlFlowGraph);
+
+                    InOutActiveVariables inOutActive = new InOutActiveVariables(DefUse, controlFlowGraph);
+                    Console.WriteLine("\nПосле применения для графа\n" + ControlFlowOptimisations.DeadOrAliveOnGraph(DefUse.UseBs, controlFlowGraph));
 
                     // создание информации о блоках
                     var blocksInfo = new List<BlockInfo>();

@@ -15,9 +15,9 @@ namespace SimpleLang.Block
             this.code = _code.GetCode();
         }
 
-        public List<int> FindLiders()
+        public List<int> FindLeaders()
         {
-            var Liders = new List<int>();
+            var Leaders = new List<int>();
             int i = 1;
 
             bool PreviousIsGoto = false;
@@ -25,25 +25,25 @@ namespace SimpleLang.Block
             foreach (var line in this.code)
             {
                 if (i == 1)
-                    Liders.Add(i);
+                    Leaders.Add(i);
                 else
                     if (!String.IsNullOrEmpty(line.label))
-                        Liders.Add(i);
+                        Leaders.Add(i);
                     else
                         if (PreviousIsGoto)
-                            Liders.Add(i);
+                            Leaders.Add(i);
 
                 PreviousIsGoto = line.operation == ThreeOperator.Goto || line.operation == ThreeOperator.IfGoto;
                 
                 i += 1;
             }
 
-            return Liders;
+            return Leaders;
         }
 
         public List<LinkedList<ThreeCode>> GenerateBlocks()
         {
-            var Liders = FindLiders();
+            var Leaders = FindLeaders();
             int i = 1;
             int LiderInd = 0;
             
@@ -51,7 +51,7 @@ namespace SimpleLang.Block
 
             foreach (var line in this.code)
             {
-                if (LiderInd < Liders.Count && i == Liders[LiderInd])
+                if (LiderInd < Leaders.Count && i == Leaders[LiderInd])
                 {
                     Blocks.Add(new LinkedList<ThreeCode>());
                     LiderInd += 1;

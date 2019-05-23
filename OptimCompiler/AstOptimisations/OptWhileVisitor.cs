@@ -53,7 +53,8 @@ namespace SimpleLang.Visitors
                 ReplaceStat(wn, null);
                 IsPerformed = true;
             }
-                
+            else
+                wn.Stat?.Visit(this);
         }
     }
 }
