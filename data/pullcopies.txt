@@ -1,0 +1,9 @@
+{
+  int a, b, c, x, y, z, r, p;
+  a = b;
+  a = c;
+  x = a - c;
+  y = c * a;
+  a = c + r;
+  z = a / p;
+}

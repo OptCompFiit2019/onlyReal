@@ -1,27 +1,27 @@
-using System;
+﻿using System;
 using System.IO;
+using System.Text;
+using System.Reflection;
 using System.Collections.Generic;
 using SimpleScanner;
 using SimpleParser;
+using SimpleLang;
 using SimpleLang.Visitors;
 using SimpleLang.ThreeCodeOptimisations;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 using SimpleLang.Block;
-using SimpleLang.GenericIterativeAlgorithm;
-using GenericTransferFunction;
+using SimpleLang.ThreeCodeOptimisations;
 
 namespace SimpleCompiler
 {
     public class SimpleCompilerMain
     {
-        public static void Main(string[] args)
-        {
+        public static void Main(string[] args) {
 
             string FileName = @"../../../data/DeadOrAliveOptimization.txt";
             if (args.Length > 0)
                 FileName = args[0];
-            try
-            {
+            try {
                 string Text = File.ReadAllText(FileName);
 
                 Scanner scanner = new Scanner();
@@ -40,95 +40,140 @@ namespace SimpleCompiler
                     FillParentVisitor generateParrent = new FillParentVisitor();
                     r.Visit(generateParrent);
 
+
+                    //Console.WriteLine(r.ToString());
+
+                    /*Opt2Visitor opt2 = new Opt2Visitor();
+					r.Visit(opt2);
+
+                    PrettyPrintVisitor ppvis = new PrettyPrintVisitor();
+                    r.Visit(ppvis);
+                    Console.WriteLine(ppvis.Text);
+
+                    Console.WriteLine("\nAssignCountVisitor");
+                    AssignCountVisitor vis1 = new AssignCountVisitor();
+                    r.Visit(vis1);
+                    Console.WriteLine(vis1.Count);
+
+                    Console.WriteLine("\nStatementCountVisitor");
+                    StatementCountVisitor vis2 = new StatementCountVisitor();
+                    r.Visit(vis2);
+                    Console.WriteLine(vis2.Count);
+
+                    Console.WriteLine("\nMaxCountExprOpsVisitor");
+					MaxCountExprOpsVisitor vis3 = new MaxCountExprOpsVisitor();
+					r.Visit(vis3);
+					Console.WriteLine(vis3.Max);
+
+					Console.WriteLine("\nNestedCyclesVisitor");
+					NestedCyclesVisitor vis4 = new NestedCyclesVisitor();
+					r.Visit(vis4);
+					Console.WriteLine(vis4.HasNestedCycles);
+
+					Console.WriteLine("\nCycleNestedToIfVisitor");
+					CycleNestedToIfVisitor vis5 = new CycleNestedToIfVisitor();
+					r.Visit(vis5);
+					Console.WriteLine(vis5.HasCycleNestedToIf);
+
+                    Console.WriteLine("\nIfNestedToCycleVisitor");
+                    IfNestedToCycleVisitor vis6 = new IfNestedToCycleVisitor();
+                    r.Visit(vis6);
+                    Console.WriteLine(vis6.HasIfNestedToCycle);
+
+                    Console.WriteLine("\nMaxDepthOfNestedCyclesVisitor");
+                    MaxDepthOfNestedCyclesVisitor vis7 = new MaxDepthOfNestedCyclesVisitor();
+                    r.Visit(vis7);
+                    Console.WriteLine(vis7.Max);*/
+
                     Console.WriteLine("\nGenerate Three address code");
 
-                    ThreeAddressCodeVisitor threeCode = new ThreeAddressCodeVisitor();
-                    r.Visit(threeCode);
+                    ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
+                    r.Visit(treeCode);
+                    var blocks = new Block(treeCode).GenerateBlocks();
 
-                    var pepeVisitor = new PrettyPrintVisitor();
-                    r.Visit(pepeVisitor);
-                    //var r = parser.root;    // корень AST
-                    Console.Write("\nДо оптимизации:\n" + pepeVisitor.Text);
-                    r.Visit(new FillParentVisitor());   // установка ссылок на родителей на AST
-                    pepeVisitor.Text = "";
-                    r.Visit(new OptMulDivOneVisitor());	// выполнение текущей оптимизации
-                    r.Visit(pepeVisitor);
-                    Console.Write("\nПосле оптимизации:\n" + pepeVisitor.Text);
+                    // добавление фиктивных блоков входа и выхода программы
+                    var entryPoint = new LinkedList<ThreeCode>();
+                    entryPoint.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
+                    var exitPoint = new LinkedList<ThreeCode>();
+                    exitPoint.AddLast(new ThreeCode("exit", "", ThreeOperator.None, null, null));
+                    blocks.Insert(0, entryPoint);
+                    blocks.Add(exitPoint);
 
-                    var blocks = new Block(threeCode).GenerateBlocks();
-
-                    //добавление фиктивных блоков входа и выхода программы
-                    //var entryPoint = new LinkedList<ThreeCode>();
-                    //entryPoint.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
-                    //var exitPoint = new LinkedList<ThreeCode>();
-                    //exitPoint.AddLast(new ThreeCode("exit", "", ThreeOperator.None, null, null));
-                    //blocks.Insert(0, entryPoint);
-                    //blocks.Add(exitPoint);
-
-
-                    // построение CFG по блокам
+                    // построение CFG
                     CFG controlFlowGraph = new CFG(blocks);
-                    //controlFlowGraph = DeadOrAliveOptimization.DeleteDeadVariables(controlFlowGraph);
-                    //controlFlowGraph = LVNOptimization.LVNOptimize(controlFlowGraph);
-
-                    Console.WriteLine("\nБлоки трехадресного кода до оптимизации\n" + controlFlowGraph);
-
-                    Console.WriteLine("\nПосле применения LVN\n" + LVNOptimization.LVNOptimize(controlFlowGraph));
-
-                    //Console.WriteLine("\nБлоки трехадресного кода после удаления мертвых переменных\n" + DeadOrAliveOptimization.DeleteDeadVariables(controlFlowGraph));
-
-                    // вычисление множеств Def и Use для всего графа потоков данных                    
+                    Console.WriteLine(treeCode.ToString());
+                    // выполнение оптимизации для программы, не разбитой на блоки
+                    //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
+                    // вычисление множеств Def и Use для всего графа потоков данных
                     var DefUse = new DefUseBlocks(controlFlowGraph);
 
-                    //InOutActiveVariables inOutActive = new InOutActiveVariables(DefUse, controlFlowGraph);
-                    //controlFlowGraph = ControlFlowOptimisations.DeadOrAliveOnGraph(inOutActive.OutBlocks, controlFlowGraph);
-                    //Console.WriteLine("\nПосле применения для графа\n" + ControlFlowOptimisations.DeadOrAliveOnGraph(inOutActive.OutBlocks, controlFlowGraph));
+                    var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
 
-                    // создание информации о блоках
-                    var blocksInfo = new List<BlockInfo>();
-                    for(int i = 0; i < DefUse.DefBs.Count; i++)
-                        blocksInfo.Add(new BlockInfo(DefUse.DefBs[i], DefUse.UseBs[i]));
+                    ControlFlowOptimisations.DeadOrAliveOnGraph(InOut, controlFlowGraph);
+                    Console.WriteLine("\nafter DeleteDeadVariables for graph\n");
+                    foreach (var block in controlFlowGraph.blocks)
+                        foreach (var line in block)
+                            Console.WriteLine(line);
+                    Console.Write("");
+                    //DeadOrAliveOptimization.
 
-                    // оператор сбора для анализа активных переменных
-                    Func<List<BlockInfo>, CFG, int, BlockInfo> meetOperator = (blocksInfos, graph, index) =>
-                    {
-                        var successorIndexes = graph.cfg.GetOutputNodes(index);
-                        var resInfo = new BlockInfo(blocksInfos[index]);
-                        foreach(var i in successorIndexes)
-                            resInfo.OUT.UnionWith(blocksInfos[i].IN);
-                        return resInfo;
-                    };
 
-                    // делегат передаточной функции для анализа активных переменных
-                    Func<BlockInfo, BlockInfo> tFunc = (blockInfo) =>
-                    {
-                        blockInfo.IN = new HashSet<string>();
-                        blockInfo.IN.UnionWith(blockInfo.OUT);
-                        blockInfo.IN.ExceptWith(blockInfo.HelpFirst);
-                        blockInfo.IN.UnionWith(blockInfo.HelpSecond);
-                        return blockInfo;
-                    };
 
-                    var transferFunction = new TransferFunction<BlockInfo>(tFunc);
+                    //SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                    //gen.Generate(treeCode.GetCode());
+                    //var lst = gen.GetGenerator().commands;
+                    //foreach(string cmd in lst)
+                    //{
+                    //    Console.WriteLine(cmd);
+                    //}
+                    //Console.WriteLine("\nExecute:");
+                    //gen.Execute();
 
-                    // создание объекта итерационного алгоритма
-                    var iterativeAlgorithm = new IterativeAlgorithm(blocksInfo, controlFlowGraph, meetOperator,
-                        false, new HashSet<string>(), new HashSet<string>(), transferFunction);
+                    /*AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
+                    app.Add(new DistributionOfConstants());
+                    app.Add(new EvalConstExpr());
+                    app.Add(new ApplyAlgebraicIdentities());
 
-                    // выполнение алгоритма
-                    iterativeAlgorithm.Perform();
+                    var blocks = app.Apply(treeCode);
+                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(blocks));
 
-                    //var Out = new List<HashSet<string>>();
-                    //foreach(var OUT in iterativeAlgorithm.)
+					CFG cfg = new CFG(blocks);
+					TransferFunction tf = new TransferFunction(cfg);
+					Console.WriteLine("\nGen 1");
+					foreach (var d in tf.Gen(blocks[0]))
+						Console.WriteLine(d);
+					Console.WriteLine("\nGen");
+					foreach (var d in tf.Gen(blocks[3]))
+						Console.WriteLine(d);
+					Console.WriteLine("\nKill");
+					foreach (var d in tf.Kill(blocks[3]))
+						Console.WriteLine(d);
 
-                    // вычисление множеств IN, OUT на основе DefUse
-                    var Out = new InOutActiveVariables(DefUse, controlFlowGraph).OutBlocks;
+					Console.WriteLine("\nTransfer function");
+					var f = tf.BlockTransferFunction(blocks[3]);
+					foreach (var d in f(tf.Gen(blocks[0])))
+						Console.WriteLine(d);
 
-                    controlFlowGraph = ControlFlowOptimisations.DeadOrAliveOnGraph(iterativeAlgorithm.GetOUTs(), controlFlowGraph);
+					var code = treeCode.GetCode();
+                    app.Apply(code);*/
 
-                    Console.WriteLine("\nПосле каскадного удаления мертвых переменных для графа\n" + controlFlowGraph);
 
-                    // полученный controlFlowGraph можно обратно преобразовывать в исходный код
+
+                    /*Opt11Visitor opt11vis = new Opt11Visitor();
+                    ppvis.Text = "";
+                    r.Visit(opt11vis);
+                    r.Visit(ppvis);
+                    Console.WriteLine(ppvis.Text);*/
+
+
+                    /*var avis = new AssignCountVisitor();
+                    parser.root.Visit(avis);
+                    Console.WriteLine("Количество присваиваний = {0}", avis.Count);
+                    Console.WriteLine("-------------------------------");
+
+                    var pp = new PrettyPrintVisitor();
+                    parser.root.Visit(pp);
+                    Console.WriteLine(pp.Text);*/
                 }
             }
             catch (FileNotFoundException)
@@ -140,7 +185,30 @@ namespace SimpleCompiler
                 Console.WriteLine("{0}", e);
             }
 
-            Console.ReadLine();
+           Console.ReadLine();
+
+           // ========
+           // My part, don't touch !!!
+
+           // Sorry for this troubles, I deleted bad part
+
+           // CFG controlFlowGraph = new CFG(blocks);
+           // Console.WriteLine(treeCode.ToString());
+           // // выполнение оптимизации для программы, не разбитой на блоки
+           // //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
+           // // вычисление множеств Def и Use для всего графа потоков данных
+           // var DefUse = new DefUseBlocks(controlFlowGraph);
+           //
+           // var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
+           //
+           // ControlFlowOptimisations.DeadOrAliveOnGraph(InOut, controlFlowGraph);
+           // Console.WriteLine("\nafter DeleteDeadVariables for graph\n");
+           // foreach (var block in controlFlowGraph.blocks)
+           //     foreach (var line in block)
+           //         Console.WriteLine(line);
+           // Console.Write("");
+
+           // ========
         }
 
     }
