@@ -361,6 +361,8 @@ namespace SimpleLang.Visitors
         public override void VisitBlockNode(BlockNode bl) {
             foreach (var st in bl.StList)
                 st.Visit(this);
+            if (currentLabel != "")
+                AddCode(new ThreeCode(currentLabel, "", ThreeOperator.None, null, null));
         }
 
         private ThreeAddressValueType GenVariable(ExprNode expr) {

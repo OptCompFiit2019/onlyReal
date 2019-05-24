@@ -58,12 +58,12 @@ namespace SimpleCompiler
                     var blocks = new Block(threeCode).GenerateBlocks();
 
                     // добавление фиктивных блоков входа и выхода программы
-                    var entryPoint = new LinkedList<ThreeCode>();
-                    entryPoint.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
-                    var exitPoint = new LinkedList<ThreeCode>();
-                    exitPoint.AddLast(new ThreeCode("exit", "", ThreeOperator.None, null, null));
-                    blocks.Insert(0, entryPoint);
-                    blocks.Add(exitPoint);
+                    //var entryPoint = new LinkedList<ThreeCode>();
+                    //entryPoint.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
+                    //var exitPoint = new LinkedList<ThreeCode>();
+                    //exitPoint.AddLast(new ThreeCode("exit", "", ThreeOperator.None, null, null));
+                    //blocks.Insert(0, entryPoint);
+                    //blocks.Add(exitPoint);
 
 
                     // построение CFG по блокам

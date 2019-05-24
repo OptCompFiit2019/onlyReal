@@ -1,24 +1,23 @@
 {
 int a, b;
-bool c;
-c = b > 2;
 if(b > 2)
 {
-for (a =1 to 10)
+while(false)
 {
 println(b);
 }
+b = 333;
 }
 else
 {
-for (a =1 to 10) {
+while(false) {
 println(a);
 }
 
-for (a =1 to 10){
+while(true) {
 println(a);
 }
-
+a =3;
 }
 a = 2;
 }
