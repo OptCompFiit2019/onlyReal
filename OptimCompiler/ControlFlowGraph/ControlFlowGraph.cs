@@ -138,6 +138,7 @@ namespace SimpleLang.ControlFlowGraph
                         break;
                     case ThreeOperator.IfGoto:
                         cfg.AddArc(i, Labels[blocks[i].Last.Value.arg2.ToString()]);
+                        cfg.AddArc(i, i + 1);
                         break;
                     default:
                         cfg.AddArc(i, i + 1);

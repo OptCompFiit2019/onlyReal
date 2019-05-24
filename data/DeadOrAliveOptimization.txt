@@ -1,23 +1,11 @@
 {
 int a, b;
-if(b > 2)
-{
+a = 1 * 1 / 2 / 1 + a * 1 + 1 * a;
 while(false)
 {
-println(b);
-}
-b = 333;
-}
-else
+while(a * 1 + b / 1 + 1 * a)
 {
-while(false) {
-println(a);
 }
-
-while(true) {
-println(a);
-}
-a =3;
 }
 a = 2;
 }

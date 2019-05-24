@@ -48,16 +48,16 @@ namespace SimpleCompiler
                     var pepeVisitor = new PrettyPrintVisitor();
                     r.Visit(pepeVisitor);
                     //var r = parser.root;    // корень AST
-                    Console.Write("Before:\n" + pepeVisitor.Text);
-                    //r.Visit(new FillParentVisitor());   // установка ссылок на родителей на AST
-                    //pepeVisitor.Text = "";
-                    //r.Visit(new OptWhileVisitor());	// выполнение текущей оптимизации
-                    //r.Visit(pepeVisitor);
-                    //Console.Write("After:\n" + pepeVisitor.Text);
+                    Console.Write("\nДо оптимизации:\n" + pepeVisitor.Text);
+                    r.Visit(new FillParentVisitor());   // установка ссылок на родителей на AST
+                    pepeVisitor.Text = "";
+                    r.Visit(new OptMulDivOneVisitor());	// выполнение текущей оптимизации
+                    r.Visit(pepeVisitor);
+                    Console.Write("\nПосле оптимизации:\n" + pepeVisitor.Text);
 
                     var blocks = new Block(threeCode).GenerateBlocks();
 
-                    // добавление фиктивных блоков входа и выхода программы
+                    //добавление фиктивных блоков входа и выхода программы
                     //var entryPoint = new LinkedList<ThreeCode>();
                     //entryPoint.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
                     //var exitPoint = new LinkedList<ThreeCode>();
@@ -68,17 +68,21 @@ namespace SimpleCompiler
 
                     // построение CFG по блокам
                     CFG controlFlowGraph = new CFG(blocks);
+                    //controlFlowGraph = DeadOrAliveOptimization.DeleteDeadVariables(controlFlowGraph);
+                    //controlFlowGraph = LVNOptimization.LVNOptimize(controlFlowGraph);
 
+                    Console.WriteLine("\nБлоки трехадресного кода до оптимизации\n" + controlFlowGraph);
 
-                    Console.WriteLine("Блоки трехадресного кода до каскадного удаления мертвых переменных\n" + controlFlowGraph);
+                    Console.WriteLine("\nПосле применения LVN\n" + LVNOptimization.LVNOptimize(controlFlowGraph));
 
-                    Console.WriteLine("\nБлоки трехадресного кода после удаления мертвых переменных\n" + DeadOrAliveOptimization.DeleteDeadVariables(controlFlowGraph));
+                    //Console.WriteLine("\nБлоки трехадресного кода после удаления мертвых переменных\n" + DeadOrAliveOptimization.DeleteDeadVariables(controlFlowGraph));
 
                     // вычисление множеств Def и Use для всего графа потоков данных                    
                     var DefUse = new DefUseBlocks(controlFlowGraph);
 
-                    InOutActiveVariables inOutActive = new InOutActiveVariables(DefUse, controlFlowGraph);
-                    Console.WriteLine("\nПосле применения для графа\n" + ControlFlowOptimisations.DeadOrAliveOnGraph(DefUse.UseBs, controlFlowGraph));
+                    //InOutActiveVariables inOutActive = new InOutActiveVariables(DefUse, controlFlowGraph);
+                    //controlFlowGraph = ControlFlowOptimisations.DeadOrAliveOnGraph(inOutActive.OutBlocks, controlFlowGraph);
+                    //Console.WriteLine("\nПосле применения для графа\n" + ControlFlowOptimisations.DeadOrAliveOnGraph(inOutActive.OutBlocks, controlFlowGraph));
 
                     // создание информации о блоках
                     var blocksInfo = new List<BlockInfo>();
@@ -96,26 +100,20 @@ namespace SimpleCompiler
                     };
 
                     // делегат передаточной функции для анализа активных переменных
-                    Func<BlockInfo, BlockInfo> tFunc1 = (blockInfo) =>
+                    Func<BlockInfo, BlockInfo> tFunc = (blockInfo) =>
                     {
                         blockInfo.IN = new HashSet<string>();
                         blockInfo.IN.UnionWith(blockInfo.OUT);
-                        return blockInfo;
-                    };
-
-                    Func<BlockInfo, BlockInfo> tFunc2 = (blockInfo) =>
-                    {
                         blockInfo.IN.ExceptWith(blockInfo.HelpFirst);
                         blockInfo.IN.UnionWith(blockInfo.HelpSecond);
                         return blockInfo;
                     };
 
-                    var transferFunction1 = new TransferFunction<BlockInfo>(tFunc1);
-                    var transferFunction2 = new TransferFunction<BlockInfo>(tFunc2);
+                    var transferFunction = new TransferFunction<BlockInfo>(tFunc);
 
                     // создание объекта итерационного алгоритма
                     var iterativeAlgorithm = new IterativeAlgorithm(blocksInfo, controlFlowGraph, meetOperator,
-                        false, new HashSet<string>(), new HashSet<string>(), transferFunction1 * transferFunction2);
+                        false, new HashSet<string>(), new HashSet<string>(), transferFunction);
 
                     // выполнение алгоритма
                     iterativeAlgorithm.Perform();
