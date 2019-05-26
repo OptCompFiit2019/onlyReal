@@ -39,8 +39,8 @@ namespace OptGui
                 res.Add(new SimpleLang.ThreeCodeOptimisations.DistributionOfConstants());
             if (checkBox2.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.EvalConstExpr());
-            //if (checkBox3.Checked)
-              //  res.Add(new SimpleLang.ThreeCodeOptimisations)
+            if (checkBox3.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.ApplyAlgebraicIdentities());
             return res;
         }
         void UpdateForms() {
@@ -158,7 +158,8 @@ namespace OptGui
                     var timer = System.Diagnostics.Stopwatch.StartNew();
                     string ooo = gen.Execute();
                     timer.Stop();
-                    ooo = ooo + "\n\n\nExecuted: " + timer.ElapsedMilliseconds.ToString() + " ms";
+                    ooo = ooo + "\n\n\nExecuted: " + timer.ElapsedMilliseconds.ToString() + " ms"
+                        + " or " + timer.ElapsedTicks.ToString() + " ticks";
                     txt.Text = ooo;
                     return;
                 }
