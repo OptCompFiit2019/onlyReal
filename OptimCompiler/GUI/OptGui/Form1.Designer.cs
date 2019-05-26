@@ -94,6 +94,16 @@
             // 
             this.comboBox2.Dock = System.Windows.Forms.DockStyle.Top;
             this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Items.AddRange(new object[] {
+            "Исходный код",
+            "Трехадресный код",
+            "Блоки трехадресного кода",
+            "Граф потока управления",
+            "Запуск",
+            "Полученный трехадресный код",
+            "Блоки трехадресного кода",
+            "Граф потока управления",
+            "Запуск"});
             this.comboBox2.Location = new System.Drawing.Point(0, 0);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(350, 21);
@@ -125,15 +135,6 @@
             this.comboBox1.Dock = System.Windows.Forms.DockStyle.Top;
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
-            "Исходный код",
-            "Трехадресный код",
-            "Блоки трехадресного кода",
-            "Граф потока управления",
-            "Запуск",
-            "Полученный трехадресный код",
-            "Блоки трехадресного кода",
-            "Граф потока управления",
-            "Запуск",
             "Исходный код",
             "Трехадресный код",
             "Блоки трехадресного кода",

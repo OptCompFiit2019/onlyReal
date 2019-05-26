@@ -18,7 +18,7 @@ namespace SimpleCompiler
     {
         public static void Main(string[] args) {
 
-            string FileName = @"../../../data/DeadOrAliveOptimization.txt";
+            string FileName = @"../../../data/a8.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -105,7 +105,7 @@ namespace SimpleCompiler
                     // выполнение оптимизации для программы, не разбитой на блоки
                     //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
                     // вычисление множеств Def и Use для всего графа потоков данных
-                    var DefUse = new DefUseBlocks(controlFlowGraph);
+                    /*var DefUse = new DefUseBlocks(controlFlowGraph);
 
                     var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
 
@@ -114,20 +114,20 @@ namespace SimpleCompiler
                     foreach (var block in controlFlowGraph.blocks)
                         foreach (var line in block)
                             Console.WriteLine(line);
-                    Console.Write("");
+                    Console.Write("");*/
                     //DeadOrAliveOptimization.
 
 
 
-                    //SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
-                    //gen.Generate(treeCode.GetCode());
-                    //var lst = gen.GetGenerator().commands;
-                    //foreach(string cmd in lst)
-                    //{
-                    //    Console.WriteLine(cmd);
-                    //}
-                    //Console.WriteLine("\nExecute:");
-                    //gen.Execute();
+                    SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                    gen.Generate(treeCode.GetCode());
+                    var lst = gen.GetGenerator().commands;
+                    foreach(string cmd in lst)
+                    {
+                        Console.WriteLine(cmd);
+                    }
+                    Console.WriteLine("\nExecute:");
+                    gen.Execute();
 
                     /*AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
                     app.Add(new DistributionOfConstants());

@@ -84,7 +84,24 @@ namespace OptGui
                     txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(threeCodeVisitor.GetCode());
                     return;
                 }
-                    
+                if (m == Modes.BeforeRun) {
+                    SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                    gen.Generate(threeCodeVisitor.GetCode());
+                    var timer = System.Diagnostics.Stopwatch.StartNew();
+                    string res = gen.Execute();
+                    timer.Stop();
+                    res = res + "\n\n\nExecuted: " + timer.ElapsedMilliseconds.ToString() + " ms";
+                    txt.Text = res;
+                    //gen.Generate(treeCode.GetCode());
+                    //var lst = gen.GetGenerator().commands;
+                    //foreach(string cmd in lst)
+                    //{
+                    //    Console.WriteLine(cmd);
+                    //}
+                    //Console.WriteLine("\nExecute:");
+                    //gen.Execute();
+                }
+
             } catch (Exception e) {
                 txt.Text = e.ToString();
             }
