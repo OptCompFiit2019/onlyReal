@@ -30,6 +30,7 @@ namespace SimpleLang.ThreeCodeOptimisations{
 
             for (int i = 0; i < res.Count; i++) {
                 Apply(res[i]);
+                //Console.WriteLine(SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(res[i]) + "\n\n");
             }
 
             return res;

@@ -51,7 +51,7 @@ namespace SimpleLang.ThreeCodeOptimisations{
                         iarg1 = val.Value;
                     }
                     if (it.Value.arg1 is Visitors.ThreeAddressLogicValue vall) {
-                        iarg1val = true;
+                        barg1val = true;
                         barg1 = vall.Value;
                     }
                     if (it.Value.arg1 is Visitors.ThreeAddressDoubleValue val2) {
@@ -66,7 +66,7 @@ namespace SimpleLang.ThreeCodeOptimisations{
                         iarg2 = val.Value;
                     }
                     if (it.Value.arg2 is Visitors.ThreeAddressLogicValue vall) {
-                        iarg2val = true;
+                        barg2val = true;
                         barg2 = vall.Value;
                     }
                     if (it.Value.arg2 is Visitors.ThreeAddressDoubleValue val2) {
@@ -79,7 +79,7 @@ namespace SimpleLang.ThreeCodeOptimisations{
                 //Logic_not, Logic_neq };
 
                 if (it.Value.operation == Visitors.ThreeOperator.Logic_or && barg1val && barg2val) {
-
+                    Set(it, barg1 || barg2);
                 }
                 if (it.Value.operation == Visitors.ThreeOperator.Logic_and && barg1val && barg2val){
                     Set(it, barg1 && barg2);

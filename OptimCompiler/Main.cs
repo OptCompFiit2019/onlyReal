@@ -126,15 +126,15 @@ namespace SimpleCompiler
                     Console.WriteLine("\nExecute:");
                     gen.Execute();
 
-                    /*AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
+                    AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
                     app.Add(new DistributionOfConstants());
                     app.Add(new EvalConstExpr());
                     app.Add(new ApplyAlgebraicIdentities());
 
-                    var blocks = app.Apply(treeCode);
-                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(blocks));
+                    var blockws = app.Apply(treeCode);
+                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(blockws));
 
-					CFG cfg = new CFG(blocks);
+					/*CFG cfg = new CFG(blocks);
 					TransferFunction tf = new TransferFunction(cfg);
 					Console.WriteLine("\nGen 1");
 					foreach (var d in tf.Gen(blocks[0]))
