@@ -6,7 +6,7 @@ using SimpleLang.Visitors;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-	class ApplyAlgebraicIdentities : ThreeCodeOptimiser
+	public class ApplyAlgebraicIdentities : ThreeCodeOptimiser
     {
 		private bool _apply = false;
 

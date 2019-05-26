@@ -90,7 +90,8 @@ namespace OptGui
                     var timer = System.Diagnostics.Stopwatch.StartNew();
                     string res = gen.Execute();
                     timer.Stop();
-                    res = res + "\n\n\nExecuted: " + timer.ElapsedMilliseconds.ToString() + " ms";
+                    res = res + "\n\n\nExecuted: " + timer.ElapsedMilliseconds.ToString() + " ms"
+                        + " or " + timer.ElapsedTicks.ToString() + " ticks";
                     txt.Text = res;
                     //gen.Generate(treeCode.GetCode());
                     //var lst = gen.GetGenerator().commands;
