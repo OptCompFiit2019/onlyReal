@@ -20,6 +20,15 @@ namespace SimpleLang.Compiler
             return genc;
         }
 
+		public void PrintCommands()
+		{
+			var lst = genc.commands;
+			foreach (string cmd in lst)
+			{
+				Console.WriteLine(cmd);
+			}
+		}
+
         // 0 - int
         // 1 - bool
         // 2 - real

@@ -74,7 +74,7 @@ namespace ProgramTree
             this.Op = op;
             Type = Left.Type == type.treal || Right.Type == type.treal ?
                 type.treal :
-                type.tint;
+                Left.Type == type.tbool ? type.tbool : type.tint;
         }
         public override void Visit(Visitor v)
         {
