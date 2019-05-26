@@ -222,5 +222,20 @@ namespace OptGui
                 UpdateMode();
             }
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMode();
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMode();
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMode();
+        }
     }
 }
