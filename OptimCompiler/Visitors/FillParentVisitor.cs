@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ProgramTree;
 namespace SimpleLang.Visitors
 {
-    class FillParentVisitor : AutoVisitor
+    public class FillParentVisitor : AutoVisitor
     {
         Stack<Node> st = new Stack<Node>(); // можно заменить на List
         public FillParentVisitor() { st.Push(null);  }
