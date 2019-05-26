@@ -31,6 +31,38 @@ namespace OptGui
         public Form1()
         {
             InitializeComponent();
+            UpdateForms();
+        }
+        public SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser GetOptimiser() {
+            SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser res = new SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser();
+            if (checkBox1.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.DistributionOfConstants());
+            if (checkBox2.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.EvalConstExpr());
+            //if (checkBox3.Checked)
+              //  res.Add(new SimpleLang.ThreeCodeOptimisations)
+            return res;
+        }
+        void UpdateForms() {
+            Modes m1 = DetectMode(comboBox1);
+            Modes m2 = DetectMode(comboBox2);
+
+            button2.Enabled = true;
+            textBox1.ReadOnly = false;
+            textBox2.ReadOnly = false;
+
+            bool enable_save = true;
+            enable_save = !(m1 == Modes.Text && m2 == Modes.Text);
+
+            enable_save = enable_save && ((m1 == Modes.Text) || (m2 == Modes.Text)) && FileName.Length > 0;
+
+            button2.Enabled = enable_save;
+
+            textBox1.ReadOnly = m1 != Modes.Text;
+            textBox2.ReadOnly = m2 != Modes.Text;
+            this.Text = "FIIT";
+            if (FileName.Length > 0)
+                this.Text = this.Text + ": " + FileName;
         }
         Modes DetectMode(ComboBox box) {
             /*
@@ -92,15 +124,45 @@ namespace OptGui
                     timer.Stop();
                     res = res + "\n\n\nExecuted: " + timer.ElapsedMilliseconds.ToString() + " ms";
                     txt.Text = res;
-                    //gen.Generate(treeCode.GetCode());
-                    //var lst = gen.GetGenerator().commands;
-                    //foreach(string cmd in lst)
-                    //{
-                    //    Console.WriteLine(cmd);
-                    //}
-                    //Console.WriteLine("\nExecute:");
-                    //gen.Execute();
+                    return;
                 }
+                
+                if (m == Modes.BeforeBlocks) {
+                    var blocks = new SimpleLang.Block.Block(threeCodeVisitor).GenerateBlocks();
+                    txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(blocks);
+                    return;
+                }
+                var opt = GetOptimiser();
+                var outcode = opt.Apply(threeCodeVisitor);
+
+                if (m == Modes.AfterBlocks) {
+                    txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(outcode);
+                    return;
+                }
+                if (m == Modes.AfterTbreeCode) {
+                    System.Collections.Generic.LinkedList<SimpleLang.Visitors.ThreeCode> res = new System.Collections.Generic.LinkedList<SimpleLang.Visitors.ThreeCode>();
+                    foreach (var block in outcode)
+                        foreach (SimpleLang.Visitors.ThreeCode code in block)
+                            res.AddLast(code);
+                    txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(res);
+                    return;
+                }
+                if (m == Modes.AfterRun) {
+                    System.Collections.Generic.LinkedList<SimpleLang.Visitors.ThreeCode> res = new System.Collections.Generic.LinkedList<SimpleLang.Visitors.ThreeCode>();
+                    foreach (var block in outcode)
+                        foreach (SimpleLang.Visitors.ThreeCode code in block)
+                            res.AddLast(code);
+                    SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                    gen.Generate(res);
+                    var timer = System.Diagnostics.Stopwatch.StartNew();
+                    string ooo = gen.Execute();
+                    timer.Stop();
+                    ooo = ooo + "\n\n\nExecuted: " + timer.ElapsedMilliseconds.ToString() + " ms";
+                    txt.Text = ooo;
+                    return;
+                }
+
+                txt.Text = "Is not implemented";
 
             } catch (Exception e) {
                 txt.Text = e.ToString();
@@ -123,18 +185,40 @@ namespace OptGui
                 FileName = openFileDialog1.FileName;
                 UpdateMode();
             }
+            UpdateForms();
+
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             Modes m1 = DetectMode(comboBox1);
             UpdateTab(m1, textBox1);
+            UpdateForms();
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             Modes m1 = DetectMode(comboBox2);
             UpdateTab(m1, textBox2);
+            UpdateForms();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (FileName.Length == 0)
+                return;
+            Modes m1 = DetectMode(comboBox1);
+            Modes m2 = DetectMode(comboBox2);
+
+            string newtxt = "";
+            if (m1 == Modes.Text)
+                newtxt = textBox1.Text;
+            if (m2 == Modes.Text)
+                newtxt = textBox2.Text;
+            if (newtxt.Length > 0) {
+                System.IO.File.WriteAllText(FileName, newtxt);
+                UpdateMode();
+            }
         }
     }
 }
