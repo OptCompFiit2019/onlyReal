@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using ProgramTree;
 using SimpleLang.Visitors;
 using SimpleLang.Block;
+using System.Text;
 namespace SimpleLang.ControlFlowGraph
 {
     public class Graph
@@ -137,6 +138,7 @@ namespace SimpleLang.ControlFlowGraph
                         break;
                     case ThreeOperator.IfGoto:
                         cfg.AddArc(i, Labels[blocks[i].Last.Value.arg2.ToString()]);
+                        cfg.AddArc(i, i + 1);
                         break;
                     default:
                         cfg.AddArc(i, i + 1);
@@ -182,5 +184,13 @@ namespace SimpleLang.ControlFlowGraph
             return this.cfg;
         }
 
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var block in blocks)
+                foreach (var line in block)
+                    sb.Append(line.ToString() + "\n");
+            return sb.ToString();
+        }
     }
 }

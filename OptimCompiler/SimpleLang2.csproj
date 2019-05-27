@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlFlowGraph\GraphDepth.cs" />
+    <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
     <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOnGraph.cs" />
     <Compile Include="ThreeCodeOptimisations\DefBUseB.cs" />
@@ -65,7 +67,6 @@
     <Compile Include="AstOptimisations\OptMulDivOneVisitor.cs" />
     <Compile Include="AstOptimisations\OptWhileVisitor.cs" />
     <Compile Include="AstOptimisations\PlusNonZero.cs" />
-    <Compile Include="AstOptimisations\PrettyPrintVisitor.cs" />
     <Compile Include="TransferFunction\TransferFunction.cs" />
     <Compile Include="ThreeCodeOptimisations\DAG.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOptimization.cs" />

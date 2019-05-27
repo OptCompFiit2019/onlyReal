@@ -6,20 +6,31 @@ namespace SimpleLang.ThreeCodeOptimisations
 {
     class ControlFlowOptimisations
     {
-        //    пройти по списку блоков и используя OUT как начальные сведения о "живости" переменных произвести оптимизацию
-        public static void DeadOrAliveOnGraph(InOutActiveVariables InOut, ControlFlowGraph.ControlFlowGraph graph)
+        /// <summary>
+        /// Применяет к графу <paramref name="graph"/> удаление мертвых переменных на основе
+        /// информации о множествах IN и OUT для блоков из <paramref name="InOut"/>.
+        /// Возвращает новый граф с выполненной на нем оптимизацией без изменения исходного графа.
+        /// </summary>
+        /// <param name="InOut"></param>
+        /// <param name="graph"></param>
+        /// <returns></returns>
+        public static ControlFlowGraph.ControlFlowGraph DeadOrAliveOnGraph(List<HashSet<string>> OutBlocks, ControlFlowGraph.ControlFlowGraph graph)
         {
-            if (InOut.OutBlocks.Count != graph.blocks.Count)
+            var resGraph = new ControlFlowGraph.ControlFlowGraph(
+                new List<LinkedList<Visitors.ThreeCode>>(graph.blocks));
+
+            if (OutBlocks.Count != resGraph.blocks.Count)
                 throw new ArgumentException("The number of elements in the sets OUT, graph.blocks must be equal");
 
-            for (int i = graph.blocks.Count-1; i >= 0; i--)
+            for (int i = resGraph.blocks.Count-1; i >= 0; i--)
             {
                 var variables = new Dictionary<string, bool>();
-                foreach (var v in InOut.OutBlocks[i])
+                foreach (var v in OutBlocks[i])
                     variables[v] = true;
 
-                DeadOrAliveOptimization.DeleteDeadVariables(graph.blocks[i], variables);
+                resGraph.blocks[i] = DeadOrAliveOptimization.DeleteDeadVariables(resGraph.blocks[i], variables);
             }
+            return resGraph;
         }
     }
 }
