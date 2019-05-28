@@ -1,85 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+# Устранение локальных общих подвыражений построением ациклического графа
 
-namespace SimpleLang.Visitors
-{
-    class DAGBlocks
-    {
-        private LinkedList<ThreeCode> program;
-        public LinkedList<ThreeCode> Program
-        {
-            set { program = value; }
-            get { return program; }
-        }
-        public ThreeAddressCodeVisitor treecode;
+(Трёхадресный код: устранение локальных общих подвыражений построением ациклического графа)
 
-        public DAGBlocks(ThreeAddressCodeVisitor code)
-        {
-            treecode = code;
-            Program = code.GetCode();
-        }
+## qwerty
 
-        public void Optimize()
-        {
-            var blocks = new SimpleLang.Block.Block(treecode).GenerateBlocks();
-            var result = new List<ThreeCode>();
+### Постановка задачи
 
-            for (int i = 0; i < blocks.Count; i++)
-            {
-                if (blocks[i].Count > 1)
-                {
-                    var graph = new DAG(blocks[i].ToList());
-                    var prog = graph.Optimize();
-                    foreach (var cmd in prog)
-                        result.Add(cmd);
-                }
-                else
-                    result.Add(blocks[i].First.Value);
-            }
-            Program = new LinkedList<ThreeCode>(result);
-        }
-    }
+Задача состояла в реализации оптимизации «устранение локальных общих подвыражений построением ациклического графа»
 
+### Зависимости задач в графе задач
 
-    class GraphNode
-    {
-        public ThreeCode code;
-        public GraphNode left;
-        public GraphNode right;
+Данная задача не зависит от других задач в графе задач и не порождает новых зависимостей.
 
-        public GraphNode(ThreeCode code)
-        {
-            this.code = code;
-            left = null;
-            right = null;
-        }
+### Теория
 
-        public GraphNode(ThreeCode code, GraphNode l, GraphNode r)
-        {
-            this.code = code;
-            left = l;
-            right = r;
-        }
+Устранение локальных общих подвыражений с помощью ациклического графа происходит в 2 этапа:
 
-        public override bool Equals(object obj)
-        {
-            if (obj is GraphNode n)
-                return this.code == n.code;
-            else
-                return false;
-        }
+1. Построение ориентированного ациклического графа, у которого вершинами являются бинарные операции а потомками выражения описывающие arg1 и arg2 трёхадресного кода. Вершины помечаются переменными, которым присваиваются соответствующие данной вершине бинарные операции.
 
-        public override string ToString()
-        {
-            string l = (left != null) ? left.code.result : "null";
-            string r = (right != null) ? right.code.result : "null";
-            return code.ToString() + string.Format("  left: {0};   right: {1}", l, r);
-        }
-    }
+2. Восстановление трёхадресного кода по ориентированному ациклическому графу происходит рекурсивно с корня орграфа. Если вершина помечена несколькими переменными, то код генерируется только для первой переменной, а для остальных генерируются команды копирования.
 
-    class DAG
+### Особенности реализации
+
+```csharp
+
+class DAG
     {
         public GraphNode root;
         public List<ThreeCode> program;
@@ -96,7 +41,7 @@ namespace SimpleLang.Visitors
             foreach (var cmd in program)
             {
                 if (cmd.operation == ThreeOperator.Assign || cmd.operation == ThreeOperator.Goto
-                    || (cmd.label != "" && cmd.arg1 == null))
+                    || (cmd.label!="" && cmd.arg1==null))
                     continue;
                 //Переименовываем переменные, которые были переприсвоены
                 if (defs.ContainsKey(cmd.arg1.ToString()))
@@ -119,7 +64,7 @@ namespace SimpleLang.Visitors
                     defs[cmd.result] = new List<string>() { cmd.result };
                 else
                 {
-                    defs[cmd.result].Add(cmd.result + "#" + defs[cmd.result].Count.ToString());
+                    defs[cmd.result].Add(cmd.result + "#" +defs[cmd.result].Count.ToString());
                     cmd.result = defs[cmd.result][defs[cmd.result].Count - 1];
                 }
 
@@ -160,7 +105,7 @@ namespace SimpleLang.Visitors
         {
             var program = new List<ThreeCode>();
             int i = 0;
-            for (i = 0; i < prog.Count - 1; i++)
+            for (i = 0; i < prog.Count -1; i++)
             {
                 if (prog[i + 1].arg1 != null && prog[i].result.Equals(prog[i + 1].arg1.ToString()) && prog[i].result.Contains("temp_") && prog[i + 1].arg2 == null)
                 {
@@ -210,7 +155,7 @@ namespace SimpleLang.Visitors
 
                 var arg = program[i].arg1.ToString();
                 ind = arg.IndexOf('#');
-                if (ind != -1)
+                if (ind!=-1)
                     program[i].arg1 = new ThreeAddressStringValue(arg.Remove(ind));
 
                 if (program[i].arg2 != null)
@@ -244,4 +189,54 @@ namespace SimpleLang.Visitors
             return new LinkedList<ThreeCode>(result);
         }
     }
-}
+```
+
+Конструктор класса _DAG_ принимает в качестве аргумента трёхадресный код программы в виде списка команд трёхадресного кода. В конструкторе вызывается метод _MakeProgram_, которая убирает лишние переменные ```temp_``` где это возможно, чтобы улучшить читаемость кода и для удобства применении оптимизации. Например:
+До вызова _MakeProgram_:
+```
+temp_1 = b + c
+a = temp_1
+```
+После вызова _MakeProgram_:
+```
+a = b + c
+```
+Перебираются все команды трёхадресного кода, и строится по ним ациклический орграф.
+_vars_ - словарь, который хранит для каждого узла графа те переменные, которыми он помечен.
+
+_GraphNodes_ - словарь, который ставит каждой команде трёхадресного кода в соответствие узел графа.
+
+_defs_ - словарь, который хранит первоначальное имя переменной и её временные названия (пронумерованные), которые используются для определения тех перменных, которые в ходе программы переприсваиваются.
+
+Вспомогательный метод _ShowGraph_ может использоваться для форматированого вывода содержимого графа.
+
+Вспомогательный метод _RightPartsEquals_ используется для сравнения на равенство правой части команды трёхадресного кода, то есть её аргументов
+Вспомогательный метод _RemoveVarNumbers_ удаляет в названиях переменных номера, которыми переменные были пронумеровано во время составления словаря _defs_
+
+Метод _Optimize_ собирает трёхадресный код программы по построенному дереву.
+
+### Тесты
+
+Программа до применения оптимизации:
+```
+x = x
+a = b + c
+b = a - d
+c = b + c
+d = a - d
+e = d
+k = m + l
+p = m + l 
+```
+
+Программа после применения оптимизации:
+```
+x = x
+a = b + c
+b = a - d
+c = b + c
+d = b
+e = d
+k = m + l
+p = k
+```

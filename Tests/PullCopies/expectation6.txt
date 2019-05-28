@@ -1,0 +1,9 @@
+{
+	real a,b,c,d,x,y;
+	a = x;
+	b = y;
+	c = x / y;
+	b = c * x;
+	a = b - c;
+	d = a + b;
+}
