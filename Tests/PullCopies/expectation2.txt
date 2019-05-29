@@ -1,0 +1,11 @@
+{
+	real a,b,c,d,e,k,x,y;
+	int i;
+	a = b;
+	for(i=1 to 10)
+	{
+		c = a;
+		d = a + e;
+		a = d - a;
+	}
+}

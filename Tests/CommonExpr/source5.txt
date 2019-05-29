@@ -1,0 +1,9 @@
+{
+  int a, c, d, f, t, e;
+  c = a - d;
+  t = c + 1;
+  c = 2;
+  d = f;
+  e = a - d;
+  c = a - d;
+}
