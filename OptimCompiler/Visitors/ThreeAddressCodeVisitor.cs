@@ -280,7 +280,22 @@ namespace SimpleLang.Visitors
 
 
         public override void VisitAssignNode(AssignNode a) {
-            AddCode(new ThreeCode(a.Id.ToString(), GenVariable(a.Expr)));
+            if (a.Expr is BinOpNode binOp && (binOp.Left is IdNode || binOp.Left is DoubleNumNode || binOp.Left is IntNumNode)
+                    && (binOp.Right is IdNode || binOp.Right is DoubleNumNode || binOp.Right is IntNumNode))
+            {
+                ThreeAddressValueType arg1 = GenVariable(binOp.Left);
+                ThreeAddressValueType arg2 = GenVariable(binOp.Right);
+                AddCode(new ThreeCode(a.Id.ToString(), ThreeCode.ParseOperator(binOp.Op), arg1, arg2));
+            }
+            else if (a.Expr is LogicOpNode logOp && (logOp.Left is IdNode || logOp.Left is DoubleNumNode || logOp.Left is IntNumNode)
+                    && (logOp.Right is IdNode || logOp.Right is DoubleNumNode || logOp.Right is IntNumNode))
+            {
+                ThreeAddressValueType arg1 = GenVariable(logOp.Left);
+                ThreeAddressValueType arg2 = GenVariable(logOp.Right);
+                AddCode(new ThreeCode(a.Id.ToString(), ThreeCode.ParseOperator(logOp.Operation), arg1, arg2));
+            }
+            else
+                AddCode(new ThreeCode(a.Id.ToString(), GenVariable(a.Expr)));
         }
 
         public override void VisitWhileNode(WhileNode w) {
@@ -346,6 +361,8 @@ namespace SimpleLang.Visitors
         public override void VisitBlockNode(BlockNode bl) {
             foreach (var st in bl.StList)
                 st.Visit(this);
+            if (currentLabel != "")
+                AddCode(new ThreeCode(currentLabel, "", ThreeOperator.None, null, null));
         }
 
         private ThreeAddressValueType GenVariable(ExprNode expr) {
@@ -355,15 +372,15 @@ namespace SimpleLang.Visitors
 
             if (expr is DoubleNumNode)
                 return new ThreeAddressDoubleValue((expr as DoubleNumNode).Num);
+
             if (expr is IntNumNode)
                 return new ThreeAddressIntValue((expr as IntNumNode).Num);
 
-            if (expr is BinOpNode) {
-                BinOpNode op = expr as BinOpNode;
+            if (expr is BinOpNode binOp) {
                 string res = GenTempVariable();
-                ThreeAddressValueType arg1 = GenVariable(op.Left);
-                ThreeAddressValueType arg2 = GenVariable(op.Right);
-                ThreeOperator p = ThreeCode.ParseOperator(op.Op);
+                ThreeAddressValueType arg1 = GenVariable(binOp.Left);
+                ThreeAddressValueType arg2 = GenVariable(binOp.Right);
+                ThreeOperator p = ThreeCode.ParseOperator(binOp.Op);
                 AddCode(new ThreeCode(res, p, arg1, arg2));
                 return new ThreeAddressStringValue(res);
             }

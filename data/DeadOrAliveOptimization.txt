@@ -1,19 +1,11 @@
 {
 int a, b;
-b = a;
-a = 1;
-a=2;
-a=3;
-
-b=a+1;
-b=b+a;
-if(a)
+for(a=1 to 5)
 {
-b=2;
+while(a)
+{
+    b = 5;
 }
-else
-{b = 3;
-a = a + b;
 }
-println(b);
+a = 2;
 }

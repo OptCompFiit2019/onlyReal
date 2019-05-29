@@ -8,29 +8,34 @@ namespace SimpleLang.ThreeCodeOptimisations
     class DeadOrAliveOptimization
     {
         /// <summary>
-        /// Изменяет передаваемый блок <paramref name="block"/>, выполняя каскадное удаление живых и мертвых переменных.
+        /// Возвращает результат каскадного удаления живых и мертвых переменных,
+        /// выполненного над передаваемым блоком <paramref name="block"/>.
         /// </summary>
         /// <param name="block"></param>
-        public static void DeleteDeadVariables(LinkedList<ThreeCode> block)
+        public static LinkedList<ThreeCode> DeleteDeadVariables(LinkedList<ThreeCode> block)
         {
             var variables = new Dictionary<string, bool>();
-            AddThreeCodeLine(block.Last.Value, variables);
+            // сначала добавляются все аргументы, которые хоть раз были определены
+            // это консервативное предположение о последующем использовании этих определений
             foreach(var line in block)
                 if(!line.result.StartsWith("temp_"))
                     variables[line.result] = true;
-            DeleteDeadVariables(block, variables);
+            return DeleteDeadVariables(block, variables);
         }
 
         /// <summary>
-        /// Изменяет передаваемый блок <paramref name="block"/>, выполняя каскадное удаление живых и мертвых переменных
-        /// при использовании предварительной информации о "живости" переменных из словаря <paramref name="variables"/>
+        /// Возвращает результат каскадного удаления живых и мертвых переменных,
+        /// выполненного над передаваемым блоком <paramref name="block"/>.
+        /// При этом используется предварительная информация о "живости" переменных 
+        /// из словаря <paramref name="variables"/>
         /// </summary>
         /// <param name="block"></param>
         /// <param name="variables"></param>
-        public static void DeleteDeadVariables(LinkedList<ThreeCode> block, Dictionary<string, bool> variables)
+        public static LinkedList<ThreeCode> DeleteDeadVariables(LinkedList<ThreeCode> block, Dictionary<string, bool> variables)
         {
-            LinkedListNode<ThreeCode> current = block.Last;
-
+            var result = new LinkedList<ThreeCode>(block);
+            LinkedListNode<ThreeCode> current = result.Last;
+            
             while (current != null)
             {
                 var previous = current.Previous;
@@ -38,11 +43,12 @@ namespace SimpleLang.ThreeCodeOptimisations
                     if (current.Value.label != null && current.Value.label != "")
                         current.Value = new ThreeCode(current.Value.label, "", ThreeOperator.None, null, null);
                     else
-                        block.Remove(current);
+                        result.Remove(current);
                 else
                     AddThreeCodeLine(current.Value, variables);
                 current = previous;
             }
+            return result;
         }
 
         /// <summary>
@@ -60,6 +66,26 @@ namespace SimpleLang.ThreeCodeOptimisations
 
             if (line.arg2 != null && line.arg2 is ThreeAddressStringValue && line.arg2.ToString() != "")
                 variables[line.arg2.ToString()] = true;
+        }
+
+        /// <summary>
+        /// Возвращает результат каскадного удаления живых и мертвых переменных,
+        /// выполненного над графом <paramref name="graph"/>.
+        /// </summary>
+        /// <param name="graph"></param>
+        public static ControlFlowGraph.ControlFlowGraph DeleteDeadVariables(ControlFlowGraph.ControlFlowGraph graph)
+        {
+            var resGraph = new ControlFlowGraph.ControlFlowGraph(
+                new List<LinkedList<Visitors.ThreeCode>>(graph.blocks));
+            foreach (var block in resGraph.blocks)
+            {
+                var replace = DeadOrAliveOptimization.DeleteDeadVariables(block);
+                block.Clear();
+                foreach (var line in replace)
+                    block.AddLast(line);
+            }
+
+            return resGraph;
         }
     }
 }
