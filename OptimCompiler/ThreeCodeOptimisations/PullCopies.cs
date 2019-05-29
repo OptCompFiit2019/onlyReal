@@ -47,7 +47,7 @@ namespace SimpleLang.Visitors
 
         public PullCopies(List<ThreeCode> prog)
         {
-            program = MakeProgram(prog);
+            program = prog;//MakeProgram(prog);
         }
 
         public List<ThreeCode> MakeProgram(List<ThreeCode> prog)
@@ -78,22 +78,30 @@ namespace SimpleLang.Visitors
             {
                 string def;
                 ThreeAddressValueType newArg;
-                if (program[i].arg2 == null)
+                if (program[i].arg2 == null && !program[i].arg1.ToString().Contains("temp_"))
                 {
                     def = program[i].result;
                     newArg = program[i].arg1;
                 }
                 else
                     continue;
+                bool same_def = false;
                 for (int j = i + 1; j < program.Count; j++)
                 {
+                    //Проверка на то, что достигли переопределения переменной def,
+                    //но чтобы была возможность протащить в это определение копию, цикл прервём в конце тела цикла.
+                    //Для этого создан флаг same_def
                     if (program[j].result == def)
-                        break;
+                        same_def = true;
+
                     if (program[j].arg1 != null && program[j].arg1.ToString() == def)
                         program[j].arg1 = newArg;
 
                     if (program[j].arg2 != null && program[j].arg2.ToString() == def)
                         program[j].arg2 = newArg;
+
+                    if (same_def)
+                        break;
                 }
             }
             return new LinkedList<ThreeCode>(program);
