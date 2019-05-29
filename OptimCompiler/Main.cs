@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Reflection;
@@ -9,6 +9,9 @@ using SimpleLang;
 using SimpleLang.Visitors;
 using SimpleLang.ThreeCodeOptimisations;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
+using SimpleLang.Block;
+using SimpleLang.ThreeCodeOptimisations;
+using SimpleLang.ControlFlowGraph;
 
 namespace SimpleCompiler
 {
@@ -16,6 +19,7 @@ namespace SimpleCompiler
     {
         public static void Main(string[] args) {
             string FileName = @"../../../data/fib.txt";
+            string FileName = @"../../../data/DeadOrAliveOptimization.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -37,9 +41,10 @@ namespace SimpleCompiler
                     FillParentVisitor generateParrent = new FillParentVisitor();
                     r.Visit(generateParrent);
 
-					//Console.WriteLine(r.ToString());
 
-					/*Opt2Visitor opt2 = new Opt2Visitor();
+                    //Console.WriteLine(r.ToString());
+
+                    /*Opt2Visitor opt2 = new Opt2Visitor();
 					r.Visit(opt2);
 
                     PrettyPrintVisitor ppvis = new PrettyPrintVisitor();
@@ -82,15 +87,46 @@ namespace SimpleCompiler
                     Console.WriteLine(vis7.Max);*/
 
                     Console.WriteLine("\nGenerate Three address code");
+
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
+                    var blocks = new Block(treeCode).GenerateBlocks();
+
+                    // добавление фиктивных блоков входа и выхода программы
+                    var entryPoint = new LinkedList<ThreeCode>();
+                    entryPoint.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
+                    var exitPoint = new LinkedList<ThreeCode>();
+                    exitPoint.AddLast(new ThreeCode("exit", "", ThreeOperator.None, null, null));
+                    blocks.Insert(0, entryPoint);
+                    blocks.Add(exitPoint);
+
+                    // построение CFG
+                    CFG controlFlowGraph = new CFG(blocks);
+                    Console.WriteLine("\nГлубина графа:\n"+GraphDepth.GetGraphDepth(controlFlowGraph));
                     Console.WriteLine(treeCode.ToString());
 
-                    SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
-                    gen.Generate(treeCode.GetCode());
-					gen.PrintCommands();
-                    Console.WriteLine("\nExecute:");
-                    gen.Execute();
+                    // выполнение оптимизации для программы, не разбитой на блоки
+                    //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
+                    // вычисление множеств Def и Use для всего графа потоков данных
+                    var DefUse = new DefUseBlocks(controlFlowGraph);
+                    GraphToDOTHelper.SaveAsDOT("C:\\Users\\vladr\\Desktop\\graph.dot", controlFlowGraph);
+                    var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
+
+                    //ControlFlowOptimisations.DeadOrAliveOnGraph(InOut, controlFlowGraph);
+                    Console.WriteLine("\nafter DeleteDeadVariables for graph\n");
+                    foreach (var block in controlFlowGraph.blocks)
+                        foreach (var line in block)
+                            Console.WriteLine(line);
+                    Console.Write("");
+					//DeadOrAliveOptimization.
+
+
+
+					//SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+					//gen.Generate(treeCode.GetCode());
+					//gen.PrintCommands();
+					//Console.WriteLine("\nExecute:");
+					//gen.Execute();
 
                     /*AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
                     app.Add(new DistributionOfConstants());
@@ -137,7 +173,6 @@ namespace SimpleCompiler
                     var pp = new PrettyPrintVisitor();
                     parser.root.Visit(pp);
                     Console.WriteLine(pp.Text);*/
-
                 }
             }
             catch (FileNotFoundException)
@@ -149,7 +184,30 @@ namespace SimpleCompiler
                 Console.WriteLine("{0}", e);
             }
 
-            Console.ReadLine();
+           Console.ReadLine();
+
+           // ========
+           // My part, don't touch !!!
+
+           // Sorry for this troubles, I deleted bad part
+
+           // CFG controlFlowGraph = new CFG(blocks);
+           // Console.WriteLine(treeCode.ToString());
+           // // выполнение оптимизации для программы, не разбитой на блоки
+           // //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
+           // // вычисление множеств Def и Use для всего графа потоков данных
+           // var DefUse = new DefUseBlocks(controlFlowGraph);
+           //
+           // var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
+           //
+           // ControlFlowOptimisations.DeadOrAliveOnGraph(InOut, controlFlowGraph);
+           // Console.WriteLine("\nafter DeleteDeadVariables for graph\n");
+           // foreach (var block in controlFlowGraph.blocks)
+           //     foreach (var line in block)
+           //         Console.WriteLine(line);
+           // Console.Write("");
+
+           // ========
         }
 
     }

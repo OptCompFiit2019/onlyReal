@@ -1,6 +1,6 @@
 {
-	bool b;
-	b = (1 < 2) && (3 < 5);
+	bool w;
+	w = (1 < 2) && (3 < 5);
 
 	int a;
 	int b;
@@ -9,12 +9,12 @@
 	a = 0;
 	b = 1;
 
-	while (b) {
+	while (w) {
 		c = a;		
 		a = b;
 		b = c + a;
 		println(a);
 		
-		b = 1 < 2 && 3 < 5;
+		w = (a < 1000000);
 	}
 }

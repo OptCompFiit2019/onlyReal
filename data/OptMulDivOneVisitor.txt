@@ -1,14 +1,13 @@
 {
-	a = 1;
-	a = 2;
-	a = 2;
-	a = 2;
-	a = 2;
-	b = 1 * a * 1 + 8 / 1;
-	b = a + 6;
-	while (false)
-	{
-		println(b);
-		a = 1;
-	}
+    int a,b;
+    a = 1;
+    a = 2;
+    a = 2 * 1;
+    b = (((1 * a) * 1) + (8 / 1));
+    b = ((a + 6) / 1);
+    while (false)
+    {
+        println(b);
+        a = 1;
+    }
 }
