@@ -1,0 +1,14 @@
+{
+int a,b,c;
+c = 400;
+a = 500;
+b = 200;
+if(2)
+{
+}
+else
+{
+println(a);
+println(b);
+}
+}

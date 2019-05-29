@@ -1,0 +1,27 @@
+{
+int a, b;
+if(b > 2)
+{
+while(false)
+{
+println(b);
+}
+}
+else
+{
+while(false) {
+println(a);
+}
+
+while(true) {
+for(a=0 to 9)
+{
+while(true) {
+}
+}
+println(a);
+}
+
+}
+a = 2;
+}

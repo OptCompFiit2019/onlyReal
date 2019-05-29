@@ -1,0 +1,17 @@
+{
+int a,b,c,d,x,y;
+a = x + y;
+b = a;
+a = 17 * 32;
+b = a;
+c = a + b;
+x = c;
+y = b;
+
+for(d = 2 to 5)
+{
+c = a + b;
+y = 17 * 32;
+x = c;
+}
+}
