@@ -116,7 +116,7 @@ namespace ProgramTree
     public class BooleanNode : ExprNode
     {
         public bool Val { get; set; }
-        public BooleanNode(bool val) { Val = val; }
+        public BooleanNode(bool val) { Val = val; Type = type.tbool; }
         public override void Visit(Visitor v)
         {
 			v.VisitBooleanNode(this);

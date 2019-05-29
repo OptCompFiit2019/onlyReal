@@ -82,6 +82,7 @@
     <Compile Include="Block\Block.cs" />
     <Compile Include="Compiler\ILCodeGenerator.cs" />
     <Compile Include="Compiler\GenCodeCreator.cs" />
+    <Compile Include="ThreeOptimize\PullCopiesOpt.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
