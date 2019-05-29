@@ -1,0 +1,12 @@
+{
+  int a, b, c, d, e, v, k;
+  d = a;
+  c = d;
+  a = b + c;
+  b = a - d;
+  e = b + c;
+  d = b;
+  c = e;
+  v = e + k;
+  e = v;
+}

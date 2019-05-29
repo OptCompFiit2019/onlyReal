@@ -1,0 +1,24 @@
+{
+  int a, b, c, d, e, i;
+  i=0;
+  while(i <=15)
+  {
+    a = b + c;
+    b = b + c;
+    e = b + c;    
+	i = i + 1;
+  }
+
+  if(b > 100)
+  {
+    a = b - c;
+    b = b - c;
+    
+  }
+  
+  if(b > 30)
+	{
+		a = b + d;
+		c = b + d;
+	}
+}

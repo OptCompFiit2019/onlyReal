@@ -1,0 +1,7 @@
+{
+  int a, b, c, d;
+  a = b;
+  x = a + b;
+  a = c;
+  a = a + d;
+}

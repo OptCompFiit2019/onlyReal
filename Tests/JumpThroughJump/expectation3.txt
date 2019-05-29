@@ -1,0 +1,20 @@
+{
+  real a, p;
+	a=2.5;
+	p=7.9;
+	if (false)
+	{
+		
+	} else
+	{
+		a=a+1;
+		p=p+5;
+		if (true)
+		{
+			
+		} else
+		{
+			p=50;
+		}
+	}
+}
