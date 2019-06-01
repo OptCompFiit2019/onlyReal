@@ -1,0 +1,9 @@
+{
+int a, b;
+while(false)
+{
+while(a + b + a)
+{
+}
+}
+}

@@ -1,0 +1,8 @@
+{
+int a, b, c, d;
+a = 1 + 5;
+for(c = 2 to 33)
+{
+println(3*c/2);
+}
+}
