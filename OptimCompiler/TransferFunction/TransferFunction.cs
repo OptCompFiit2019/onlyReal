@@ -7,7 +7,7 @@ namespace GenericTransferFunction
     /// <summary>
     /// Класс, реализующий передаточную функцию
     /// </summary>
-    class TransferFunction<T>
+    public class TransferFunction<T>
     {
         private List<Func<T, T>> algorithms;
 
