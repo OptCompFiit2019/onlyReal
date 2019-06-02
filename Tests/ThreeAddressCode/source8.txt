@@ -1,0 +1,11 @@
+{
+	int i;
+	for (i = 1 to 100) {
+		int j;
+		j = 1;
+		while (j < i)
+			j=j+2;
+		if (i == j) 
+			println(i);
+	}
+}

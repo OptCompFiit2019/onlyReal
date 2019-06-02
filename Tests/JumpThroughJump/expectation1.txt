@@ -1,13 +1,3 @@
-{
-  real b;
-  int c;
-	if (false)
-	{
-		
-	} 
-	else
-	{
-		b=3.14;
-	}
-        c = 0;
-}
+           if False goto label_1
+           b = 3,14
+label_1:   c = 0

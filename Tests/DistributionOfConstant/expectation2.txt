@@ -1,0 +1,7 @@
+{
+	int k;
+	int j;
+	j = 123;
+	for (k = 1 to 20) 
+		k = k + j;
+}

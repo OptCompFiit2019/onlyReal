@@ -1,0 +1,7 @@
+{
+	int i;
+	int t;
+	t = 0;
+	for (i = 1 to 100)
+		t =  t + i;
+}

@@ -1,0 +1,7 @@
+		temp_0 = 23 < 55
+		c = temp_0
+		if c goto label_0
+		b = 3.14
+		goto label_1
+label_0: a = 1
+label_1:

@@ -1,14 +1,17 @@
 {
-  real a, p;
-	a=2.5;
-	p=7.9;
+	real a;
+	real p;
+
+	a=7.8;
+	p=9.3;
+
 	if (true)
 	{
-		a=a+1;
-		p=p+5;
+		a=a+1.34;
+		p=p+5.98;
 		if (false)
 		{
-			p=50;
+			p=50.67;
 		}
 	} else
 	{
