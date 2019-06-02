@@ -11,6 +11,8 @@ using SimpleLang.ThreeCodeOptimisations;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 using SimpleLang.Block;
 using SimpleLang.ControlFlowGraph;
+using SimpleLang.GenericIterativeAlgorithm;
+using GenericTransferFunction;
 
 namespace SimpleCompiler
 {
@@ -89,17 +91,8 @@ namespace SimpleCompiler
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
                     var blocks = new Block(treeCode).GenerateBlocks();
-
-                    // добавление фиктивных блоков входа и выхода программы
-                    var entryPoint = new LinkedList<ThreeCode>();
-                    entryPoint.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
-                    var exitPoint = new LinkedList<ThreeCode>();
-                    exitPoint.AddLast(new ThreeCode("exit", "", ThreeOperator.None, null, null));
-                    blocks.Insert(0, entryPoint);
-                    blocks.Add(exitPoint);
-
-                    // построение CFG
                     CFG controlFlowGraph = new CFG(blocks);
+
                     Console.WriteLine("\nГлубина графа:\n"+GraphDepth.GetGraphDepth(controlFlowGraph));
                     Console.WriteLine(treeCode.ToString());
 
@@ -116,6 +109,7 @@ namespace SimpleCompiler
                         foreach (var line in block)
                             Console.WriteLine(line);
                     Console.Write("");*/
+
                     //DeadOrAliveOptimization.
 
                     /*CFG cfg = SimpleLang.GenericIterativeAlgorithm.Test

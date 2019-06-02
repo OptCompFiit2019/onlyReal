@@ -30,10 +30,10 @@ namespace SimpleLang.GenericIterativeAlgorithm
                 || HelpFirst.Count != other.HelpFirst.Count || HelpSecond.Count != other.HelpSecond.Count)
                 return false;
 
-            return IN.SetEquals(other.IN) && OUT.SetEquals(other.OUT) 
+            return IN.SetEquals(other.IN) && OUT.SetEquals(other.OUT)
                 && HelpFirst.SetEquals(other.HelpFirst) && HelpSecond.SetEquals(other.HelpSecond);
         }
-
+        
         public BlockInfo(BasicBlock commands)
         {
             Commands = commands;
@@ -68,11 +68,11 @@ namespace SimpleLang.GenericIterativeAlgorithm
             HelpSecond = helpSecond;
         }
     }
-
+    
     public class IterativeAlgorithm<T>
     {
         // направление обхода: true - прямой, false - обратный
-        public bool IsForward { get;}
+        public bool IsForward { get; }
         public ControlFlowGraph.ControlFlowGraph Graph { get; }
         // информация о блоках. Каждому блоку с индексом i в графе соответствует экземпляр
         // класса BlockInfo<T> в списке BlocksInfo с тем же индексом
@@ -86,8 +86,8 @@ namespace SimpleLang.GenericIterativeAlgorithm
         // значение инициализации IN/OUT для остальных блоков
         public ISet<T> InitOther { get; }
 
-        public IterativeAlgorithm(List<BlockInfo<T>> blocksInfo, ControlFlowGraph.ControlFlowGraph graph, 
-            Func<List<BlockInfo<T>>, ControlFlowGraph.ControlFlowGraph, int, BlockInfo<T>> meetOperator, bool isForward, 
+        public IterativeAlgorithm(List<BlockInfo<T>> blocksInfo, ControlFlowGraph.ControlFlowGraph graph,
+            Func<List<BlockInfo<T>>, ControlFlowGraph.ControlFlowGraph, int, BlockInfo<T>> meetOperator, bool isForward,
             IEnumerable<T> initValueEntryExit, IEnumerable<T> initValueOthers,
             TransferFunction<BlockInfo<T>> function)
         {
@@ -112,7 +112,7 @@ namespace SimpleLang.GenericIterativeAlgorithm
             {
                 BlocksInfo[i].IN = InitEntryExit;
                 BlocksInfo[i].OUT = InitOther;
-            }   
+            }
 
             if (IsForward)
                 BlocksInfo[0].OUT = InitEntryExit;
@@ -126,7 +126,7 @@ namespace SimpleLang.GenericIterativeAlgorithm
             while (isChanged)
             {
                 isChanged = false;
-                for(int index = startIndex; index < endIndex; index++)
+                for (int index = startIndex; index < endIndex; index++)
                 {
                     var prevFunctionResult = new BlockInfo<T>(BlocksInfo[index]);
                     BlocksInfo[index] = MeetOperator(BlocksInfo, Graph, index);

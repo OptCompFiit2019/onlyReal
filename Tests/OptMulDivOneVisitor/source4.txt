@@ -1,0 +1,10 @@
+{
+int a, b;
+a = 1;
+for(b = 1 * b to b){
+while(a * 1 + b / 1 + 1 * a)
+{
+}
+}
+a = 2;
+}
