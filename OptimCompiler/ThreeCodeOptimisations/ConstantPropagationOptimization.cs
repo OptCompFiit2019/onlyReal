@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
-using SimpleLang.ThreeCodeOptimisations;
 using SimpleLang.Visitors;
 using SimpleLang.GenericIterativeAlgorithm;
 

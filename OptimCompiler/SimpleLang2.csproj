@@ -53,6 +53,8 @@
     <Compile Include="ThreeCodeOptimisations\IterAlgoActiveVariables.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
+    <Compile Include="TransferFunction\ReachingDefsTest.cs" />
+    <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />
@@ -75,7 +77,6 @@
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOptimization.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />
-    <Compile Include="TransferFunction.cs" />
     <Compile Include="Syntax\ParserHelper.cs" />
     <Compile Include="Syntax\ProgramTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

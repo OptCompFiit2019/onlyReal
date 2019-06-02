@@ -4,16 +4,35 @@ using System.Linq;
 using System.Text;
 using SimpleLang.Visitors;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
+using SimpleLang.GenericIterativeAlgorithm;
+using GenericTransferFunction;
 
 namespace SimpleLang
 {
     using BasicBlock = LinkedList<ThreeCode>;
 
-    class TransferFunction
+    public class ReachingDefsAdaptor
+    {
+        private ReachingDefsTransferFunction tf;
+
+        public ReachingDefsAdaptor(CFG cfg)
+            => tf = new ReachingDefsTransferFunction(cfg);
+
+        public TransferFunction<BlockInfo<ThreeCode>> TransferFunction()
+            => new TransferFunction<BlockInfo<ThreeCode>>(bi =>
+            {
+                var newIn = new BlockInfo<ThreeCode>(bi);
+                newIn.IN = tf.BlockTransferFunction(bi.Commands)
+                    (new HashSet<ThreeCode>(bi.OUT));
+                return newIn;
+            });
+    }
+
+    public class ReachingDefsTransferFunction
     {
         private CFG cfg;
 
-        public TransferFunction(CFG cfg) => this.cfg = cfg;
+        public ReachingDefsTransferFunction(CFG cfg) => this.cfg = cfg;
 
         private IEnumerable<ThreeCode> Definitions(BasicBlock bb)
             => bb.Where(tc => tc.operation != ThreeOperator.Goto
@@ -65,8 +84,13 @@ namespace SimpleLang
         }
 
         private IEnumerable<InstructionTransferFunction> InstructionTransferFunctions(BasicBlock bb)
-            => InstructionGens(bb).Zip(InstructionKills(bb), (g, k) =>
+        {
+            var tf = InstructionGens(bb).Zip(InstructionKills(bb), (g, k) =>
                 new InstructionTransferFunction(g, k));
+            if (tf.Count() == 0)
+                tf = new InstructionTransferFunction[] { new InstructionTransferFunction() };
+            return tf;
+        }
 
         public Func<HashSet<ThreeCode>, HashSet<ThreeCode>> BlockTransferFunction(BasicBlock bb)
             => InstructionTransferFunctions(bb).Aggregate((f, g) => f * g).Func;
@@ -75,6 +99,9 @@ namespace SimpleLang
     public class InstructionTransferFunction
     {
         public Func<HashSet<ThreeCode>, HashSet<ThreeCode>> Func;
+
+        public InstructionTransferFunction()
+            => Func = defs => defs;
 
         public InstructionTransferFunction(HashSet<ThreeCode> gen, HashSet<ThreeCode> kill)
             => Func = defs => new HashSet<ThreeCode>(gen.Union(defs.Except(kill)));

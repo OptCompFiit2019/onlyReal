@@ -117,10 +117,14 @@ namespace SimpleCompiler
                     Console.WriteLine("\nafter DeadOrAliveOptimization\n");
                     Console.WriteLine(cfg);*/
 
-                    var constPropOptimizer = new ConstantPropagationOptimizer();
+                    /*var constPropOptimizer = new ConstantPropagationOptimizer();
                     CFG cfg1 = constPropOptimizer.ApplyOptimization(controlFlowGraph.blocks);
                     Console.WriteLine("\nafter ConstantPropagationOptimization\n");
-                    Console.WriteLine(cfg1);
+                    Console.WriteLine(cfg1);*/
+
+                    var reachingDefsTest = new ReachingDefsTest();
+                    reachingDefsTest.IterativeAlgorithm(controlFlowGraph.blocks);
+                    reachingDefsTest.PrintOutput();
 
                     //SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
                     //gen.Generate(treeCode.GetCode());
