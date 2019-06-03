@@ -1,0 +1,36 @@
+Block1
+defB: i
+useB:
+Block2
+defB:
+useB: i
+Block3
+defB:
+useB:
+Block4
+defB: a b c
+useB: i
+Block5
+defB:
+useB:
+Block6
+defB: c
+useB: c
+Block7
+defB: i
+useB: i
+Block8
+defB: i j
+useB:
+Block9
+defB:
+useB: j
+Block10
+defB:
+useB:
+Block11
+defB: i j
+useB: i j
+Block12
+defB:
+useB:

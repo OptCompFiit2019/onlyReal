@@ -42,7 +42,7 @@ namespace SimpleLang.Visitors
     }
 
 
-    class CommonExpr 
+    class CommonExpr
     {
         public List<ThreeCode> program;
 
@@ -77,38 +77,28 @@ namespace SimpleLang.Visitors
         {
             var result = new List<ThreeCode>();
 
-            //идем по каждой команде в блоке
-            for (int j = 0; j < program.Count; j++)
+            for (int i = 0; i < program.Count - 1; i++)
             {
-                var mainCommand = program[j];
-                result.Add(mainCommand);
-                //использовалась ли раньше такая команда в этом блоке?
-                for (int k = j - 1; k >= 0; k--)
+                if (program[i].arg1 == null && program[i].arg2 == null)
+                    continue;
+                else
                 {
-                    var flag = false;
-                    var tempCommand = program[k];
-                    if (mainCommand.arg2 != null && tempCommand.arg2 != null &&
-                        mainCommand.arg1.Equals(tempCommand.arg1) && mainCommand.operation.Equals(tempCommand.operation) && mainCommand.arg2.Equals(tempCommand.arg2))
+                    for (int j = i + 1; j < program.Count; j++)
                     {
-                        //если да, то в промежутке между этими определениями менялись ли arg1 или arg2?
-                        for (int m = k + 1; m < j; m++)
+                        if (program[j].arg1.ToString() == program[i].arg1.ToString() && program[j].arg2 != null && program[i].arg2 != null && program[j].arg2.ToString() == program[i].arg2.ToString() && program[j].operation == program[i].operation)
                         {
-                            var def = program[m];
-                            if (!(def.result == tempCommand.arg1.ToString() || def.result == tempCommand.arg2.ToString()))
-                            {
-                                result[result.Count - 1] = new ThreeCode(mainCommand.result, new ThreeAddressStringValue(tempCommand.result));//какой тип должен быть??????
-                                flag = true;
-                                break;
-                            }
+                            program[j].operation = ThreeOperator.Assign;
+                            program[j].arg1 = new ThreeAddressStringValue(program[i].result);
+                            program[j].arg2 = null;
                         }
-                        //если вдруг одинаковые команды идут друг за другом
-                        if (k + 1 == j)
-                            result[result.Count - 1] = new ThreeCode(mainCommand.result, new ThreeAddressStringValue(tempCommand.result));
+                        if (program[j].result == program[i].result || program[j].result == program[i].arg1.ToString() || (program[i].arg2 != null && program[j].result == program[i].arg2.ToString()))
+                            break;
                     }
-                    if (flag) break;
                 }
             }
-            
+
+            for (int i = 0; i < program.Count; i++)
+                result.Add(program[i]);
             return new LinkedList<ThreeCode>(result);
         }
     }

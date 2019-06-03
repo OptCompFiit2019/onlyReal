@@ -1,0 +1,22 @@
+{
+int a, b;
+if(b > 2)
+{
+while(false)
+{
+println(b);
+}
+}
+else
+{
+while(false) {
+println(a);
+}
+
+while(true) {
+println(a);
+}
+
+}
+a = 2;
+}

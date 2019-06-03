@@ -10,15 +10,16 @@ using SimpleLang.Visitors;
 using SimpleLang.ThreeCodeOptimisations;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 using SimpleLang.Block;
-using SimpleLang.ThreeCodeOptimisations;
 using SimpleLang.ControlFlowGraph;
+using SimpleLang.GenericIterativeAlgorithm;
+using GenericTransferFunction;
 
 namespace SimpleCompiler
 {
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
-            string FileName = @"../../../data/a8.txt";
+            string FileName = @"../../../data/ConstantPropagationOptimizationTest.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -90,41 +91,31 @@ namespace SimpleCompiler
                     ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
                     r.Visit(treeCode);
                     var blocks = new Block(treeCode).GenerateBlocks();
-
-                    // добавление фиктивных блоков входа и выхода программы
-                    var entryPoint = new LinkedList<ThreeCode>();
-                    entryPoint.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
-                    var exitPoint = new LinkedList<ThreeCode>();
-                    exitPoint.AddLast(new ThreeCode("exit", "", ThreeOperator.None, null, null));
-                    blocks.Insert(0, entryPoint);
-                    blocks.Add(exitPoint);
-
-                    // построение CFG
                     CFG controlFlowGraph = new CFG(blocks);
+
                     Console.WriteLine("\nГлубина графа:\n"+GraphDepth.GetGraphDepth(controlFlowGraph));
                     Console.WriteLine(treeCode.ToString());
 
                     // выполнение оптимизации для программы, не разбитой на блоки
                     //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
                     // вычисление множеств Def и Use для всего графа потоков данных
-<<<<<<< HEAD
                     /*var DefUse = new DefUseBlocks(controlFlowGraph);
 
                     var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
 
                     ControlFlowOptimisations.DeadOrAliveOnGraph(InOut, controlFlowGraph);
-=======
+
                     var DefUse = new DefUseBlocks(controlFlowGraph);
+
                     GraphToDOTHelper.SaveAsDOT("C:\\Users\\vladr\\Desktop\\graph.dot", controlFlowGraph);
                     var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
 
                     //ControlFlowOptimisations.DeadOrAliveOnGraph(InOut, controlFlowGraph);
->>>>>>> 9bb82898181400a5a5bdfad25d6bf5cddf38cd9e
                     Console.WriteLine("\nafter DeleteDeadVariables for graph\n");
                     foreach (var block in controlFlowGraph.blocks)
                         foreach (var line in block)
                             Console.WriteLine(line);
-<<<<<<< HEAD
+
                     Console.Write("");*/
                     //DeadOrAliveOptimization.
 
@@ -136,18 +127,32 @@ namespace SimpleCompiler
 					gen.PrintCommands();
                     Console.WriteLine("\nExecute:");
                     gen.Execute();
-=======
-                    Console.Write("");
-					//DeadOrAliveOptimization.
+
+                    Console.Write("");*/
+
+                    //DeadOrAliveOptimization.
+
+                    /*CFG cfg = SimpleLang.GenericIterativeAlgorithm.Test
+                        .DeadOrAliveOptimization(controlFlowGraph.blocks);
+                    Console.WriteLine("\nafter DeadOrAliveOptimization\n");
+                    Console.WriteLine(cfg);*/
+
+                    /*var constPropOptimizer = new ConstantPropagationOptimizer();
+                    CFG cfg1 = constPropOptimizer.ApplyOptimization(controlFlowGraph.blocks);
+                    Console.WriteLine("\nafter ConstantPropagationOptimization\n");
+                    Console.WriteLine(cfg1);*/
+
+                    var reachingDefsTest = new ReachingDefsTest();
+                    reachingDefsTest.IterativeAlgorithm(controlFlowGraph.blocks);
+                    reachingDefsTest.PrintOutput();
 
 
+                    //SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                    //gen.Generate(treeCode.GetCode());
+                    //gen.PrintCommands();
+                    //Console.WriteLine("\nExecute:");
+                    //gen.Execute();
 
-					//SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
-					//gen.Generate(treeCode.GetCode());
-					//gen.PrintCommands();
-					//Console.WriteLine("\nExecute:");
-					//gen.Execute();
->>>>>>> 9bb82898181400a5a5bdfad25d6bf5cddf38cd9e
 
                     AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
                     app.Add(new DistributionOfConstants());

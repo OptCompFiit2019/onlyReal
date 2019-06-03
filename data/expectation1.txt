@@ -1,0 +1,13 @@
+{
+  real b;
+  int c;
+	if (false)
+	{
+		
+	} 
+	else
+	{
+		b=3.14;
+	}
+        c = 0;
+}

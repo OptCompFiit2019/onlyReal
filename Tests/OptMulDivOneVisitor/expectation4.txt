@@ -1,0 +1,11 @@
+{
+    int a,b;
+    a = 1;
+    for (b = b to b)
+    {
+        while (((a + b) + a))
+        {
+        }
+    }
+    a = 2;
+}

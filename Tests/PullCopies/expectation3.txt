@@ -1,0 +1,21 @@
+{
+  int i, j, a, b, c, d, e, f, g, t, k;
+  for (i = 1 to 10)
+  {
+    c = a;
+    d = f;
+    d = g;
+    e = a * 2;
+    c = g + 2;
+    t = a;
+  }
+
+  for (j = 1 to 10)
+  {
+    c = t;
+    d = k;
+    d = f + 1;
+    e = t * 2 * (d - 1);
+    c = (d + 2) * t;
+  }
+}
