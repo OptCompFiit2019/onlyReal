@@ -10,11 +10,14 @@ namespace SimpleLang.ThreeCodeOptimisations
         public DistributionOfConstants()
         {
         }
+
         public bool Applyed()
         {
             return _apply;
         }
-        public void Apply(LinkedList<Visitors.ThreeCode> program){
+        public bool NeedFullCode() { return false; }
+        public void Apply(ref List<LinkedList<Visitors.ThreeCode>> res) { throw new Exception("Not implemented"); }
+        public void Apply(ref LinkedList<Visitors.ThreeCode> program){
             _apply = false;
 
             Dictionary<String, Visitors.ThreeAddressValueType> replace = new Dictionary<string, Visitors.ThreeAddressValueType>();

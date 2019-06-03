@@ -19,7 +19,7 @@ namespace SimpleCompiler
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
-            string FileName = @"../../../data/ConstantPropagationOptimizationTest.txt";
+            string FileName = @"../../../data/DeadOrAliveOptimizationTest.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -40,6 +40,18 @@ namespace SimpleCompiler
 
                     FillParentVisitor generateParrent = new FillParentVisitor();
                     r.Visit(generateParrent);
+
+                    {
+                        ThreeAddressCodeVisitor treeCod2e = new ThreeAddressCodeVisitor();
+                        r.Visit(treeCod2e);
+                        //var blocks = new Block(treeCod2e).GenerateBlocks();
+
+                        AutoThreeCodeOptimiser ap2p = new AutoThreeCodeOptimiser();
+                        ap2p.Add(new DeadOrAliveOptimizationAdapter());
+
+                        var blockwss = ap2p.Apply(treeCod2e);
+                        Console.WriteLine(ThreeAddressCodeVisitor.ToString(blockwss));
+                    }
 
 
                     //Console.WriteLine(r.ToString());
@@ -121,7 +133,7 @@ namespace SimpleCompiler
 
 
 
-                    SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                   /* SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
                     gen.Generate(treeCode.GetCode());
 
 					gen.PrintCommands();
@@ -142,9 +154,9 @@ namespace SimpleCompiler
                     Console.WriteLine("\nafter ConstantPropagationOptimization\n");
                     Console.WriteLine(cfg1);*/
 
-                    var reachingDefsTest = new ReachingDefsTest();
-                    reachingDefsTest.IterativeAlgorithm(controlFlowGraph.blocks);
-                    reachingDefsTest.PrintOutput();
+                    //var reachingDefsTest = new ReachingDefsTest();
+                    //reachingDefsTest.IterativeAlgorithm(controlFlowGraph.blocks);
+                    //reachingDefsTest.PrintOutput();
 
 
                     //SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();

@@ -26,7 +26,9 @@ namespace SimpleLang.ThreeCodeOptimisations{
             it.Value.arg1 = new Visitors.ThreeAddressLogicValue(res);
             _apply = true;
         }
-        public void Apply(LinkedList<Visitors.ThreeCode> program) {
+        public bool NeedFullCode() { return false; }
+        public void Apply(ref List<LinkedList<Visitors.ThreeCode>> res) { throw new Exception("Not implemented"); }
+        public void Apply(ref LinkedList<Visitors.ThreeCode> program) {
             _apply = false;
 
             for (var it = program.First; it != null; it = it.Next) {

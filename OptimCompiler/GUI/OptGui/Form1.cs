@@ -41,6 +41,8 @@ namespace OptGui
                 res.Add(new SimpleLang.ThreeCodeOptimisations.EvalConstExpr());
             if (checkBox3.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.ApplyAlgebraicIdentities());
+            if (checkBox4.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.DeadOrAliveOptimizationAdapter());
             return res;
         }
         void UpdateForms() {
