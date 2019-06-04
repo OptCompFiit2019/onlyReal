@@ -24,7 +24,7 @@ ID {Alpha}{AlphaDigit}*
 }
 
 {ID}  { 
-  int res = ScannerHelper.GetIDToken(yytext);
+  int res = ScannerHelper.GetIDToken(yytext, this);
   if (res == (int)Tokens.ID)
     yylval.sVal = yytext;
   return res;
@@ -77,9 +77,9 @@ public void LexError()
 class ScannerHelper 
 {
   private static Dictionary<string,int> keywords;
-
-  static ScannerHelper() 
-  {
+  private static Scanner parrent = null;
+  
+  static void FillDict() {
     keywords = new Dictionary<string,int>();
     keywords.Add("while", (int) Tokens.WHILE);
     keywords.Add("for", (int) Tokens.FOR);
@@ -90,12 +90,21 @@ class ScannerHelper
     keywords.Add("else", (int) Tokens.ELSE);
     keywords.Add("true", (int) Tokens.TRUE);
     keywords.Add("false", (int) Tokens.FALSE);
-	keywords.Add("int", (int) Tokens.TINT);
-	keywords.Add("real", (int) Tokens.TREAL);
-	keywords.Add("bool", (int) Tokens.TBOOL);
+    keywords.Add("int", (int) Tokens.TINT);
+    keywords.Add("real", (int) Tokens.TREAL);
+    keywords.Add("bool", (int) Tokens.TBOOL);
   }
-  public static int GetIDToken(string s)
+
+  static ScannerHelper() 
   {
+    FillDict();
+  }
+  public static int GetIDToken(string s, Scanner p)
+  {
+    if (p != parrent) {
+        FillDict();
+        parrent = p;
+    }
     if (keywords.ContainsKey(s.ToLower()))
       return keywords[s];
     else

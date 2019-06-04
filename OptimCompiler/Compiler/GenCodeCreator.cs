@@ -8,7 +8,7 @@ using SimpleParser;
 
 namespace SimpleLang.Compiler
 {
-    class GenCodeCreator
+    public class GenCodeCreator
     {
         private DynamicMethod dyn;
         private ILGenerator gen;
@@ -112,9 +112,17 @@ namespace SimpleLang.Compiler
             gen.Emit(OpCodes.Ret);
         }
 
-        public void RunProgram()
+        public string RunProgram()
         {
+            var tw = Console.Out;
+            System.IO.MemoryStream stre = new System.IO.MemoryStream();
+            System.IO.TextWriter wr = new System.IO.StreamWriter(stre);
+            Console.SetOut(wr);
             dyn.Invoke(null, null);
+            Console.SetOut(tw);
+            wr.Flush();
+            stre.Flush();
+            return Encoding.UTF8.GetString(stre.ToArray());
         }
 
         public void WriteCommandsOn()

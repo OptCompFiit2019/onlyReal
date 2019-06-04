@@ -84,7 +84,7 @@ var		: type_ { InDefSect = true; } varlist
 		{ 
 			foreach (var v in ($3 as VarDefNode).vars)
 			{
-				SymbolTable.NewVarDef(v.Name, $1);
+				SymbolTable.NewVarDef(v.Name, $1, this);
 				v.Type = $1;
 			}
 			$$ = $3;

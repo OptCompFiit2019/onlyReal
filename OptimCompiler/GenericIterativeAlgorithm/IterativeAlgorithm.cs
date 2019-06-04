@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using GenericTransferFunction;
+using SimpleLang.Visitors;
 
 namespace SimpleLang.GenericIterativeAlgorithm
 {
+    using BasicBlock = LinkedList<ThreeCode>;
+
     /// <summary>
     /// Вспомогательный класс, хранящий информацию о множествах отдельного блока, таких как
     /// IN, OUT, def, use, gen, kill, e_gen, e_kill
     /// </summary>
-    class BlockInfo<T>
+    public class BlockInfo<T>
     {
+        public BasicBlock Commands;
         public ISet<T> IN;
         public ISet<T> OUT;
         public ISet<T> HelpFirst; // Аналог def_b, gen_b, e_gen_b
@@ -29,9 +33,19 @@ namespace SimpleLang.GenericIterativeAlgorithm
             return IN.SetEquals(other.IN) && OUT.SetEquals(other.OUT)
                 && HelpFirst.SetEquals(other.HelpFirst) && HelpSecond.SetEquals(other.HelpSecond);
         }
+        
+        public BlockInfo(BasicBlock commands)
+        {
+            Commands = commands;
+            IN = new HashSet<T>();
+            OUT = new HashSet<T>();
+            HelpFirst = new HashSet<T>();
+            HelpSecond = new HashSet<T>();
+        }
 
         public BlockInfo(BlockInfo<T> source)
         {
+            Commands = new LinkedList<ThreeCode>(source.Commands);
             IN = new HashSet<T>(source.IN);
             OUT = new HashSet<T>(source.OUT);
             HelpFirst = new HashSet<T>(source.HelpFirst);
@@ -54,14 +68,14 @@ namespace SimpleLang.GenericIterativeAlgorithm
             HelpSecond = helpSecond;
         }
     }
-
-    class IterativeAlgorithm<T>
+    
+    public class IterativeAlgorithm<T>
     {
         // направление обхода: true - прямой, false - обратный
         public bool IsForward { get; }
         public ControlFlowGraph.ControlFlowGraph Graph { get; }
         // информация о блоках. Каждому блоку с индексом i в графе соответствует экземпляр
-        // класса BlockInfo в списке BlocksInfo с тем же индексом
+        // класса BlockInfo<T> в списке BlocksInfo с тем же индексом
         public List<BlockInfo<T>> BlocksInfo { get; }
         // оператор сбора
         public Func<List<BlockInfo<T>>, ControlFlowGraph.ControlFlowGraph, int, BlockInfo<T>> MeetOperator;
@@ -87,7 +101,7 @@ namespace SimpleLang.GenericIterativeAlgorithm
         }
 
         /// <summary>
-        /// Выполняет оптимизационный алгоритм и возвращает результат как List<BlockInfo>,
+        /// Выполняет оптимизационный алгоритм и возвращает результат как List<BlockInfo<T>>,
         /// </summary>
         /// <returns></returns>
         public List<BlockInfo<T>> Perform()

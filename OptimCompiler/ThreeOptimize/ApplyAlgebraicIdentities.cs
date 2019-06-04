@@ -6,7 +6,7 @@ using SimpleLang.Visitors;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-	class ApplyAlgebraicIdentities : ThreeCodeOptimiser
+	public class ApplyAlgebraicIdentities : ThreeCodeOptimiser
     {
 		private bool _apply = false;
 
@@ -25,8 +25,11 @@ namespace SimpleLang.ThreeCodeOptimisations
 			it.Value.arg1 = res;
 			_apply = true;
 		}
+        public bool NeedFullCode() { return false;  }
+        public void Apply(ref List<LinkedList<ThreeCode>> res) { throw new Exception("Not implemented");  }
 
-		public void Apply(LinkedList<ThreeCode> program)
+
+        public void Apply(ref LinkedList<ThreeCode> program)
 		{
             _apply = false;
 
