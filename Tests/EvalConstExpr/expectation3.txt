@@ -1,0 +1,6 @@
+{
+	real r;
+	r = 18.32;
+	bool b;
+	b =True;
+}

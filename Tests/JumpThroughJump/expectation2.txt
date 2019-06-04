@@ -1,12 +1,4 @@
-{
-  int b, c;
-	if (false)
-	{
-		
-	} 
-	else 
-	{
-		b=9;
-		c=8;
-	}
-}
+           if False goto label_1
+           b = 9
+           c = 8
+label_1:

@@ -1,0 +1,8 @@
+{
+	while (true) {
+		int a;
+		a = 23;
+		println(a);
+	}
+	
+}

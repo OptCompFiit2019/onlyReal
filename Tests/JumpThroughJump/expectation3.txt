@@ -1,20 +1,9 @@
-{
-  real a, p;
-	a=2.5;
-	p=7.9;
-	if (false)
-	{
-		
-	} else
-	{
-		a=a+1;
-		p=p+5;
-		if (true)
-		{
-			
-		} else
-		{
-			p=50;
-		}
-	}
-}
+           a = 7,8
+           p = 9,3
+           if False goto label_1
+           a = a + 1,34
+           p = p + 5,98
+           if True goto label_3
+           p = 50,67
+label_3:
+label_1:

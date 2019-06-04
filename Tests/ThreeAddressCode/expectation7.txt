@@ -1,0 +1,7 @@
+a = 123
+temp_2 = 45 * a
+temp_1 = 13 + temp_2
+temp_3 = 44/2
+temp_0 = temp_1 - temp_3
+g = temp_0
+println g

@@ -1,5 +1,6 @@
 {
-  int b, c;
+	int b;
+	int c;
 	if (true)
 	{
 		b=9;

@@ -1,12 +1,5 @@
-{
-  int a, b;
-	a=1;
-	b=2;
-	if (true) 
-	{
-		
-	} else
-	{
-		b=112;
-	}
-}
+	   a = 1
+           b = 2
+           if True goto label_1
+           b = 112
+label_1:

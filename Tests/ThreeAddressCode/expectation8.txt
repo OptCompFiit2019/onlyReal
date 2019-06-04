@@ -1,0 +1,19 @@
+		i = 1
+label_0:temp_0=i < 100
+		if temp_0 goto label_1
+		goto label_2
+label_1: j=1
+label_3: temp_2 = j< i
+		temp_1 = temp_2
+		if temp_1 goto label_4
+		goto label_5
+label_4:temp_3 = j + 2
+		j = temp_3
+		goto label_3
+label_5: temp_4 = i == j
+		if temp_4 goto label_6
+		goto label+7
+label_6:println i
+label_7: i = i +1
+		goto label_0
+label_2:
