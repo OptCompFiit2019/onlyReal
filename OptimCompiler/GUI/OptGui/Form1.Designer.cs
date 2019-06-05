@@ -35,6 +35,9 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.checkBox52 = new System.Windows.Forms.CheckBox();
+            this.checkBox51 = new System.Windows.Forms.CheckBox();
+            this.checkBox5 = new System.Windows.Forms.CheckBox();
             this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
@@ -96,6 +99,7 @@
             "Блоки трехадресного кода",
             "Граф потока управления",
             "Запуск",
+            "Оптимизации по дереву",
             "Полученный трехадресный код",
             "Блоки трехадресного кода",
             "Граф потока управления",
@@ -126,6 +130,7 @@
             "Блоки трехадресного кода",
             "Граф потока управления",
             "Запуск",
+            "Оптимизации по дереву",
             "Полученный трехадресный код",
             "Блоки трехадресного кода",
             "Граф потока управления",
@@ -138,6 +143,9 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.checkBox52);
+            this.tabPage2.Controls.Add(this.checkBox51);
+            this.tabPage2.Controls.Add(this.checkBox5);
             this.tabPage2.Controls.Add(this.checkBox4);
             this.tabPage2.Controls.Add(this.checkBox3);
             this.tabPage2.Controls.Add(this.checkBox2);
@@ -149,6 +157,39 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Optimizations";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // checkBox52
+            // 
+            this.checkBox52.AutoSize = true;
+            this.checkBox52.Location = new System.Drawing.Point(300, 29);
+            this.checkBox52.Name = "checkBox51";
+            this.checkBox52.Size = new System.Drawing.Size(89, 17);
+            this.checkBox52.TabIndex = 3;
+            this.checkBox52.Text = "If True";
+            this.checkBox52.UseVisualStyleBackColor = true;
+            this.checkBox52.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            // 
+            // checkBox51
+            // 
+            this.checkBox51.AutoSize = true;
+            this.checkBox51.Location = new System.Drawing.Point(300, 6);
+            this.checkBox51.Name = "checkBox51";
+            this.checkBox51.Size = new System.Drawing.Size(89, 17);
+            this.checkBox51.TabIndex = 3;
+            this.checkBox51.Text = "Mull on Null";
+            this.checkBox51.UseVisualStyleBackColor = true;
+            this.checkBox51.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            // 
+            // checkBox5
+            // 
+            this.checkBox5.AutoSize = true;
+            this.checkBox5.Location = new System.Drawing.Point(4, 99);
+            this.checkBox5.Name = "checkBox5";
+            this.checkBox5.Size = new System.Drawing.Size(89, 17);
+            this.checkBox5.TabIndex = 3;
+            this.checkBox5.Text = "Non Zero JTJ";
+            this.checkBox5.UseVisualStyleBackColor = true;
+            this.checkBox5.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // checkBox4
             // 
@@ -273,6 +314,9 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.CheckBox checkBox52;
+        private System.Windows.Forms.CheckBox checkBox51;
+        private System.Windows.Forms.CheckBox checkBox5;
         private System.Windows.Forms.CheckBox checkBox4;
         private System.Windows.Forms.CheckBox checkBox3;
         private System.Windows.Forms.CheckBox checkBox2;

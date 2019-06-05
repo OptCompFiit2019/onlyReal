@@ -88,6 +88,7 @@
     <Compile Include="Visitors\Opt11Visitor.cs" />
     <Compile Include="Visitors\FillParentVisitor.cs" />
     <Compile Include="ThreeOptimize\EvalConstExpr.cs" />
+    <Compile Include="ThreeOptimize\NonZeroOperator_ThreeCodeOptimiser.cs" />
     <Compile Include="ThreeOptimize\ThreeCodeOptimiser.cs" />
     <Compile Include="ThreeOptimize\DistributionOfConstants.cs" />
     <Compile Include="ThreeOptimize\AutoThreeCodeOptimiser.cs" />
@@ -95,6 +96,8 @@
     <Compile Include="Compiler\ILCodeGenerator.cs" />
     <Compile Include="Compiler\GenCodeCreator.cs" />
     <Compile Include="ThreeOptimize\DeadOrAliveOptimizationAdapter.cs" />
+    <Compile Include="Visitors\AutoApplyVisitorInterface.cs" />
+    <Compile Include="Visitors\AutoApplyVisitor.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

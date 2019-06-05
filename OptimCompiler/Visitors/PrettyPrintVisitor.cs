@@ -7,7 +7,7 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    class PrettyPrintVisitor: Visitor
+    public class PrettyPrintVisitor: Visitor
     {
         public string Text = "";
         private int Indent = 0;
