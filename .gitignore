@@ -4,3 +4,4 @@ build
 obj
 SimpleLex.cs
 SimpleYacc.cs
+.idea/*
