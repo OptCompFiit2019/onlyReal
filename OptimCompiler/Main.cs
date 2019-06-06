@@ -54,7 +54,7 @@ namespace SimpleCompiler
                         //var blocks = new Block(treeCod2e).GenerateBlocks();
 
                         AutoThreeCodeOptimiser ap2p = new AutoThreeCodeOptimiser();
-                        ap2p.Add(new SimpleLang.ThreeCodeOptimisations.NonZero_JTJ());
+                        ap2p.Add(new SimpleLang.ThreeCodeOptimisations.NonZero_JTJOpt());
 
                         var blockwss = ap2p.Apply(treeCod2e);
                         Console.WriteLine(ThreeAddressCodeVisitor.ToString(blockwss));
