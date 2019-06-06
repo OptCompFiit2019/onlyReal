@@ -44,11 +44,15 @@
     <Compile Include="ThreeCodeOptimisations\ConstantPropagationOptimization.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOnGraph.cs" />
     <Compile Include="ThreeCodeOptimisations\DefBUseB.cs" />
+    <Compile Include="ThreeCodeOptimisations\DefUse.cs" />
     <Compile Include="ThreeCodeOptimisations\IterAlgoActiveVariables.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
+    <Compile Include="ThreeOptimize\DeleteOfDeadCodeOpt.cs" />
+    <Compile Include="ThreeOptimize\PullOfCopiesOpt.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
     <Compile Include="TransferFunction\ReachingDefsTest.cs" />
     <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
+    <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />
@@ -69,6 +73,7 @@
     <Compile Include="TransferFunction\TransferFunction.cs" />
     <Compile Include="ThreeCodeOptimisations\DAG.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOptimization.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />
     <Compile Include="Syntax\ParserHelper.cs" />
     <Compile Include="Syntax\ProgramTree.cs" />

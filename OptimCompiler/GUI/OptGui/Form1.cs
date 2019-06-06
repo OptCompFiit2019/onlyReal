@@ -55,6 +55,16 @@ namespace OptGui
                 res.Add(new SimpleLang.ThreeCodeOptimisations.DeadOrAliveOptimizationAdapter());
             if (checkBox5.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.NonZero_JTJ());
+            if (checkBox6.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.DefUseConstOpt());
+            if (checkBox7.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.DefUseDeadCodeOpt());
+            if (checkBox8.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.DeleteOfDeadCodeOpt());
+            if (checkBox9.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.PullOfCopiesOpt());
+            if (checkBox10.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.UnreachableCodeOpt());
             return res;
         }
         void UpdateForms() {

@@ -9,8 +9,10 @@ namespace SimpleLang.ThreeCodeOptimisations
     public class DefUseConstOpt : ThreeCodeOptimiser
     {
         private bool _applyed;
+        public bool NeedFullCode() { return false; }
+        public void Apply(ref List<LinkedList<Visitors.ThreeCode>> res) { throw new Exception("Not implemented"); }
 
-        public void Apply(LinkedList<ThreeCode> program)
+        public void Apply(ref LinkedList<ThreeCode> program)
         {
             _applyed = false;
             var blocksDefs = new List<VarDef>();
@@ -70,7 +72,10 @@ namespace SimpleLang.ThreeCodeOptimisations
     {
         private bool _applyed;
 
-        public void Apply(LinkedList<ThreeCode> program)
+        public bool NeedFullCode() { return false; }
+        public void Apply(ref List<LinkedList<Visitors.ThreeCode>> res) { throw new Exception("Not implemented"); }
+
+        public void Apply(ref LinkedList<ThreeCode> program)
         {
             _applyed = false;
             var blocksDefs = new List<VarDef>();

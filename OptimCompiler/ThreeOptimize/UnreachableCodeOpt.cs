@@ -1,6 +1,5 @@
 using System;
 using SimpleLang.Visitors;
-using System;
 using System.Collections.Generic;
 
 namespace SimpleLang.ThreeCodeOptimisations
@@ -80,6 +79,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                         foreach (var line_del in linesToDelete)
                             code.Remove(line_del);
                         linesToDelete.Clear();
+                        _apply = true;
                     }
                 }
 
