@@ -864,6 +864,104 @@ namespace SimpleLang
                             Console.WriteLine("Тест {0} успешно пройден!", source);
                         break;
 
+                    case "PullCopies (Intel)":  //Intel
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            expectationCode = GetThreeAddressCodeVisitor(pathToFolder, expectation);
+
+                            flag = true;
+                            var pc = new PullOfCopies(sourceCode);
+                            pc.PullCopies();
+                            var opt_program = pc.Program.ToList();
+                            var target = expectationCode.GetCode().ToList();
+                            bool testFault = false;
+                            CheckResults(opt_program, target, ref flag, ref testFault, source, 1);
+                            if (flag)
+                                Console.WriteLine("Тест {0} успешно пройден!", source);
+                        }
+                        break;
+
+                    case "DeleteOfDeadCode (Intel)":  //Intel
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            expectationCode = GetThreeAddressCodeVisitor(pathToFolder, expectation);
+
+                            flag = true;
+                            var ddc = new DeleteOfDeadCode(sourceCode);
+                            ddc.DeleteDeadCode();
+                            var opt_program = ddc.Program.ToList();
+                            var target = expectationCode.GetCode().ToList();
+                            bool testFault = false;
+                            CheckResults(opt_program, target, ref flag, ref testFault, source, 1);
+                            if (flag)
+                                Console.WriteLine("Тест {0} успешно пройден!", source);
+                        }
+                        break;
+
+                    case "DefUse":  //komanda
+                        sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                        sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                        expectationCode = GetThreeAddressCodeVisitor(pathToFolder, expectation);
+                        expectationBlocks = new Block.Block(expectationCode).GenerateBlocks();
+
+                        AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
+                        app.Add(new DefUseConstOpt());
+                        app.Add(new DefUseDeadCodeOpt());
+                        var blocks = app.Apply(sourceCode);
+
+                        flag = true;
+                        for (int j = 0; j < sourceBlocks.Count; j++)
+                        {
+                            bool testFault = false;
+
+                            var opt_program = blocks[j].ToList();
+                            var target = expectationBlocks.ElementAt(j).ToList();
+                            CheckResults(opt_program, target, ref flag, ref testFault, source, j);
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "OptWhileVisitor":  //Roll
+                        {
+                            string text = File.ReadAllText(pathToFolder + source);
+                            Scanner scanner = new Scanner();
+                            scanner.SetSource(text, 0);
+                            SimpleParser.SymbolTable.vars = new Dictionary<string, type>();
+                            Parser parser = new Parser(scanner);
+
+                            var b = parser.Parse();
+                            if (!b)
+                            {
+                                Console.WriteLine("Ошибка при парсинге программы из файла: {0}", source);
+                                continue;
+                            }
+
+                            var r = parser.root;
+                            FillParentVisitor generateParrent = new FillParentVisitor();
+                            r.Visit(generateParrent);
+
+                            r.Visit(new FillParentVisitor());
+                            r.Visit(new OptWhileVisitor());
+
+                            ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
+                            r.Visit(treeCode);
+                            expectationCode = GetThreeAddressCodeVisitor(pathToFolder, expectation);
+
+                            bool testFault = false;
+                            flag = true;
+                            var opt_program = treeCode.GetCode().ToList();
+                            var target = expectationCode.GetCode().ToList();
+                            CheckResults(opt_program, target, ref flag, ref testFault, source, 1);
+
+                            if (flag)
+                                Console.WriteLine("Тест {0} успешно пройден!", source);
+                        }
+                        break;
+
+                    //здесь будет
+                    //OptWhileVisitor           Roll
+                    //OptMulDivOneVisitor       Roll
 
                     //здесь будет
                     //DefUse (оптимизация)      komanda
@@ -881,3 +979,5 @@ namespace SimpleLang
         }
     }
 }
+
+

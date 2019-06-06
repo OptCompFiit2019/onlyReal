@@ -46,12 +46,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AstOptimisations\Opt_8_13.cs" />
     <Compile Include="AvailableExprs.cs" />
     <Compile Include="ControlFlowGraph\GraphDepth.cs" />
     <Compile Include="DeepSpanTree.cs" />
+    <Compile Include="DeleteOfDeadCode.cs" />
     <Compile Include="GenericIterativeAlgorithm\Test.cs" />
     <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
     <Compile Include="IterativeAlgorithm.cs" />
+    <Compile Include="PullOfCopies.cs" />
     <Compile Include="TestSystem.cs" />
     <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
     <Compile Include="ThreeCodeOptimisations\ConstantPropagationOptimization.cs" />

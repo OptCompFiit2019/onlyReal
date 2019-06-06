@@ -6,47 +6,9 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    class FillParentVisitor : AutoVisitor
+    class ChangeVisitor2 : AutoVisitor
     {
-        Stack<Node> st = new Stack<Node>(); // можно заменить на List
-        public FillParentVisitor()
-        {
-            st.Push(null);
-        }
-        public override void VisitBinOpNode(BinOpNode binop)
-        {
-            binop.Parent = st.Peek();
-            st.Push(binop);
-            base.VisitBinOpNode(binop);
-            st.Pop();
-        }
-        public override void VisitAssignNode(AssignNode a)
-        {
-            a.Parent = st.Peek();
-            st.Push(a);
-            base.VisitAssignNode(a);
-            st.Pop();
-        }
-        public override void VisitIfNode(IfNode ifn)
-        {
-            ifn.Parent = st.Peek();
-            st.Push(ifn);
-            base.VisitIfNode(ifn);
-            st.Pop();
-        }
-
-        public override void VisitWhileNode(WhileNode w)
-        {
-            w.Parent = st.Peek();
-            st.Push(w);
-            base.VisitWhileNode(w);
-            st.Pop();
-        }
-    }
-
-    class ChangeVisitor : AutoVisitor
-    {
-        public void ReplaceExpr(ExprNode from, ExprNode to)
+        public void ReplaceExpr2(ExprNode from, ExprNode to)
         {
             var p = from.Parent;
             if (p == null)
@@ -87,15 +49,15 @@ namespace SimpleLang.Visitors
             }
             else if (p is IfNode ifn)
             {
-                if (ifn.StatIf == from) // Поиск подузла в Parent
-                    ifn.StatIf = to;
-                else if (ifn.StatElse == from)
-                    ifn.StatElse = to;
+                if (ifn.If == from) // Поиск подузла в Parent
+                    ifn.If = to;
+                else if (ifn.Else == from)
+                    ifn.Else = to;
             }
         }
     }
 
-    class Opt1Visitor : ChangeVisitor
+    class OptVisitor_8 : ChangeVisitor2
     {
         public override void VisitBinOpNode(BinOpNode binop)
         {
@@ -104,22 +66,22 @@ namespace SimpleLang.Visitors
                 (binop.Op == "==" || binop.Op == ">="))
             {
                 if (binop.Parent is IfNode ifn)
-                    ifn.Expr = new BoolNode(true);
+                    ifn.Cond = new BooleanNode(true);
                 else if (binop.Parent is WhileNode w)
-                    w.Expr = new BoolNode(true);
+                    w.Expr = new BooleanNode(true);
                 else
-                    ReplaceExpr(binop, new BoolNode(true));
+                    ReplaceExpr2(binop, new BooleanNode(true));
             }
             else if ((binop.Left is ExprNode) && (binop.Right is ExprNode) &&
                      (binop.Left.ToString() == binop.Right.ToString()) &&
                      (binop.Op == "==" || binop.Op == ">="))
             {
                 if (binop.Parent is IfNode ifn)
-                    ifn.Expr = new BoolNode(true);
+                    ifn.Cond = new BooleanNode(true);
                 else if (binop.Parent is WhileNode w)
-                    w.Expr = new BoolNode(true);
+                    w.Expr = new BooleanNode(true);
                 else
-                    ReplaceExpr(binop, new BoolNode(true));
+                    ReplaceExpr2(binop, new BooleanNode(true));
             }
             else
             {
@@ -128,22 +90,22 @@ namespace SimpleLang.Visitors
         }
         public override void VisitIfNode(IfNode ifn)
         {
-            ifn.Expr.Visit(this);
+            ifn.Cond.Visit(this);
         }
         public override void VisitWhileNode(WhileNode w)
         {
             w.Expr.Visit(this);
         }
     }
-    class Opt2Visitor : ChangeVisitor
+    class OptVisitor_13 : ChangeVisitor
     {
         public override void VisitBlockNode(BlockNode bl)
         {
             for (int i = 0; i < bl.StList.Count; i++)
                 if (bl.StList[i] is IfNode ifn)
                 {
-                    var stlist1 = ifn.StatIf as BlockNode;
-                    var stlist2 = ifn.StatElse as BlockNode;
+                    var stlist1 = ifn.If as BlockNode;
+                    var stlist2 = ifn.Else as BlockNode;
                     bool null1, null2;
                     null1 = null2 = false;
                     if (stlist1.StList.Count == 1 & stlist1.StList[0] is NullNode)
