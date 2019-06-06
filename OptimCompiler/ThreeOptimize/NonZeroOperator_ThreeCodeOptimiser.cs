@@ -14,6 +14,7 @@ namespace SimpleLang.ThreeCodeOptimisations
 
         public void Apply(ref LinkedList<ThreeCode> program)
         {
+            _applyed = false;
             code = program;
             DeleteEmptyOp();
             DeleteJumpThroughJump();
@@ -37,9 +38,9 @@ namespace SimpleLang.ThreeCodeOptimisations
                 if (line.Next.Value.arg1 == null && line.Next.Value.arg2 == null && line.Next.Value.result == null)
                 {
                     line = line.Next.Next;
+                    _applyed = true;
                     continue;
                 }
-                _applyed = true;
                 line = line.Next;
             }
         }
@@ -56,10 +57,11 @@ namespace SimpleLang.ThreeCodeOptimisations
                     var nextLine = line.Next;
                     code.Remove(line);
                     line = nextLine;
+                    _applyed = true;
                     continue;
                 }
 
-                if (line.Value.operation == ThreeOperator.IfGoto)
+                if (line.Value.operation == ThreeOperator.IfGoto && (line.Value.arg1 is ThreeAddressLogicValue))
                 {
                     inIf = true;
 
@@ -78,10 +80,10 @@ namespace SimpleLang.ThreeCodeOptimisations
                         line = line.Next;                      
                     }
                     line = line.Next.Next;
+                    _applyed = true;
 
                     continue;
                 }
-                _applyed = true;
                 line = line.Next;
             }
         }

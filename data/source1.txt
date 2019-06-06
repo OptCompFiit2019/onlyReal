@@ -1,9 +1,9 @@
 {
-  real b;
-  int c;
-	if (true)
-	{
-		b=3.14;
-	} 
-        c = 0;
+  real r;
+  r = 3.14;
+  bool b;
+  b = (r < 6.28) && true || false;
+  if (b && true || (! false)) {
+    println( r * 2 -2.18 /5 +234);
+  }
 }

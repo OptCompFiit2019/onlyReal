@@ -6,7 +6,7 @@ using SimpleLang.Visitors;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class PullOfCopiesOpt : ThreeCodeOptimiser
+    public class PullOfCopiesOpt : ThreeCodeOptimiser
     {
         private bool _apply = false;
 
@@ -56,10 +56,15 @@ namespace SimpleLang.ThreeCodeOptimisations
                     if (list[j].result == left)
                         break;
                     if (list[j].arg1.ToString() == left)
+                    {
                         list[j].arg1 = right;
+                        _apply = true;
+                    }
 
-                    if (list[i].arg2 != null && list[j].arg2.ToString() == left)
+                    if (list[i].arg2 != null && list[j].arg2.ToString() == left) {
                         list[j].arg2 = right;
+                        _apply = true;
+                    }
                 }
             }
         }

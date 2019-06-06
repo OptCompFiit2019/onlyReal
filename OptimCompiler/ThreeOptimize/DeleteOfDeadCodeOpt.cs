@@ -6,7 +6,7 @@ using SimpleLang.Visitors;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class DeleteOfDeadCodeOpt : ThreeCodeOptimiser
+    public class DeleteOfDeadCodeOpt : ThreeCodeOptimiser
     {
         public LinkedList<ThreeCode> Program { set; get; }
 

@@ -1,6 +1,6 @@
 {
 	real r;
-	r = 1 + 2 + 3 + 4 + 3.14 + 5.18;
+	r = 9/3;
 	bool b;
-	b = ( r < 55.0 ) && (true || false);
+	b = true || false;
 }

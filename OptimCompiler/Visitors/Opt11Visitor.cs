@@ -3,7 +3,7 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    class Opt11Visitor: ChangeVisitor
+    public class Opt11Visitor: AutoApplyVisitorInterface
     {
         public Opt11Visitor()
         {
@@ -15,6 +15,7 @@ namespace SimpleLang.Visitors
             {
                 if (ifn.If != null)
                     ifn.If.Visit(this);
+                SetApply();
                 ReplaceStat(ifn, ifn.If);
             }
             else

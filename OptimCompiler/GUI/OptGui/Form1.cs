@@ -21,17 +21,27 @@ namespace OptGui
             "Блоки трехадресного кода",
             "Граф потока управления",
             "Запуск",
+            "Оптимизации по дереву",           
             "Полученный трехадресный код",
             "Блоки трехадресного кода",
             "Граф потока управления",
             "Запуск",*/
         enum Modes { Text, BeforeThreeCode, BeforeBlocks,  BeforeGraph, BeforeRun,
-            AfterTbreeCode, AfterBlocks, AfterGraph, AfterRun}
+            ASTOpt, AfterTbreeCode, AfterBlocks, AfterGraph, AfterRun}
 
         public Form1()
         {
             InitializeComponent();
             UpdateForms();
+        }
+        public SimpleLang.Visitors.AutoApplyVisitor GetASTOptimizer()
+        {
+            SimpleLang.Visitors.AutoApplyVisitor res = new SimpleLang.Visitors.AutoApplyVisitor();
+            if (checkBox51.Checked)
+                res.Add(new SimpleLang.Visitors.Opt2Visitor());
+            if (checkBox52.Checked)
+                res.Add(new SimpleLang.Visitors.Opt11Visitor());
+            return res;
         }
         public SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser GetOptimiser() {
             SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser res = new SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser();
@@ -43,6 +53,18 @@ namespace OptGui
                 res.Add(new SimpleLang.ThreeCodeOptimisations.ApplyAlgebraicIdentities());
             if (checkBox4.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.DeadOrAliveOptimizationAdapter());
+            if (checkBox5.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.NonZero_JTJ());
+            if (checkBox6.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.DefUseConstOpt());
+            if (checkBox7.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.DefUseDeadCodeOpt());
+            if (checkBox8.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.DeleteOfDeadCodeOpt());
+            if (checkBox9.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.PullOfCopiesOpt());
+            if (checkBox10.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.UnreachableCodeOpt());
             return res;
         }
         void UpdateForms() {
@@ -73,6 +95,7 @@ namespace OptGui
             "Блоки трехадресного кода",
             "Граф потока управления",
             "Запуск",
+            "Оптимизации по дереву",            
             "Полученный трехадресный код",
             "Блоки трехадресного кода",
             "Граф потока управления",
@@ -83,10 +106,11 @@ namespace OptGui
                 case 2: return Modes.BeforeBlocks;
                 case 3: return Modes.BeforeGraph;
                 case 4: return Modes.BeforeRun;
-                case 5: return Modes.AfterTbreeCode;
-                case 6: return Modes.AfterBlocks;
-                case 7: return Modes.AfterGraph;
-                case 8: return Modes.AfterRun;
+                case 5: return Modes.ASTOpt;
+                case 6: return Modes.AfterTbreeCode;
+                case 7: return Modes.AfterBlocks;
+                case 8: return Modes.AfterGraph;
+                case 9: return Modes.AfterRun;
                 default: return Modes.Text;
             }
         }
@@ -112,10 +136,22 @@ namespace OptGui
                 var r = pars.root;
                 SimpleLang.Visitors.FillParentVisitor parVisitor = new SimpleLang.Visitors.FillParentVisitor();
                 r.Visit(parVisitor);
+
+                SimpleLang.Visitors.AutoApplyVisitor optAst = GetASTOptimizer();
+                optAst.Apply(r);
+                if (m == Modes.ASTOpt)
+                {
+                    SimpleLang.Visitors.PrettyPrintVisitor vis = new SimpleLang.Visitors.PrettyPrintVisitor();
+                    r.Visit(vis);
+                    txt.Text = vis.Text;
+                    return;
+                }
+
                 SimpleLang.Visitors.ThreeAddressCodeVisitor threeCodeVisitor = new SimpleLang.Visitors.ThreeAddressCodeVisitor();
                 r.Visit(threeCodeVisitor);
                 if (m == Modes.BeforeThreeCode) {
                     txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(threeCodeVisitor.GetCode());
+                    Console.WriteLine(txt.Text);
                     return;
                 }
                 if (m == Modes.BeforeRun) {
@@ -148,6 +184,7 @@ namespace OptGui
                         foreach (SimpleLang.Visitors.ThreeCode code in block)
                             res.AddLast(code);
                     txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(res);
+                    Console.WriteLine(txt.Text);
                     return;
                 }
                 if (m == Modes.AfterRun) {
