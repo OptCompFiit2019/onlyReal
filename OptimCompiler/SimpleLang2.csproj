@@ -50,6 +50,7 @@
     <Compile Include="ThreeCodeOptimisations\ConstantPropagationOptimization.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOnGraph.cs" />
     <Compile Include="ThreeCodeOptimisations\DefBUseB.cs" />
+    <Compile Include="ThreeCodeOptimisations\DefUse.cs" />
     <Compile Include="ThreeCodeOptimisations\IterAlgoActiveVariables.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
