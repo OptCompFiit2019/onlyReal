@@ -1,0 +1,38 @@
+E_genB
+Block 1:
+Block 2:
+Block 3: (j, Logic_less, 10)
+Block 4:
+Block 5: (b, Plus, 1,4)(j, Plus, 1)
+Block 6: (c, Plus, 1)
+Block 7:
+Block 8:
+Block 9:
+Block 10:
+Block 11:
+
+E_killB
+Block 1: c b
+Block 2: j
+Block 3: temp_0
+Block 4:
+Block 5: b j
+Block 6: c
+Block 7: c b
+Block 8:  c b
+Block 9:
+Block 10:  b
+Block 11:
+
+Transfer function
+Block 1:
+Block 2:
+Block 3: (j, Logic_less, 10)
+Block 4:
+Block 5: (b, Plus, 1,4)(j, Plus, 1)
+Block 6: (c, Plus, 1)
+Block 7:
+Block 8:
+Block 9:
+Block 10:
+Block 11:

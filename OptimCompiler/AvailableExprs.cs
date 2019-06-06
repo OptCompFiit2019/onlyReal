@@ -11,7 +11,7 @@ namespace SimpleLang.Visitors
     using ExprSet = HashSet<(String, String, String)>;
     using KillerSet = HashSet<String>;
     
-    public static class AvaliableExprs
+    public class AvaliableExprs
     {
         public static bool IsDefinition(ThreeOperator opType)
         {
@@ -35,21 +35,21 @@ namespace SimpleLang.Visitors
             return ret;
         }
 
-        public static KillerSet GetKillerSet(LinkedList<ThreeCode> bblock)
+        public KillerSet GetKillerSet(LinkedList<ThreeCode> bblock)
         {
             return new KillerSet(bblock
                                  .Where(l => IsDefinition(l.operation))
                                  .Select(l => l.result));
         }
 
-        public static (List<ExprSet>, List<KillerSet>) GetGenAndKillerSets(List<LinkedList<ThreeCode>> bblocks)
+        public (List<ExprSet>, List<KillerSet>) GetGenAndKillerSets(List<LinkedList<ThreeCode>> bblocks)
         {
             return (bblocks.Select(b => GetGenExprSet(b)).ToList(),
                     bblocks.Select(b => GetKillerSet(b)).ToList());
 
         }
 
-        public static ExprSet TransferByGenAndKiller(ExprSet X, ExprSet gen, KillerSet kill)
+        public ExprSet TransferByGenAndKiller(ExprSet X, ExprSet gen, KillerSet kill)
         {
             if (X == null) return gen;
             return new ExprSet(X.Where(e => !kill.Contains(e.Item1) && !kill.Contains(e.Item3))

@@ -165,5 +165,9 @@ namespace SimpleLang.Visitors
                 Text += ',' + w.vars[i].Name;
             Text += ";";
         }
+        public override void VisitNullNode(NullNode nil)
+        {
+            Text += IndentStr() + nil.Value.ToString() + ";";
+        }
     }
 }

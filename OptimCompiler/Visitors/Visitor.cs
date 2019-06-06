@@ -25,5 +25,6 @@ namespace SimpleLang.Visitors
         public virtual void VisitPrintlnNode(PrintlnNode w) { }
         public virtual void VisitVarDefNode(VarDefNode w) { }		
 		public virtual void VisitEmptyNode(EmptyNode w) { }
+        public virtual void VisitNullNode(NullNode val) { }
     }
 }

@@ -344,4 +344,14 @@ namespace ProgramTree
             return s;            
         }
     }
+    public class NullNode : StatementNode
+    {
+        public string Value = "NULL";
+        public NullNode() { }
+        public override void Visit(Visitor v)
+        {
+            v.VisitNullNode(this);
+        }
+        public override string ToString() => Value;
+    }
 }

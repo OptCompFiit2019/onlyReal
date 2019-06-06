@@ -10,6 +10,7 @@ AlphaDigit {Alpha}|{Digit}
 INTNUM  {Digit}+
 REALNUM {INTNUM}\.{INTNUM}
 ID {Alpha}{AlphaDigit}* 
+NIL #NULL
 
 %%
 
@@ -28,6 +29,13 @@ ID {Alpha}{AlphaDigit}*
   if (res == (int)Tokens.ID)
     yylval.sVal = yytext;
   return res;
+}
+
+{NIL}  { 
+  int res1 = ScannerHelper.GetNILToken(yytext);
+  if (res1 == (int)Tokens.NIL)
+	yylval.sVal = yytext;  
+  return res1;
 }
 
 "=" { return (int)Tokens.ASSIGN; }
@@ -110,5 +118,11 @@ class ScannerHelper
     else
       return (int)Tokens.ID;
   }
-  
+  public static int GetNILToken(string s)
+  {
+    if (keywords.ContainsKey(s.ToLower())) 
+      return keywords[s];
+    else
+      return (int)Tokens.NIL;
+  }
 }
