@@ -37,6 +37,9 @@ Tester.LaunchTest("ApplyAlgebraicIdentities");
 Tester.LaunchTest("DistributionOfConstant");
 Tester.LaunchTest("ThreeAddressCode");
 Tester.LaunchTest("EvalConstExpr");
+Tester.LaunchTest("PullOfCopies (Intel)");
+Tester.LaunchTest("DeleteOfDeadCode (Intel)");
+Tester.LaunchTest("DefUse");
 ```
 Метод _LaunchTest_ класса _Tester_ принимает в качестве аргумента название оптимизации или алгоритма, который нужно применить. По этому названию находится папка с тестами и запускается работа алгоритма. Результат работы алгоритма сравнивается с ожидаемым результатом. Если что-то не правильно, то система предупредит об этом.
 
