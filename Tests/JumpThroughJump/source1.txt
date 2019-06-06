@@ -1,6 +1,6 @@
 {
-  real b;
-  int c;
+	real b;
+	int c;
 	if (true)
 	{
 		b=3.14;

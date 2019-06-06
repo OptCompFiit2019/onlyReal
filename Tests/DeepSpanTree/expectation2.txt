@@ -1,0 +1,14 @@
+v1=1 v2=2 type=Tree
+v1=1 v2=3 type=Tree
+v1=2 v2=4 type=Tree
+v1=3 v2=4 type=Cross
+v1=4 v2=5 type=Tree
+v1=5 v2=6 type=Tree
+v1=5 v2=7 type=Tree
+v1=6 v2=12 type=Tree
+v1=7 v2=8 type=Tree
+v1=8 v2=9 type=Tree
+v1=8 v2=10 type=Tree
+v1=9 v2=11 type=Tree
+v1=10 v2=8 type=Back
+v1=11 v2=5 type=Back

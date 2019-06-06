@@ -1,52 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
 using GenericTransferFunction;
+using SimpleLang.Visitors;
 
 namespace SimpleLang.GenericIterativeAlgorithm
 {
+    using BasicBlock = LinkedList<ThreeCode>;
+
     /// <summary>
     /// Вспомогательный класс, хранящий информацию о множествах отдельного блока, таких как
     /// IN, OUT, def, use, gen, kill, e_gen, e_kill
     /// </summary>
-    class BlockInfo
+    public class BlockInfo<T>
     {
-        public ISet<string> IN;
-        public ISet<string> OUT;
-        public ISet<string> HelpFirst; // Аналог def_b, gen_b, e_gen_b
-        public ISet<string> HelpSecond; // Аналог use_b, kill_b, e_kill_b
+        public BasicBlock Commands;
+        public ISet<T> IN;
+        public ISet<T> OUT;
+        public ISet<T> HelpFirst; // Аналог def_b, gen_b, e_gen_b
+        public ISet<T> HelpSecond; // Аналог use_b, kill_b, e_kill_b
 
         /// <summary>
         /// Определяет равенство текущего объекта и <paramref name="other"/> по совпадению полей.
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(BlockInfo other)
+        public bool Equals(BlockInfo<T> other)
         {
             if (IN.Count != other.IN.Count || OUT.Count != other.OUT.Count
                 || HelpFirst.Count != other.HelpFirst.Count || HelpSecond.Count != other.HelpSecond.Count)
                 return false;
 
-            return IN.SetEquals(other.IN) && OUT.SetEquals(other.OUT) 
+            return IN.SetEquals(other.IN) && OUT.SetEquals(other.OUT)
                 && HelpFirst.SetEquals(other.HelpFirst) && HelpSecond.SetEquals(other.HelpSecond);
         }
-
-        public BlockInfo(BlockInfo source)
+        
+        public BlockInfo(BasicBlock commands)
         {
-            IN = new HashSet<string>(source.IN);
-            OUT = new HashSet<string>(source.OUT);
-            HelpFirst = new HashSet<string>(source.HelpFirst);
-            HelpSecond = new HashSet<string>(source.HelpSecond);
+            Commands = commands;
+            IN = new HashSet<T>();
+            OUT = new HashSet<T>();
+            HelpFirst = new HashSet<T>();
+            HelpSecond = new HashSet<T>();
         }
 
-        public BlockInfo(ISet<string> helpFirst, ISet<string> helpSecond)
+        public BlockInfo(BlockInfo<T> source)
         {
-            IN = new HashSet<string>();
-            OUT = new HashSet<string>();
+            Commands = new LinkedList<ThreeCode>(source.Commands);
+            IN = new HashSet<T>(source.IN);
+            OUT = new HashSet<T>(source.OUT);
+            HelpFirst = new HashSet<T>(source.HelpFirst);
+            HelpSecond = new HashSet<T>(source.HelpSecond);
+        }
+
+        public BlockInfo(ISet<T> helpFirst, ISet<T> helpSecond)
+        {
+            IN = new HashSet<T>();
+            OUT = new HashSet<T>();
             HelpFirst = helpFirst;
             HelpSecond = helpSecond;
         }
 
-        public BlockInfo(ISet<string> helpFirst, ISet<string> helpSecond, ISet<string> In, ISet<string> Out)
+        public BlockInfo(ISet<T> helpFirst, ISet<T> helpSecond, ISet<T> In, ISet<T> Out)
         {
             IN = In;
             OUT = Out;
@@ -54,43 +68,43 @@ namespace SimpleLang.GenericIterativeAlgorithm
             HelpSecond = helpSecond;
         }
     }
-
-    class IterativeAlgorithm
+    
+    public class IterativeAlgorithm<T>
     {
         // направление обхода: true - прямой, false - обратный
-        public bool IsForward { get;}
+        public bool IsForward { get; }
         public ControlFlowGraph.ControlFlowGraph Graph { get; }
         // информация о блоках. Каждому блоку с индексом i в графе соответствует экземпляр
-        // класса BlockInfo в списке BlocksInfo с тем же индексом
-        public List<BlockInfo> BlocksInfo { get; }
+        // класса BlockInfo<T> в списке BlocksInfo с тем же индексом
+        public List<BlockInfo<T>> BlocksInfo { get; }
         // оператор сбора
-        public Func<List<BlockInfo>, ControlFlowGraph.ControlFlowGraph, int, BlockInfo> MeetOperator;
+        public Func<List<BlockInfo<T>>, ControlFlowGraph.ControlFlowGraph, int, BlockInfo<T>> MeetOperator;
         // передаточная функция
-        public TransferFunction<BlockInfo> Function { get; }
+        public TransferFunction<BlockInfo<T>> Function { get; }
         // значение инициализации IN/OUT первого или последнего блока для прямого или обратного обходов соответственно
-        public ISet<string> InitEntryExit { get; }
+        public ISet<T> InitEntryExit { get; }
         // значение инициализации IN/OUT для остальных блоков
-        public ISet<string> InitOther { get; }
+        public ISet<T> InitOther { get; }
 
-        public IterativeAlgorithm(List<BlockInfo> blocksInfo, ControlFlowGraph.ControlFlowGraph graph, 
-            Func<List<BlockInfo>, ControlFlowGraph.ControlFlowGraph, int, BlockInfo> meetOperator, bool isForward, 
-            IEnumerable<string> initValueEntryExit, IEnumerable<string> initValueOthers,
-            TransferFunction<BlockInfo> function)
+        public IterativeAlgorithm(List<BlockInfo<T>> blocksInfo, ControlFlowGraph.ControlFlowGraph graph,
+            Func<List<BlockInfo<T>>, ControlFlowGraph.ControlFlowGraph, int, BlockInfo<T>> meetOperator, bool isForward,
+            IEnumerable<T> initValueEntryExit, IEnumerable<T> initValueOthers,
+            TransferFunction<BlockInfo<T>> function)
         {
             BlocksInfo = blocksInfo;
             Graph = graph;
             MeetOperator = meetOperator;
             IsForward = isForward;
-            InitEntryExit = new HashSet<string>(initValueEntryExit);
-            InitOther = new HashSet<string>(initValueOthers);
+            InitEntryExit = new HashSet<T>(initValueEntryExit);
+            InitOther = new HashSet<T>(initValueOthers);
             Function = function;
         }
 
         /// <summary>
-        /// Выполняет оптимизационный алгоритм и возвращает результат как List<BlockInfo>,
+        /// Выполняет оптимизационный алгоритм и возвращает результат как List<BlockInfo<T>>,
         /// </summary>
         /// <returns></returns>
-        public List<BlockInfo> Perform()
+        public List<BlockInfo<T>> Perform()
         {
             int countBlocks = Graph.blocks.Count;
 
@@ -98,7 +112,7 @@ namespace SimpleLang.GenericIterativeAlgorithm
             {
                 BlocksInfo[i].IN = InitEntryExit;
                 BlocksInfo[i].OUT = InitOther;
-            }   
+            }
 
             if (IsForward)
                 BlocksInfo[0].OUT = InitEntryExit;
@@ -112,9 +126,9 @@ namespace SimpleLang.GenericIterativeAlgorithm
             while (isChanged)
             {
                 isChanged = false;
-                for(int index = startIndex; index < endIndex; index++)
+                for (int index = startIndex; index < endIndex; index++)
                 {
-                    var prevFunctionResult = new BlockInfo(BlocksInfo[index]);
+                    var prevFunctionResult = new BlockInfo<T>(BlocksInfo[index]);
                     BlocksInfo[index] = MeetOperator(BlocksInfo, Graph, index);
                     BlocksInfo[index] = Function.Apply(BlocksInfo[index]);
                     isChanged = isChanged || !prevFunctionResult.Equals(BlocksInfo[index]);
@@ -127,11 +141,11 @@ namespace SimpleLang.GenericIterativeAlgorithm
         /// Возвращает список множеств OUT для блоков
         /// </summary>
         /// <returns></returns>
-        public List<HashSet<string>> GetOUTs()
+        public List<HashSet<T>> GetOUTs()
         {
-            var res = new List<HashSet<string>>();
+            var res = new List<HashSet<T>>();
             foreach (var info in BlocksInfo)
-                res.Add(new HashSet<string>(info.OUT));
+                res.Add(new HashSet<T>(info.OUT));
             return res;
         }
 
@@ -139,11 +153,11 @@ namespace SimpleLang.GenericIterativeAlgorithm
         /// Возвращает список множеств IN для блоков
         /// </summary>
         /// <returns></returns>
-        public List<HashSet<string>> GetINs()
+        public List<HashSet<T>> GetINs()
         {
-            var res = new List<HashSet<string>>();
+            var res = new List<HashSet<T>>();
             foreach (var info in BlocksInfo)
-                res.Add(new HashSet<string>(info.IN));
+                res.Add(new HashSet<T>(info.IN));
             return res;
         }
 

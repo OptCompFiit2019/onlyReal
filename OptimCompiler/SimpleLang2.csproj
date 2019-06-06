@@ -45,13 +45,18 @@
   <ItemGroup>
     <Compile Include="ControlFlowGraph\GraphDepth.cs" />
     <Compile Include="Dominators\DominatorsFinder.cs" />
+    <Compile Include="GenericIterativeAlgorithm\Test.cs" />
     <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
     <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
+    <Compile Include="ThreeCodeOptimisations\ConstantPropagationOptimization.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOnGraph.cs" />
     <Compile Include="ThreeCodeOptimisations\DefBUseB.cs" />
     <Compile Include="ThreeCodeOptimisations\DefUse.cs" />
     <Compile Include="ThreeCodeOptimisations\IterAlgoActiveVariables.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
+    <Compile Include="TransferFunction\ConstantPropagation.cs" />
+    <Compile Include="TransferFunction\ReachingDefsTest.cs" />
+    <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />
@@ -74,7 +79,6 @@
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOptimization.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />
-    <Compile Include="TransferFunction.cs" />
     <Compile Include="Syntax\ParserHelper.cs" />
     <Compile Include="Syntax\ProgramTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -92,6 +96,7 @@
     <Compile Include="Block\Block.cs" />
     <Compile Include="Compiler\ILCodeGenerator.cs" />
     <Compile Include="Compiler\GenCodeCreator.cs" />
+    <Compile Include="ThreeOptimize\DeadOrAliveOptimizationAdapter.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

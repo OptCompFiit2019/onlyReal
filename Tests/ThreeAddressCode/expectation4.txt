@@ -1,0 +1,8 @@
+label_0:	temp_0 = true
+			if temp_0 goto label_1
+			goto label_2
+label_1: 	a =23
+			println a
+			goto label_0
+label_2:
+

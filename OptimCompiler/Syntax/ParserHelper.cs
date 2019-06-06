@@ -8,9 +8,14 @@ namespace SimpleParser
 
     public static class SymbolTable // Таблица символов
     {
+        private static Parser parent = null;
         public static Dictionary<string, type> vars = new Dictionary<string, type>(); // таблица символов
-        public static void NewVarDef(string name, type t)
+        public static void NewVarDef(string name, type t, Parser p)
         {
+            if (p != parent) {
+                parent = p;
+                vars = new Dictionary<string, type>();
+            }
             if (vars.ContainsKey(name))
                 throw new Exception("Переменная " + name + " уже определена");
             else vars.Add(name, t);

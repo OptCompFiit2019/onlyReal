@@ -58,6 +58,7 @@ namespace SimpleLang.Visitors
                         var nn = line.Next.Value.arg1;
                         (line.Value.arg2 as ThreeAddressStringValue).Value = (line.Next.Value.arg1 as ThreeAddressStringValue).Value;
                         code.Remove(line.Next);
+                        code.Remove(line.Next);
                         line = line.Next;                      
                     }
                     line = line.Next.Next;

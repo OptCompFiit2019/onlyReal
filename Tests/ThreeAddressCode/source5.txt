@@ -1,0 +1,11 @@
+{
+	bool c;
+	c = 23 < 55;
+	if (c) {
+		int a;
+		a = 1;
+	} else {
+		real b;
+		b = 3.14;
+	}
+}

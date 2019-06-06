@@ -1,0 +1,10 @@
+{
+int a,b,c,d,x,y;
+a = x + y;
+b = a;
+a = 17;
+b = 18;
+c = a + b;
+x = c;
+y = x;
+}
