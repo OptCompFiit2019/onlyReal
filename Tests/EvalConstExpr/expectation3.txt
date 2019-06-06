@@ -1,6 +1,6 @@
 {
 	real r;
-	r = 18.32;
+	r = 3;
 	bool b;
 	b =True;
 }

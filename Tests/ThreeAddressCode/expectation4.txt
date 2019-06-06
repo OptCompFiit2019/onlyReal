@@ -1,4 +1,4 @@
-label_0:	temp_0 = true
+label_0:	temp_0 = True
 			if temp_0 goto label_1
 			goto label_2
 label_1: 	a =23

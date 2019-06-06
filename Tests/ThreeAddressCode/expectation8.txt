@@ -7,12 +7,11 @@ label_3: temp_2 = j< i
 		temp_1 = temp_2
 		if temp_1 goto label_4
 		goto label_5
-label_4:temp_3 = j + 2
-		j = temp_3
+label_4:j = j + 2
 		goto label_3
-label_5: temp_4 = i == j
-		if temp_4 goto label_6
-		goto label+7
+label_5: temp_3 = i == j
+		if temp_3 goto label_6
+		goto label_7
 label_6:println i
 label_7: i = i +1
 		goto label_0

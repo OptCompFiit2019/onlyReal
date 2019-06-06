@@ -3,8 +3,7 @@
 label_0: temp_0 = i < 100
 		if temp_0 goto label_1
 		goto label_2
-label_1:temp_1 = t + i
-		t = temp_1
+label_1:t = t + i
 		i = i + 1
 		goto label_0
 label_2:
