@@ -1,0 +1,12 @@
+﻿{
+	int a,b,c;
+	a = 0;
+	if (false)
+		a=1;
+	else
+		while (a < 3){
+			a = a + 1;
+			b = 2;
+			c = 3;
+		}
+}
