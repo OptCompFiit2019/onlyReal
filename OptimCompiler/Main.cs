@@ -19,7 +19,7 @@ namespace SimpleCompiler
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
-            string FileName = @"../../../data/DeadOrAliveOptimizationTest.txt";
+            string FileName = @"../../../data/fib.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -44,6 +44,13 @@ namespace SimpleCompiler
                     {
                         ThreeAddressCodeVisitor treeCod2e = new ThreeAddressCodeVisitor();
                         r.Visit(treeCod2e);
+
+                        SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                        gen.Generate(treeCod2e.GetCode());
+                        gen.PrintCommands();
+                        string res = gen.Execute();
+                        Console.WriteLine(res);
+
                         //var blocks = new Block(treeCod2e).GenerateBlocks();
 
                         AutoThreeCodeOptimiser ap2p = new AutoThreeCodeOptimiser();

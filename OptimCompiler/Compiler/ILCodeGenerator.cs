@@ -118,13 +118,13 @@ namespace SimpleLang.Compiler
             type type2 = DetectType(val2);
 
             if (type1 == type2) {
+                type t = isLogic ? type.tbool : type1;
+
                 if (varTypes.ContainsKey(name)) {
-                    if (varTypes[name] != type1)
+                    if (varTypes[name] != t)
                         throw new Exception("Previous declaration is different");
                     return;
                 }
-
-                type t = isLogic ? type.tbool : type1;
 
                 var v = CreateVariable(t);
                 variables.Add(name, v);
