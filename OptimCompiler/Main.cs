@@ -61,36 +61,6 @@ namespace SimpleCompiler
                     }
 
 
-                    //Console.WriteLine("---------------Avilov AST Test----------------");
-                    //Console.WriteLine("----------------Before 6---------------");
-                    //Console.WriteLine("----------------LessOptVisitor---------------");
-                    //PrettyPrintVisitor ppv = new PrettyPrintVisitor();
-                    //r.Visit(ppv);
-                    //Console.WriteLine(ppv.Text);
-
-                    //LessOptVisitor opt6 = new LessOptVisitor();
-                    //r.Visit(opt6);
-
-                    //Console.WriteLine("----------------After 6---------------");
-                    //PrettyPrintVisitor ppv2 = new PrettyPrintVisitor();
-                    //r.Visit(ppv2);
-                    //Console.WriteLine(ppv2.Text);
-
-                    //Console.WriteLine("---------------Avilov AST Test----------------");
-                    //Console.WriteLine("----------------Before 12---------------");
-                    //Console.WriteLine("----------------LessOptVisitor---------------");
-                    //PrettyPrintVisitor ppv3 = new PrettyPrintVisitor();
-                    //r.Visit(ppv3);
-                    //Console.WriteLine(ppv3.Text);
-
-                    //LessOptVisitor opt12 = new LessOptVisitor();
-                    //r.Visit(opt12);
-
-                    //Console.WriteLine("----------------After 12---------------");
-                    //PrettyPrintVisitor ppv4 = new PrettyPrintVisitor();
-                    //r.Visit(ppv4);
-                    //Console.WriteLine(ppv4.Text);
-
                     //Console.WriteLine(r.ToString());
 
                     /*Opt2Visitor opt2 = new Opt2Visitor();
