@@ -1,4 +1,5 @@
 {
+  int a, b, d, y, x;
   a = b;
   d = a + x;
   y = x;
