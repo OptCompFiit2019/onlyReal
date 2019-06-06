@@ -864,7 +864,7 @@ namespace SimpleLang
                             Console.WriteLine("Тест {0} успешно пройден!", source);
                         break;
 
-                    case "PullCopies (Intel)":  //Intel
+                    case "PullOfCopies (Intel)":  //Intel
                         {
                             sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
                             expectationCode = GetThreeAddressCodeVisitor(pathToFolder, expectation);
@@ -960,13 +960,6 @@ namespace SimpleLang
                         break;
 
                     //здесь будет
-                    //OptWhileVisitor           Roll
-                    //OptMulDivOneVisitor       Roll
-
-                    //здесь будет
-                    //DefUse (оптимизация)      komanda
-                    //DeleteDeadCode (Intel)    Intel
-                    //PullCopies (Intel)        Intel 
                     //OptWhileVisitor           Roll
                     //OptMulDivOneVisitor       Roll
 

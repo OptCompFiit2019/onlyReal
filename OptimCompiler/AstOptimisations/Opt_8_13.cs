@@ -97,7 +97,7 @@ namespace SimpleLang.Visitors
             w.Expr.Visit(this);
         }
     }
-    class OptVisitor_13 : ChangeVisitor
+    class OptVisitor_13 : ChangeVisitor2
     {
         public override void VisitBlockNode(BlockNode bl)
         {
