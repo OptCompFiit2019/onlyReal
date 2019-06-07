@@ -1,0 +1,7 @@
+{
+  int a;
+  while(false)
+  {
+    a = 10;
+  }
+}

@@ -6,10 +6,11 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    class ChangeVisitor2 : AutoVisitor
+    public class ChangeVisitor2 : AutoApplyVisitorInterface
     {
         public void ReplaceExpr2(ExprNode from, ExprNode to)
         {
+            SetApply();
             var p = from.Parent;
             if (p == null)
                 from = to;
@@ -32,8 +33,9 @@ namespace SimpleLang.Visitors
             }
         }
 
-        public void ReplaceStat(StatementNode from, StatementNode to)
+        public override void ReplaceStat(StatementNode from, StatementNode to)
         {
+            SetApply();
             var p = from.Parent;
             if (p is AssignNode || p is ExprNode)
             {
@@ -57,7 +59,7 @@ namespace SimpleLang.Visitors
         }
     }
 
-    class OptVisitor_8 : ChangeVisitor2
+    public class OptVisitor_8 : ChangeVisitor2
     {
         public override void VisitBinOpNode(BinOpNode binop)
         {
@@ -65,22 +67,26 @@ namespace SimpleLang.Visitors
                 (binop.Left as IdNode).Name == (binop.Right as IdNode).Name &&
                 (binop.Op == "==" || binop.Op == ">="))
             {
-                if (binop.Parent is IfNode ifn)
+                if (binop.Parent is IfNode ifn) { 
                     ifn.Cond = new BooleanNode(true);
-                else if (binop.Parent is WhileNode w)
+                    SetApply();
+                } else if (binop.Parent is WhileNode w) { 
                     w.Expr = new BooleanNode(true);
-                else
+                    SetApply();
+                }else
                     ReplaceExpr2(binop, new BooleanNode(true));
             }
             else if ((binop.Left is ExprNode) && (binop.Right is ExprNode) &&
                      (binop.Left.ToString() == binop.Right.ToString()) &&
                      (binop.Op == "==" || binop.Op == ">="))
             {
-                if (binop.Parent is IfNode ifn)
+                if (binop.Parent is IfNode ifn) { 
                     ifn.Cond = new BooleanNode(true);
-                else if (binop.Parent is WhileNode w)
+                    SetApply();
+                }else if (binop.Parent is WhileNode w) { 
                     w.Expr = new BooleanNode(true);
-                else
+                    SetApply();
+                }else
                     ReplaceExpr2(binop, new BooleanNode(true));
             }
             else
@@ -97,7 +103,7 @@ namespace SimpleLang.Visitors
             w.Expr.Visit(this);
         }
     }
-    class OptVisitor_13 : ChangeVisitor2
+    public class OptVisitor_13 : ChangeVisitor2
     {
         public override void VisitBlockNode(BlockNode bl)
         {
@@ -113,9 +119,10 @@ namespace SimpleLang.Visitors
                     if (stlist2.StList.Count == 1 & stlist2.StList[0] is NullNode)
                         null2 = true;
 
-                    if (null1 && null2)
+                    if (null1 && null2) { 
                         bl.StList[i] = new NullNode();
-                    else
+                        SetApply();
+                    }else
                         base.VisitIfNode(ifn);
                 }
         }

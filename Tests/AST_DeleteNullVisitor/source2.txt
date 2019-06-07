@@ -1,0 +1,10 @@
+{
+int a, b, c;
+a = 3;
+#NULL;
+b = 2;
+#NULL;
+c = 1;
+#NULL;
+c = c + a;
+}

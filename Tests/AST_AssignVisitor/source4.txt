@@ -1,0 +1,12 @@
+{
+int a, b;
+int c, d;
+a = 3;
+b = a + 3;
+c = b + a + 2;
+d = c + b;
+c = c;
+b = a + 2;
+d = d;
+a = b + 1;
+}

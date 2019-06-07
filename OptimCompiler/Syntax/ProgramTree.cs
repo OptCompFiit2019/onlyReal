@@ -67,7 +67,12 @@ namespace ProgramTree
                  rb = Right.Type == type.tbool;
 
             if (op == "&&" || op == "||") { if (!lb || !rb) throw e; }
-            else if (lb || rb) throw e;
+            else
+                if (lb || rb)
+                    if (op != "==")
+                        throw e;
+
+                    
             
             this.Left = Left;
             this.Right = Right;
@@ -147,7 +152,7 @@ namespace ProgramTree
         public string Operation { get; set; }
         public LogicOpNode(ExprNode Left, ExprNode Right, string op, LexLocation opLoc)
         {
-            if (Left.Type == type.tbool || Right.Type == type.tbool)
+            if ((Left.Type == type.tbool || Right.Type == type.tbool) && (op != "=="))
                 throw new Exception($"({opLoc.StartLine},{opLoc.StartColumn}): Оператор \"{op}\" нельзя " +
                     $"применить к операндам типа \"{TypeName(Left.Type)}\" и \"{TypeName(Right.Type)}\".");
             this.Left = Left;
