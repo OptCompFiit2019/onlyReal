@@ -7,7 +7,7 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    class ElseStVisitor : ChangeVisitor
+    public class ElseStVisitor : AutoApplyVisitorInterface
     {
         public override void VisitIfNode(IfNode ifn)
         {

@@ -37,9 +37,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AstOptimisations\Opt_8_13.cs" />
+    <Compile Include="AstOptimisations\IfFalseVisitor.cs" />
+    <Compile Include="AstOptimisations\MultiplicationComputeVisitor.cs" />
     <Compile Include="ControlFlowGraph\GraphDepth.cs" />
+    <Compile Include="DeepSpanTree.cs" />
+    <Compile Include="DeleteOfDeadCode.cs" />
     <Compile Include="GenericIterativeAlgorithm\Test.cs" />
     <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
+    <Compile Include="IterativeAlgorithm.cs" />
+    <Compile Include="PullOfCopies.cs" />
     <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
     <Compile Include="ThreeCodeOptimisations\ConstantPropagationOptimization.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOnGraph.cs" />
@@ -49,10 +56,10 @@
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="ThreeOptimize\DeleteOfDeadCodeOpt.cs" />
     <Compile Include="ThreeOptimize\PullOfCopiesOpt.cs" />
+    <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
     <Compile Include="TransferFunction\ReachingDefsTest.cs" />
     <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
-    <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />
@@ -70,10 +77,10 @@
     <Compile Include="AstOptimisations\OptMulDivOneVisitor.cs" />
     <Compile Include="AstOptimisations\OptWhileVisitor.cs" />
     <Compile Include="AstOptimisations\PlusNonZero.cs" />
+    <Compile Include="AstOptimisations\Optimisations.cs" />
     <Compile Include="TransferFunction\TransferFunction.cs" />
     <Compile Include="ThreeCodeOptimisations\DAG.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOptimization.cs" />
-    <Compile Include="Main.cs" />
     <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />
     <Compile Include="Syntax\ParserHelper.cs" />
     <Compile Include="Syntax\ProgramTree.cs" />
@@ -96,6 +103,8 @@
     <Compile Include="ThreeOptimize\DeadOrAliveOptimizationAdapter.cs" />
     <Compile Include="Visitors\AutoApplyVisitorInterface.cs" />
     <Compile Include="Visitors\AutoApplyVisitor.cs" />
+    <Compile Include="AstOptimisations\LessOptVisitor.cs" />
+    <Compile Include="AstOptimisations\ElseStVisitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

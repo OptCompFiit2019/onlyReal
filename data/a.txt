@@ -1,4 +1,12 @@
 {
+int c, d;
+bool a;
+int b;
+int h;
+int i, j, gg, hh, k, t;
+a = a;
+c = c - c;
+
 	b= 123;
 	c = 321;
 	b = b + 321;
@@ -7,7 +15,7 @@
 
 	if ((a==true) && (b == false))
 	{
-		b=3.14;
+		b=3;
 		for (b=1 to 555-1)
 			h = 1;
 	}
@@ -17,8 +25,8 @@
 
 	for (i=1 to 100){
 		for(j=1 to 100){
-			a = a + b;
-		}
+			j = j+ i;
+      }
 	}
 
 	while (gg) {
@@ -29,8 +37,8 @@
 	for (i=23 to 44) {
 		h=2;
 		b=b+55;
-		a=b+(2*c+4);
-		c=a+3+3;
+		j=b+(2*c+4);
+		c=j+3+3;
 		for (b=1 to 555-1)
 			h = 1;
 		while(true) {

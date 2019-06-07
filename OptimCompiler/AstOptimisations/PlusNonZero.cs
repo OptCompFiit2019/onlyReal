@@ -6,7 +6,7 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    class PlusNonZero : AutoApplyVisitorInterface
+    public class PlusNonZero : AutoApplyVisitorInterface
     {
         public override void VisitBinOpNode(BinOpNode binop)
         {
