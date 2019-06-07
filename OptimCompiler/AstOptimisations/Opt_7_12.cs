@@ -6,7 +6,7 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    class Opt7Visitor : AutoApplyVisitorInterface {
+    public class Opt7Visitor : AutoApplyVisitorInterface {
         public override void VisitLogicOpNode (LogicOpNode lop) 
         {
             if (lop.Left is ExprNode)
@@ -32,7 +32,7 @@ namespace SimpleLang.Visitors
         }
     }
 
-    class Opt12Visitor : AutoApplyVisitorInterface {
+    public class Opt12Visitor : AutoApplyVisitorInterface {
         public override void VisitIfNode(IfNode ifn) {
             if (ifn.Cond is BooleanNode bn && bn.Val == false) {
                 if (ifn.Else != null)

@@ -61,6 +61,10 @@ namespace OptGui
                 res.Add(new SimpleLang.Visitors.LessOptVisitor());
             if (checkBox62.Checked)
                 res.Add(new SimpleLang.Visitors.MultiplicationComputeVisitor());
+            if (checkBox63.Checked)
+                res.Add(new SimpleLang.Visitors.Opt7Visitor());
+            if (checkBox64.Checked)
+                res.Add(new SimpleLang.AstOptimisations.LinearizeBlocks());
             return res;
         }
         public SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser GetOptimiser() {
@@ -157,16 +161,6 @@ namespace OptGui
                 SimpleLang.Visitors.FillParentVisitor parVisitor = new SimpleLang.Visitors.FillParentVisitor();
                 r.Visit(parVisitor);
 
-                SimpleLang.Visitors.AutoApplyVisitor optAst = GetASTOptimizer();
-                optAst.Apply(r);
-                if (m == Modes.ASTOpt)
-                {
-                    SimpleLang.Visitors.PrettyPrintVisitor vis = new SimpleLang.Visitors.PrettyPrintVisitor();
-                    r.Visit(vis);
-                    txt.Text = vis.Text;
-                    return;
-                }
-
                 SimpleLang.Visitors.ThreeAddressCodeVisitor threeCodeVisitor = new SimpleLang.Visitors.ThreeAddressCodeVisitor();
                 r.Visit(threeCodeVisitor);
                 if (m == Modes.BeforeThreeCode) {
@@ -177,11 +171,28 @@ namespace OptGui
                 if (m == Modes.BeforeRun) {
                     SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
                     gen.Generate(threeCodeVisitor.GetCode());
-                    var timer = System.Diagnostics.Stopwatch.StartNew();
-                    string res = gen.Execute();
-                    timer.Stop();
-                    res = res + "\n\n\nExecuted: " + timer.ElapsedMilliseconds.ToString() + " ms"
-                        + " or " + timer.ElapsedTicks.ToString() + " ticks";
+
+                    List<long> datas = new List<long>();
+                    List<long> datas2 = new List<long>();
+                    int count_run = Int32.Parse(textBox3.Text);
+                    string res = "";
+                    for (int i = 0; i < count_run; i++)
+                    {
+                        var timer = System.Diagnostics.Stopwatch.StartNew();
+                        res = gen.Execute();
+                        timer.Stop();
+
+                        datas.Add(timer.ElapsedMilliseconds);
+                        datas2.Add(timer.ElapsedTicks);
+                    }
+
+                    res = res + "\n\nExecuted avg: " + (datas.Min()).ToString() + " ms"
+                            + " or " + (datas2.Min()).ToString() + " ticks\n";
+                    for (int i = 0; i < datas.Count; i++) {
+                        res = res + i.ToString() + ": " + datas[i].ToString() + " ms or " + datas2[i].ToString() + " ticks\n";
+                    }
+
+
                     txt.Text = res;
                     return;
                 }
@@ -191,6 +202,19 @@ namespace OptGui
                     txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(blocks);
                     return;
                 }
+
+                SimpleLang.Visitors.AutoApplyVisitor optAst = GetASTOptimizer();
+                optAst.Apply(r);
+                if (m == Modes.ASTOpt)
+                {
+                    SimpleLang.Visitors.PrettyPrintVisitor vis = new SimpleLang.Visitors.PrettyPrintVisitor();
+                    r.Visit(vis);
+                    txt.Text = vis.Text;
+                    return;
+                }
+
+                threeCodeVisitor = new SimpleLang.Visitors.ThreeAddressCodeVisitor();
+                r.Visit(threeCodeVisitor);
                 var opt = GetOptimiser();
                 var outcode = opt.Apply(threeCodeVisitor);
 
@@ -214,12 +238,28 @@ namespace OptGui
                             res.AddLast(code);
                     SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
                     gen.Generate(res);
-                    var timer = System.Diagnostics.Stopwatch.StartNew();
-                    string ooo = gen.Execute();
-                    timer.Stop();
-                    ooo = ooo + "\n\n\nExecuted: " + timer.ElapsedMilliseconds.ToString() + " ms"
-                        + " or " + timer.ElapsedTicks.ToString() + " ticks";
-                    txt.Text = ooo;
+
+                    List<long> datas = new List<long>();
+                    List<long> datas2 = new List<long>();
+                    int count_run = Int32.Parse(textBox3.Text);
+                    string re2 = "";
+                    for (int i = 0; i < count_run; i++)
+                    {
+                        var timer = System.Diagnostics.Stopwatch.StartNew();
+                        re2 = gen.Execute();
+                        timer.Stop();
+
+                        datas.Add(timer.ElapsedMilliseconds);
+                        datas2.Add(timer.ElapsedTicks);
+                    }
+
+                    re2 = re2 + "\n\nExecuted avg: " + (datas.Min()).ToString() + " ms"
+                            + " or " + (datas2.Min()).ToString() + " ticks\n";
+                    for (int i = 0; i < datas.Count; i++)
+                    {
+                        re2 = re2 + i.ToString() + ": " + datas[i].ToString() + " ms or " + datas2[i].ToString() + " ticks\n";
+                    }
+                    txt.Text = re2;
                     return;
                 }
 
@@ -248,6 +288,15 @@ namespace OptGui
             }
             UpdateForms();
 
+        }
+        private void Setting_count_run_textChange(object sender, EventArgs even) {
+            StringBuilder b = new StringBuilder();
+            for (int i = 0; i < textBox3.Text.Length; i++)
+            {
+                if (Char.IsDigit(textBox3.Text[i]))
+                    b.Append(textBox3.Text[i]);
+            }
+            textBox3.Text = b.ToString();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)

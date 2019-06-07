@@ -46,7 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AstOptimisations\Opt_7_12.cs" />
     <Compile Include="AstOptimisations\Opt_8_13.cs" />
+    <Compile Include="AstOptimisations\LinearizeBlocks.cs" />
     <Compile Include="AvailableExprs.cs" />
     <Compile Include="AstOptimisations\IfFalseVisitor.cs" />
     <Compile Include="AstOptimisations\MultiplicationComputeVisitor.cs" />
