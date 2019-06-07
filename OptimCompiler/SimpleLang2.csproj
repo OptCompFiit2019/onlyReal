@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="AstOptimisations\AssignVisitor.cs" />
     <Compile Include="AstOptimisations\DeleteNullVisitor.cs" />
+    <Compile Include="AstOptimisations\FalseExprMoreAndNonEqualVisitor.cs" />
     <Compile Include="AstOptimisations\Opt_8_13.cs" />
     <Compile Include="AvailableExprs.cs" />
     <Compile Include="AstOptimisations\IfFalseVisitor.cs" />
