@@ -44,7 +44,7 @@ Intel
                     if (list[j].arg1.ToString() == left)
                         list[j].arg1 = right;
 
-                    if (list[i].arg2 != null && list[j].arg2.ToString() == left)
+                    if (list[j].arg2 != null && list[j].arg2.ToString() == left)
                         list[j].arg2 = right;
                 }
             }
@@ -74,3 +74,4 @@ e = d * b
 a = x - y
 k = 0 + a
 ```
+

@@ -29,12 +29,14 @@ namespace SimpleLang.Visitors
                 } else continue;
 
                 for (int j = i + 1; j < Program.Count; j++) {
+                    int k;
                     if (list[j].result == left)
                         break;
+
                     if (list[j].arg1.ToString() == left)
                         list[j].arg1 = right;
 
-                    if (list[i].arg2 != null && list[j].arg2.ToString() == left)
+                    if (list[j].arg2 != null && list[j].arg2.ToString() == left)
                         list[j].arg2 = right;
                 }
             }

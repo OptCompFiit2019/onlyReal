@@ -38,7 +38,7 @@ namespace SimpleLang.ThreeCodeOptimisations
         public void PullCopies()
         {
             var list = Program.ToList();
-            for (int i = 0; i < Program.Count - 1; i++)
+            for (int i = 0; i < Program.Count; i++)
             {
 
                 string left;
@@ -61,7 +61,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                         _apply = true;
                     }
 
-                    if (list[i].arg2 != null && list[j].arg2.ToString() == left) {
+                    if (list[j].arg2 != null && list[j].arg2.ToString() == left) {
                         list[j].arg2 = right;
                         _apply = true;
                     }
