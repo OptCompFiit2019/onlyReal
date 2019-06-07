@@ -14,7 +14,7 @@ namespace SimpleLang.Visitors
         }
         public override void VisitIfNode(IfNode ifn)
         {
-            if (ifn.Else == null && ifn.If == null)
+            if (ifn.Else is NullNode)
             {
                 ReplaceStat(ifn, new NullNode());
             }
