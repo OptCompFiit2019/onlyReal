@@ -46,28 +46,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AstOptimisations\Opt_7_12.cs" />
     <Compile Include="AstOptimisations\Opt_8_13.cs" />
     <Compile Include="AvailableExprs.cs" />
     <Compile Include="AstOptimisations\IfFalseVisitor.cs" />
     <Compile Include="AstOptimisations\MultiplicationComputeVisitor.cs" />
     <Compile Include="ControlFlowGraph\GraphDepth.cs" />
     <Compile Include="DeepSpanTree.cs" />
-    <Compile Include="DeleteOfDeadCode.cs" />
     <Compile Include="GenericIterativeAlgorithm\Test.cs" />
     <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
+    <Compile Include="IterationAlgorithm\AttainableVariables.cs" />
     <Compile Include="IterativeAlgorithm.cs" />
-    <Compile Include="PullOfCopies.cs" />
     <Compile Include="TestSystem.cs" />
     <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
     <Compile Include="ThreeCodeOptimisations\ConstantPropagationOptimization.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOnGraph.cs" />
     <Compile Include="ThreeCodeOptimisations\DefBUseB.cs" />
     <Compile Include="ThreeCodeOptimisations\DefUse.cs" />
+    <Compile Include="ThreeCodeOptimisations\DeleteOfDeadCode.cs" />
     <Compile Include="ThreeCodeOptimisations\IterAlgoActiveVariables.cs" />
+    <Compile Include="ThreeCodeOptimisations\PullOfCopies.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="ThreeOptimize\DeleteOfDeadCodeOpt.cs" />
+    <Compile Include="ThreeOptimize\EliminationTranToTranOpt.cs" />
     <Compile Include="ThreeOptimize\PullOfCopiesOpt.cs" />
     <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
+    <Compile Include="TransferFunction %28Intel%29\TransferFunction.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
     <Compile Include="TransferFunction\ReachingDefsTest.cs" />
     <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
@@ -120,6 +124,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
