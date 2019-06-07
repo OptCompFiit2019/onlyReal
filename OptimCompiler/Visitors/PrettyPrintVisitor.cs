@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ProgramTree;
+using SimpleParser;
 
 namespace SimpleLang.Visitors
 {
@@ -160,7 +161,7 @@ namespace SimpleLang.Visitors
         }
         public override void VisitVarDefNode(VarDefNode w) 
         {
-            Text += IndentStr() + "var " + w.vars[0].Name;
+            Text += IndentStr() + SymbolTable.TypeName(w.vars[0].Type) + " " + w.vars[0].Name;
             for (int i = 1; i < w.vars.Count; i++)
                 Text += ',' + w.vars[i].Name;
             Text += ";";

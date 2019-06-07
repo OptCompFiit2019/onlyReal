@@ -19,7 +19,7 @@ namespace SimpleCompiler
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
-            string FileName = @"../../../Tests\Roslyn\ConstantPropagation/source1.txt";
+            string FileName = @"../../../Tests/AST_Opt2Visitor/source3.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -63,12 +63,14 @@ namespace SimpleCompiler
 
                     //Console.WriteLine(r.ToString());
 
-                    /*Opt2Visitor opt2 = new Opt2Visitor();
-					r.Visit(opt2);
+                    r.Visit(new Opt2Visitor());
 
                     PrettyPrintVisitor ppvis = new PrettyPrintVisitor();
                     r.Visit(ppvis);
                     Console.WriteLine(ppvis.Text);
+
+                    /*Opt2Visitor opt2 = new Opt2Visitor();
+					r.Visit(opt2);
 
                     Console.WriteLine("\nAssignCountVisitor");
                     AssignCountVisitor vis1 = new AssignCountVisitor();
