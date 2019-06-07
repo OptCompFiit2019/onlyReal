@@ -5,6 +5,6 @@ b = 2 + a;
 c = a;
 a = b + c;
 b = c;
-{}
-{}
+#NULL;
+#NULL;
 }

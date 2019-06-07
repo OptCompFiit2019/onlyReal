@@ -12,7 +12,7 @@ namespace SimpleLang.Visitors
         {
             if ((a.Expr is IdNode) && String.Equals(a.Id.Name, (a.Expr as IdNode).Name))
             {
-                ReplaceStat(a, null);
+                ReplaceStat(a, new NullNode());
             }
             else
             {

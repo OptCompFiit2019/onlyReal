@@ -10,13 +10,13 @@ namespace SimpleLang.Visitors
     {
         public override void VisitBlockNode(BlockNode bln)
         {
-            bln.StList = bln.StList.Where(x => x != null).ToList();
+            bln.StList = bln.StList.Where(x =>!(x is NullNode)).ToList();
         }
         public override void VisitIfNode(IfNode ifn)
         {
             if (ifn.Else == null && ifn.If == null)
             {
-                ReplaceStat(ifn, null);
+                ReplaceStat(ifn, new NullNode());
             }
         }
     }

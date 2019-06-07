@@ -1,10 +1,10 @@
 {
 int b, c, d;
 b = 3;
-#NULL
+#NULL;
 c = b;
 d = b;
 c = d;
-#NULL
+#NULL;
 c = b;
 }
