@@ -5,8 +5,10 @@ using System.Text;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class DeadOrAliveOptimization
+    public class DeadOrAliveOptimization : ThreeCodeOptimiser
     {
+        private static bool IsApplyed = false;
+
         /// <summary>
         /// Возвращает результат каскадного удаления живых и мертвых переменных,
         /// выполненного над передаваемым блоком <paramref name="block"/>.
@@ -17,8 +19,8 @@ namespace SimpleLang.ThreeCodeOptimisations
             var variables = new Dictionary<string, bool>();
             // сначала добавляются все аргументы, которые хоть раз были определены
             // это консервативное предположение о последующем использовании этих определений
-            foreach(var line in block)
-                if(!line.result.StartsWith("temp_"))
+            foreach (var line in block)
+                if (!line.result.StartsWith("temp_"))
                     variables[line.result] = true;
             return DeleteDeadVariables(block, variables);
         }
@@ -35,15 +37,24 @@ namespace SimpleLang.ThreeCodeOptimisations
         {
             var result = new LinkedList<ThreeCode>(block);
             LinkedListNode<ThreeCode> current = result.Last;
-            
+
             while (current != null)
             {
                 var previous = current.Previous;
                 if (!(variables.ContainsKey(current.Value.result) && variables[current.Value.result]) && current.Value.result != "")
                     if (current.Value.label != null && current.Value.label != "")
-                        current.Value = new ThreeCode(current.Value.label, "", ThreeOperator.None, null, null);
+                        if (current.Next == null || (current.Next.Value.label != null && current.Next.Value.label != ""))
+                            current.Value = new ThreeCode(current.Value.label, "", ThreeOperator.None, null, null);
+                        else
+                        {
+                            current.Next.Value.label = current.Value.label;
+                            result.Remove(current);
+                        }
                     else
+                    {
                         result.Remove(current);
+                        IsApplyed = true;
+                    }
                 else
                     AddThreeCodeLine(current.Value, variables);
                 current = previous;
@@ -87,5 +98,22 @@ namespace SimpleLang.ThreeCodeOptimisations
 
             return resGraph;
         }
+
+        public void Apply(ref LinkedList<ThreeCode> program)
+        {
+            IsApplyed = false;
+            program = DeleteDeadVariables(program);
+        }
+
+        public bool NeedFullCode() => false;
+
+        public void Apply(ref List<LinkedList<ThreeCode>> res)
+        {
+            IsApplyed = false;
+            for (int i = 0; i < res.Count; i++)
+                res[i] = DeleteDeadVariables(res[i]);
+        }
+
+        public bool Applyed() => IsApplyed;
     }
 }
