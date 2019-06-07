@@ -1,0 +1,25 @@
+{
+  int a;
+  if (false)
+  {
+    if (true)
+    {
+      a = 1;
+    }
+    else
+    {
+      a = 2;
+    }
+  }
+  else
+  {
+    if (true)
+    {
+      a = 3;
+    }
+    else
+    {
+      a = 4;
+    }
+  }
+}

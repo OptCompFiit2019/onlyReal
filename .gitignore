@@ -4,4 +4,6 @@ build
 obj
 SimpleLex.cs
 SimpleYacc.cs
+*.icloud
+*.jpg
 .idea/*

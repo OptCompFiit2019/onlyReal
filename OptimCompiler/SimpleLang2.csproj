@@ -90,6 +90,7 @@
     <Compile Include="AstOptimisations\OptMulDivOneVisitor.cs" />
     <Compile Include="AstOptimisations\OptWhileVisitor.cs" />
     <Compile Include="AstOptimisations\PlusNonZero.cs" />
+    <Compile Include="AstOptimisations\Optimisations.cs" />
     <Compile Include="TransferFunction\TransferFunction.cs" />
     <Compile Include="ThreeCodeOptimisations\DAG.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOptimization.cs" />
@@ -116,6 +117,8 @@
     <Compile Include="ThreeOptimize\DeadOrAliveOptimizationAdapter.cs" />
     <Compile Include="Visitors\AutoApplyVisitorInterface.cs" />
     <Compile Include="Visitors\AutoApplyVisitor.cs" />
+    <Compile Include="AstOptimisations\LessOptVisitor.cs" />
+    <Compile Include="AstOptimisations\ElseStVisitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

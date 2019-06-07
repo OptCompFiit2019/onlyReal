@@ -11,7 +11,7 @@ namespace SimpleLang.Visitors
     /// Выполняет оптимизации по удалению алгебраических выражений вида:
     /// 1 * ex, ex * 1, ex / 1
     /// </summary>
-    class OptMulDivOneVisitor : ChangeVisitor
+    public class OptMulDivOneVisitor : AutoApplyVisitorInterface
     {
         public bool IsPerformed { get; set; }
 
