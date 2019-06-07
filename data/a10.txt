@@ -1,0 +1,40 @@
+{
+    int a;
+    a = 1;
+    a = 0;
+    a = (a + 15);
+    println(true);
+    if ((a >= a))
+    {
+        println(true);
+    }
+    else
+    {
+        println(false);
+    }
+    if ((a == a))
+    {
+
+    }
+    else
+    {
+
+    }
+    if ((a > 1))
+    {
+
+    }
+    else
+    {
+
+    }
+    a = 0;
+    a = ((a + a) + a);
+    while (false)
+    {
+        println(false);
+    }
+    println(true);
+    println(22);
+    println(2);
+}

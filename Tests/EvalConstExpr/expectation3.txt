@@ -1,6 +1,7 @@
 {
 	int r;
 	r = 3;
-	bool b;
-	b = true;
+	bool b, temp_0;
+	temp_0 = true;
+	b = temp_0;
 }

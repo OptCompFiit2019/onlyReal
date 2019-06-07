@@ -19,7 +19,7 @@ namespace SimpleCompiler
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
-            string FileName = @"../../../data/a.txt";
+            string FileName = @"../../../data/a10.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -54,7 +54,9 @@ namespace SimpleCompiler
                         //var blocks = new Block(treeCod2e).GenerateBlocks();
 
                         AutoThreeCodeOptimiser ap2p = new AutoThreeCodeOptimiser();
-                        ap2p.Add(new SimpleLang.ThreeCodeOptimisations.NonZero_JTJOpt());
+                        ap2p.Add(new SimpleLang.ThreeCodeOptimisations.DistributionOfConstants());
+                        ap2p.Add(new SimpleLang.ThreeCodeOptimisations.EvalConstExpr());
+                        ap2p.Add(new SimpleLang.ThreeCodeOptimisations.DeadOrAliveOptimizationAdapter());
 
                         var blockwss = ap2p.Apply(treeCod2e);
                         Console.WriteLine(ThreeAddressCodeVisitor.ToString(blockwss));
