@@ -2,8 +2,9 @@
   int a;
   a = 1;
   a = a * 0 + 434 * 0;
-  a = a + 0;
+  a = a + 0 + 5*3;
   a= 0 + a;
+
 
   if ( true ) {
     println(true);
@@ -30,5 +31,16 @@
   a = a * 1 + a / 1 + 1 * a;
   while (false) {
     println(false);
+  }
+
+  if (false) {
+    println(false);
+  } else {
+    println(true);
+  }
+  if (12 > 5343) {
+
+  } else {
+    println(22);
   }
 }

@@ -42,9 +42,9 @@ namespace OptGui
             if (checkBox52.Checked)
                 res.Add(new SimpleLang.Visitors.Opt11Visitor());
             if (checkBox53.Checked)
-                res.Add(new SimpleLang.Visitors.Opt1Visitor());
+                res.Add(new SimpleLang.Visitors.OptVisitor_8());
             if (checkBox54.Checked)
-                res.Add(new SimpleLang.Visitors.Opt2v2Visitor());
+                res.Add(new SimpleLang.Visitors.OptVisitor_13());
             if (checkBox55.Checked)
                 res.Add(new SimpleLang.Optimisations.OptSimilarDifference());
             if (checkBox56.Checked)
@@ -55,6 +55,12 @@ namespace OptGui
                 res.Add(new SimpleLang.Visitors.OptWhileVisitor());
             if (checkBox59.Checked)
                 res.Add(new SimpleLang.Visitors.PlusNonZero());
+            if (checkBox60.Checked)
+                res.Add(new SimpleLang.Visitors.ElseStVisitor());
+            if (checkBox61.Checked)
+                res.Add(new SimpleLang.Visitors.LessOptVisitor());
+            if (checkBox62.Checked)
+                res.Add(new SimpleLang.Visitors.MultiplicationComputeVisitor());
             return res;
         }
         public SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser GetOptimiser() {
@@ -68,7 +74,7 @@ namespace OptGui
             if (checkBox4.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.DeadOrAliveOptimizationAdapter());
             if (checkBox5.Checked)
-                res.Add(new SimpleLang.ThreeCodeOptimisations.NonZero_JTJ());
+                res.Add(new SimpleLang.ThreeCodeOptimisations.NonZero_JTJOpt());
             if (checkBox6.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.DefUseConstOpt());
             if (checkBox7.Checked)
