@@ -341,7 +341,7 @@ namespace ProgramTree
         }
         public override string ToString()
         {
-            string s = "var " + vars[0].ToString();
+            string s = TypeName(vars[0].Type) + " " + vars[0].ToString();
             for (int i = 1; i < vars.Count; ++i)
                 s += ", " + vars[i].ToString();
             s += ";";
