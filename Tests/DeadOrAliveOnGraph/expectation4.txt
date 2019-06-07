@@ -5,12 +5,13 @@ a = 500;
 b = 200;
 if(2)
 {
-b = c + 4;
-a = 30;
+	b = c + 4;
+	a = 30;
 }
 else
 {
 }
+
 println(a);
 println(b);
 }

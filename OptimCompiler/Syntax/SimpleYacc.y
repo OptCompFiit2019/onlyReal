@@ -26,9 +26,10 @@
 %token <iVal> INUM 
 %token <dVal> RNUM 
 %token <sVal> ID
+%token <nVal> NIL
 
 %type <eVal> expr ident LT LF E T F
-%type <stVal> assign statement while for println if var varlist
+%type <stVal> assign statement while for println if var varlist null
 %type <blVal> stlist block
 %type <tVal> type_
 
@@ -55,6 +56,7 @@ statement: assign SEMICOLON { $$ = $1; }
         | if     { $$ = $1; }
         | var SEMICOLON     { $$ = $1; }
         | block   { $$ = $1; }
+		| null SEMICOLON   { $$ = $1; }
     ;
 
 ident   : ID
@@ -68,6 +70,9 @@ ident   : ID
                 }
             }   
         ;
+		
+null	: NIL { $$ = new NullNode(); }
+		;		
 
 println   : PRINTLN LPAREN expr RPAREN { $$ = new PrintlnNode($3); }
         ;

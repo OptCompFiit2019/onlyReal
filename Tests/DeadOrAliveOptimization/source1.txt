@@ -1,5 +1,5 @@
 {
-    int a,b;
+int a,b;
 a = 1;
 a = 2;
 b = a + 1;

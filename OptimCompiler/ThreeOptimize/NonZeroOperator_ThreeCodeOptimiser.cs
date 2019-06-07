@@ -7,7 +7,7 @@ using SimpleLang.Visitors;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    public class NonZero_JTJ:ThreeCodeOptimiser
+    public class NonZero_JTJOpt :ThreeCodeOptimiser
     {
         public LinkedList<ThreeCode> code;
         private bool _applyed = false;
