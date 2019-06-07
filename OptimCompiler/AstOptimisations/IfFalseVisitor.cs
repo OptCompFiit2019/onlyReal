@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ProgramTree;
+﻿using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
@@ -13,6 +8,7 @@ namespace SimpleLang.Visitors
         {
             if (ifn.Cond is BooleanNode boolVal && !boolVal.Val)
             {
+                ifn.Else.Visit(this);
                 ReplaceStat(ifn, ifn.Else);
             }
         }
