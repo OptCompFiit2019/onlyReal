@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class DeadOrAliveOptimization : ThreeCodeOptimiser
+    public class DeadOrAliveOptimization : ThreeCodeOptimiser
     {
         private static bool IsApplyed = false;
 

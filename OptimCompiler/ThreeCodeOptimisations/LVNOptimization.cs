@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class LVNOptimization : ThreeCodeOptimiser
+    public class LVNOptimization : ThreeCodeOptimiser
     {
         private static bool IsApplyed = false;
 
