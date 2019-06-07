@@ -19,7 +19,7 @@ namespace SimpleCompiler
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
-            string FileName = @"../../../Tests/AST_Opt2Visitor/source3.txt";
+            string FileName = @"../../../data/fib.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -42,7 +42,7 @@ namespace SimpleCompiler
                     r.Visit(generateParrent);
 
                     {
-                        /*ThreeAddressCodeVisitor treeCod2e = new ThreeAddressCodeVisitor();
+                        ThreeAddressCodeVisitor treeCod2e = new ThreeAddressCodeVisitor();
                         r.Visit(treeCod2e);
 
                         SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
@@ -57,20 +57,18 @@ namespace SimpleCompiler
                         ap2p.Add(new SimpleLang.ThreeCodeOptimisations.NonZero_JTJOpt());
 
                         var blockwss = ap2p.Apply(treeCod2e);
-                        Console.WriteLine(ThreeAddressCodeVisitor.ToString(blockwss));*/
+                        Console.WriteLine(ThreeAddressCodeVisitor.ToString(blockwss));
                     }
 
 
                     //Console.WriteLine(r.ToString());
 
-                    r.Visit(new Opt2Visitor());
+                    /*Opt2Visitor opt2 = new Opt2Visitor();
+					r.Visit(opt2);
 
                     PrettyPrintVisitor ppvis = new PrettyPrintVisitor();
                     r.Visit(ppvis);
                     Console.WriteLine(ppvis.Text);
-
-                    /*Opt2Visitor opt2 = new Opt2Visitor();
-					r.Visit(opt2);
 
                     Console.WriteLine("\nAssignCountVisitor");
                     AssignCountVisitor vis1 = new AssignCountVisitor();
@@ -114,8 +112,8 @@ namespace SimpleCompiler
                     var blocks = new Block(treeCode).GenerateBlocks();
                     CFG controlFlowGraph = new CFG(blocks);
 
-                    //Console.WriteLine("\nГлубина графа:\n"+GraphDepth.GetGraphDepth(controlFlowGraph));
-                    //Console.WriteLine(treeCode.ToString());
+                    Console.WriteLine("\nГлубина графа:\n"+GraphDepth.GetGraphDepth(controlFlowGraph));
+                    Console.WriteLine(treeCode.ToString());
 
                     // выполнение оптимизации для программы, не разбитой на блоки
                     //DeadOrAliveOptimization.DeleteDeadVariables(treeCode.GetCode());
@@ -142,14 +140,14 @@ namespace SimpleCompiler
 
 
 
-                    /* SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
-                     gen.Generate(treeCode.GetCode());
+                   /* SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                    gen.Generate(treeCode.GetCode());
 
-                     gen.PrintCommands();
-                     Console.WriteLine("\nExecute:");
-                     gen.Execute();
+					gen.PrintCommands();
+                    Console.WriteLine("\nExecute:");
+                    gen.Execute();
 
-                     Console.Write("");*/
+                    Console.Write("");*/
 
                     //DeadOrAliveOptimization.
 
@@ -158,33 +156,32 @@ namespace SimpleCompiler
                     Console.WriteLine("\nafter DeadOrAliveOptimization\n");
                     Console.WriteLine(cfg);*/
 
-                    var constPropOptimizer = new ConstantPropagationOptimizer();
+                    /*var constPropOptimizer = new ConstantPropagationOptimizer();
                     CFG cfg1 = constPropOptimizer.ApplyOptimization(controlFlowGraph.blocks);
                     Console.WriteLine("\nafter ConstantPropagationOptimization\n");
-                    Console.WriteLine(cfg1);
+                    Console.WriteLine(cfg1);*/
 
                     //var reachingDefsTest = new ReachingDefsTest();
                     //reachingDefsTest.IterativeAlgorithm(controlFlowGraph.blocks);
                     //reachingDefsTest.PrintOutput();
 
 
-                    SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
-                    gen.Generate(treeCode.GetCode());
-                    gen.PrintCommands();
-                    Console.WriteLine("\nExecute:");
-                    gen.Execute();
+                    //SimpleLang.Compiler.ILCodeGenerator gen = new SimpleLang.Compiler.ILCodeGenerator();
+                    //gen.Generate(treeCode.GetCode());
+                    //gen.PrintCommands();
+                    //Console.WriteLine("\nExecute:");
+                    //gen.Execute();
 
-                    //RunTests();
 
-                    /*AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
+                    AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
                     app.Add(new DistributionOfConstants());
                     app.Add(new EvalConstExpr());
                     app.Add(new ApplyAlgebraicIdentities());
 
                     var blockws = app.Apply(treeCode);
-                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(blockws));*/
+                    Console.WriteLine(ThreeAddressCodeVisitor.ToString(blockws));
 
-                    /*CFG cfg = new CFG(blocks);
+					/*CFG cfg = new CFG(blocks);
 					TransferFunction tf = new TransferFunction(cfg);
 					Console.WriteLine("\nGen 1");
 					foreach (var d in tf.Gen(blocks[0]))
@@ -235,29 +232,5 @@ namespace SimpleCompiler
             Console.ReadLine();
         }
 
-        private static void RunTests()
-        {
-            var Tester = new TestSystem();
-            Tester.LaunchTest("DAG");
-            Tester.LaunchTest("PullCopies");
-            Tester.LaunchTest("CommonExpr");
-            Tester.LaunchTest("DefBUseB");
-            Tester.LaunchTest("JumpThroughJump");
-            Tester.LaunchTest("DeepSpanTree");
-            Tester.LaunchTest("AvailableExprs");
-            Tester.LaunchTest("DeadOrAliveOnGraph");
-            //Tester.LaunchTest("DeadOrAliveOptimization");
-            Tester.LaunchTest("GraphDepth");
-            Tester.LaunchTest("IterativeAlgorithm");
-            Tester.LaunchTest("LVNOptimization");
-            Tester.LaunchTest("TransferFunction");
-            Tester.LaunchTest("ApplyAlgebraicIdentities");
-            Tester.LaunchTest("DistributionOfConstant");
-            //Tester.LaunchTest("ThreeAddressCode");
-            //Tester.LaunchTest("EvalConstExpr");
-            //Tester.LaunchTest("PullOfCopies (Intel)");
-            Tester.LaunchTest("DeleteOfDeadCode (Intel)");
-            //Tester.LaunchTest("DefUse");
-        }
     }
 }
