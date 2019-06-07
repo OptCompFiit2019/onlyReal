@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using SimpleLang.ControlFlowGraph;
 using SimpleLang.GenericIterativeAlgorithm;
 using GenericTransferFunction;
+using ProgramTree;
 
 namespace SimpleLang
 {
@@ -131,22 +132,49 @@ namespace SimpleLang
             return treeCode;
         }
 
+        private Node GetRootOfAST(string path)
+        {
+            string text = File.ReadAllText(path);
+            Scanner scanner = new Scanner();
+            scanner.SetSource(text, 0);
+            SimpleParser.SymbolTable.vars = new Dictionary<string, type>();
+            Parser parser = new Parser(scanner);
+
+            var b = parser.Parse();
+            if (!b)
+            {
+                Console.WriteLine("Ошибка при парсинге программы из файла: {0}", path);
+            }
+
+            return parser.root;
+        }
+
+        private string DeleteEmptyLines(string text)
+        {
+            var lines = text.Split('\n').Where(x => x != "\r").ToList();
+            string result = lines[0];
+            for (int i = 1; i < lines.Count; i++)
+                result += "\n" + lines[i];
+            return result;
+        }
         //Функция для построчного сравнения ожидаемого результата(target) и программы после оптимизации(optimized_program)
         //source - имя файла с тестомб block_num - номер проверяемого базового блока
         private void CheckResults(List<ThreeCode> optimized_program, List<ThreeCode> target, ref bool flag, ref bool testFault, string source, int block_num = 1)
         {
             if (optimized_program.Count != target.Count)
             {
+                Console.WriteLine("Тест {0} не пройден: кол-во команд в ББл #{1} не совпадает с ожидаемым", source, block_num);
+                Console.WriteLine("Получилось:");
                 foreach (var e in optimized_program)
                 {
                     Console.WriteLine(e);
                 }
                 Console.WriteLine("-----");
+                Console.WriteLine("Ожидалось:");
                 foreach (var e in target)
                 {
                     Console.WriteLine(e);
                 }
-                Console.WriteLine("Тест {0} не пройден: кол-во команд в ББл #{1} не совпадает с ожидаемым", source, block_num);
                 flag = false;
                 return;
             }
@@ -157,7 +185,19 @@ namespace SimpleLang
                         optimized_program.ElementAt(k).operation.ToString() != "IfGoto" &&
                         optimized_program.ElementAt(k).ToString() != target.ElementAt(k).ToString())
                     {
-                        Console.WriteLine("Тест {0} не пройден: ошибка в строке #{1} в ББл #{2}", source, k, block_num);
+                        Console.WriteLine("Тест {0} не пройден: ошибка в строке #{1} в ББл #{2}", source, k + 1, block_num);
+                        Console.WriteLine("Получилось:");
+                        foreach (var e in optimized_program)
+                        {
+                            Console.WriteLine(e);
+                        }
+                        Console.WriteLine("-----");
+                        Console.WriteLine("Ожидалось:");
+                        foreach (var e in target)
+                        {
+                            Console.WriteLine(e);
+                        }
+
                         flag = false;
                         testFault = true;
                         break;
@@ -906,7 +946,7 @@ namespace SimpleLang
 
                         AutoThreeCodeOptimiser app = new AutoThreeCodeOptimiser();
                         app.Add(new DefUseConstOpt());
-                        app.Add(new DefUseDeadCodeOpt());
+                        if (sourceBlocks.Count == 1) app.Add(new DefUseDeadCodeOpt());
                         var blocks = app.Apply(sourceCode);
 
                         flag = true;
@@ -922,46 +962,123 @@ namespace SimpleLang
                             Console.WriteLine("Тест {0} успешно пройден!", source);
                         break;
 
-                    case "OptWhileVisitor":  //Roll
+                    case "AST_Opt8Visitor":  //qwerty
                         {
-                            string text = File.ReadAllText(pathToFolder + source);
-                            Scanner scanner = new Scanner();
-                            scanner.SetSource(text, 0);
-                            SimpleParser.SymbolTable.vars = new Dictionary<string, type>();
-                            Parser parser = new Parser(scanner);
-
-                            var b = parser.Parse();
-                            if (!b)
-                            {
-                                Console.WriteLine("Ошибка при парсинге программы из файла: {0}", source);
-                                continue;
-                            }
-
-                            var r = parser.root;
+                            var source_root = GetRootOfAST(pathToFolder + source);
                             FillParentVisitor generateParrent = new FillParentVisitor();
-                            r.Visit(generateParrent);
+                            source_root.Visit(generateParrent);
 
-                            r.Visit(new FillParentVisitor());
-                            r.Visit(new OptWhileVisitor());
+                            var opt8_visitor = new OptVisitor_8();
+                            source_root.Visit(opt8_visitor);
 
-                            ThreeAddressCodeVisitor treeCode = new ThreeAddressCodeVisitor();
-                            r.Visit(treeCode);
-                            expectationCode = GetThreeAddressCodeVisitor(pathToFolder, expectation);
+                            var source_print = new PrettyPrintVisitor();
+                            source_root.Visit(source_print);
 
-                            bool testFault = false;
-                            flag = true;
-                            var opt_program = treeCode.GetCode().ToList();
-                            var target = expectationCode.GetCode().ToList();
-                            CheckResults(opt_program, target, ref flag, ref testFault, source, 1);
+                            var expectation_root = GetRootOfAST(pathToFolder + expectation);
+                            var expectation_print = new PrettyPrintVisitor();
+                            expectation_root.Visit(expectation_print);
 
-                            if (flag)
+                            string opt_program = source_print.Text;
+                            string target = expectation_print.Text;
+
+                            if (opt_program == target)
                                 Console.WriteLine("Тест {0} успешно пройден!", source);
+                            else
+                                Console.WriteLine("Тест {0} не пройден!\nПолучено:\n{1}\n\nОжидалось:\n{2}\n\n", source, opt_program, target);
+                        }
+                        break;
+
+                    case "AST_Opt13Visitor":  //qwerty
+                        {
+                            var source_root = GetRootOfAST(pathToFolder + source);
+
+                            var opt13_visitor = new OptVisitor_13();
+                            source_root.Visit(opt13_visitor);
+
+                            var source_print = new PrettyPrintVisitor();
+                            source_root.Visit(source_print);
+
+                            var expectation_root = GetRootOfAST(pathToFolder + expectation);
+                            var expectation_print = new PrettyPrintVisitor();
+                            expectation_root.Visit(expectation_print);
+
+                            string opt_program = source_print.Text;
+                            string target = expectation_print.Text;
+
+                            if (opt_program == target)
+                                Console.WriteLine("Тест {0} успешно пройден!", source);
+                            else
+                                Console.WriteLine("Тест {0} не пройден!\nПолучено:\n{1}\n\nОжидалось:\n{2}\n\n", source, opt_program, target);
+                        }
+                        break;
+
+                    case "AST_OptWhileVisitor":  //Roll
+                        {
+                            var source_root = GetRootOfAST(pathToFolder + source);
+                            FillParentVisitor generateParrent = new FillParentVisitor();
+                            source_root.Visit(generateParrent);
+
+                            source_root.Visit(new FillParentVisitor());
+                            source_root.Visit(new OptWhileVisitor());
+
+                            var source_print = new PrettyPrintVisitor();
+                            source_root.Visit(source_print);
+
+                            var expectation_root = GetRootOfAST(pathToFolder + expectation);
+                            var expectation_print = new PrettyPrintVisitor();
+                            expectation_root.Visit(expectation_print);
+
+                            string opt_program = DeleteEmptyLines(source_print.Text);
+                            string target = DeleteEmptyLines(expectation_print.Text);
+
+                            if (opt_program == target)
+                                Console.WriteLine("Тест {0} успешно пройден!", source);
+                            else
+                                Console.WriteLine("Тест {0} не пройден!\nПолучено:\n{1}\n\nОжидалось:\n{2}\n\n", source, opt_program, target);
+                        }
+                        break;
+
+                    case "AST_OptMulDivOneVisitor":  //Roll
+                        {
+                            var source_root = GetRootOfAST(pathToFolder + source);
+
+                            source_root.Visit(new FillParentVisitor());
+                            source_root.Visit(new OptMulDivOneVisitor());
+
+                            var source_print = new PrettyPrintVisitor();
+                            source_root.Visit(source_print);
+
+                            var expectation_root = GetRootOfAST(pathToFolder + expectation);
+                            var expectation_print = new PrettyPrintVisitor();
+                            expectation_root.Visit(expectation_print);
+
+                            string opt_program = source_print.Text;
+                            string target = expectation_print.Text;
+
+                            if (opt_program == target)
+                                Console.WriteLine("Тест {0} успешно пройден!", source);
+                            else
+                                Console.WriteLine("Тест {0} не пройден!\nПолучено:\n{1}\n\nОжидалось:\n{2}\n\n", source, opt_program, target);
                         }
                         break;
 
                     //здесь будет
-                    //OptWhileVisitor           Roll
-                    //OptMulDivOneVisitor       Roll
+                    //AST_LinearizeBlocks           SouthPark
+                    //AST_PlusNonZero               SouthPark
+                    //AST_ElseStVisitor             Roslyn
+                    //AST_IfFalseVisitor            12
+                    //AST_LessOptVisitor            6
+                    //AST_MultiplicationComputeVisitor 3
+                    //AST_Opt2Visitor               Roslyn
+                    //AST_Opt11Visitor              Roslyn
+                    //AST_Opt7Visitor               Intel
+                    //AST_Opt12Visitor              Intel
+                    //AST_AssignVisitor             Boom
+                    //AST_DeleteNullVisitor         Boom
+                    //AST_FalseExprMoreAndNonEqualVisitor 9
+                    //AST_Opt10SimilarAssignment    Nvidia
+                    //AST_Opt5SimilarDifference     Nvidia
+
 
                     default:
                         break;
