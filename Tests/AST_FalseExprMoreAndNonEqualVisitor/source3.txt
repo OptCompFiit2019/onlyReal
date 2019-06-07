@@ -1,0 +1,6 @@
+﻿{
+	int a;
+	bool c;
+	c = a != a;
+	с = a > a;
+}
