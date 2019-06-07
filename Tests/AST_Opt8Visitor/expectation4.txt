@@ -1,0 +1,9 @@
+{
+    bool b,c;	
+	int a, x;
+	c = true;
+    if(true)
+    {
+        b = true;
+    }
+}
