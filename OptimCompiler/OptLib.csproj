@@ -49,10 +49,10 @@
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="ThreeOptimize\DeleteOfDeadCodeOpt.cs" />
     <Compile Include="ThreeOptimize\PullOfCopiesOpt.cs" />
+    <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
     <Compile Include="TransferFunction\ReachingDefsTest.cs" />
     <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
-    <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />
@@ -70,10 +70,11 @@
     <Compile Include="AstOptimisations\OptMulDivOneVisitor.cs" />
     <Compile Include="AstOptimisations\OptWhileVisitor.cs" />
     <Compile Include="AstOptimisations\PlusNonZero.cs" />
+    <Compile Include="AstOptimisations\Opt_8_13cs.cs" />
+    <Compile Include="AstOptimisations\Optimisations.cs" />
     <Compile Include="TransferFunction\TransferFunction.cs" />
     <Compile Include="ThreeCodeOptimisations\DAG.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOptimization.cs" />
-    <Compile Include="Main.cs" />
     <Compile Include="ControlFlowGraph\ControlFlowGraph.cs" />
     <Compile Include="Syntax\ParserHelper.cs" />
     <Compile Include="Syntax\ProgramTree.cs" />

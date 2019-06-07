@@ -41,6 +41,20 @@ namespace OptGui
                 res.Add(new SimpleLang.Visitors.Opt2Visitor());
             if (checkBox52.Checked)
                 res.Add(new SimpleLang.Visitors.Opt11Visitor());
+            if (checkBox53.Checked)
+                res.Add(new SimpleLang.Visitors.Opt1Visitor());
+            if (checkBox54.Checked)
+                res.Add(new SimpleLang.Visitors.Opt2v2Visitor());
+            if (checkBox55.Checked)
+                res.Add(new SimpleLang.Optimisations.OptSimilarDifference());
+            if (checkBox56.Checked)
+                res.Add(new SimpleLang.Optimisations.OptSimilarAssignment());
+            if (checkBox57.Checked)
+                res.Add(new SimpleLang.Visitors.OptMulDivOneVisitor());
+            if (checkBox58.Checked)
+                res.Add(new SimpleLang.Visitors.OptWhileVisitor());
+            if (checkBox59.Checked)
+                res.Add(new SimpleLang.Visitors.PlusNonZero());
             return res;
         }
         public SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser GetOptimiser() {

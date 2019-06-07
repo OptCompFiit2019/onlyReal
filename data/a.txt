@@ -4,6 +4,8 @@ bool a;
 int b;
 int h;
 int i, j, gg, hh, k, t;
+a = a;
+c = c - c;
 
 	b= 123;
 	c = 321;
