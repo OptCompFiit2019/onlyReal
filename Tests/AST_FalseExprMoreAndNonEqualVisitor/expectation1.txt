@@ -1,0 +1,5 @@
+﻿{
+	int a;
+	bool c;
+	c = false;
+}
