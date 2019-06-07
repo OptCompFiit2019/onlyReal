@@ -120,6 +120,8 @@
     <Compile Include="Visitors\AutoApplyVisitor.cs" />
     <Compile Include="AstOptimisations\LessOptVisitor.cs" />
     <Compile Include="AstOptimisations\ElseStVisitor.cs" />
+    <Compile Include="ControlFlowGraph\DetectReversibleEdges.cs" />
+    <Compile Include="Dominators\DominatorsFinder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
