@@ -7,7 +7,7 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    class MultiplicationComputeVisitor : ChangeVisitor
+    public class MultiplicationComputeVisitor : AutoApplyVisitorInterface
     {
         public override void VisitBinOpNode(BinOpNode binop)
         {
