@@ -1,0 +1,13 @@
+           a = 5
+           b = 3
+           goto label_0
+label_0:   
+           c = 2
+label_1:   i = 1
+label_2:   temp_0 = i < 10
+           if temp_0 goto label_3
+           goto label_4
+label_3:   c = c + 1
+           i = i + 1
+           goto label_2
+label_4:   d = 7

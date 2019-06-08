@@ -1,0 +1,10 @@
+           a = 5
+           b = 3
+           goto label_0
+label_0:   
+           c = 2
+label_1:   d = 7
+           goto label_2
+label_2:   
+           a = a + 1
+label_3:   
