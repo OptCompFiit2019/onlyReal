@@ -1,0 +1,6 @@
+{
+    bool a,b;
+	int c;	
+    a = true;
+    b = true;
+}
