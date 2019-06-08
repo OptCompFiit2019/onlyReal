@@ -14,6 +14,7 @@ Block
 	Console.WriteLine(treeCode.ToString());
 
 	Console.WriteLine("\nGenerate Base Blocks");
-	var blocks = new Block(treeCode).GenerateBlocks();
-	Console.WriteLine(blocks.ToString());
+	var block = new Block(treeCode);
+	var blocks = block.GenerateBlocks();
+	Console.WriteLine(block.ToString());
 
