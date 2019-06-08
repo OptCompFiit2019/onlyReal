@@ -32,7 +32,7 @@ namespace SimpleLang.ThreeCodeOptimisations
             _apply = false;
             Program = program;
             var dag = new DAG(Program.ToList());
-            Program = dag.Optimize();
+            Program = dag.Optimize(ref _apply);
             program = Program;
         }
     }

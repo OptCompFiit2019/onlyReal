@@ -4,22 +4,22 @@
   {
     if (true)
     {
-      a = 1;
+      a = 5;
     }
     else
     {
-      a = 2;
+      a = 10;
     }
   }
   else
   {
     if (false)
     {
-      a = 3;
+      a = 15;
     }
     else
     {
-      a = 4;
+      a = 20;
     }
   }
 }
