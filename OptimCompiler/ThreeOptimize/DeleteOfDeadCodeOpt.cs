@@ -51,12 +51,14 @@ namespace SimpleLang.ThreeCodeOptimisations
                     a = list[i].arg2.ToString();
                     abool = true;
                     Deleting(list, i, ref removeIndexList, a, abool);
+                    this._apply = true;
                     arg2IsNull = false;
                 }
 
                 a = list[i].arg1.ToString();
                 abool = true;
                 Deleting(list, i, ref removeIndexList, a, abool);
+                this._apply = true;
 
                 if (arg2IsNull)
                 {
