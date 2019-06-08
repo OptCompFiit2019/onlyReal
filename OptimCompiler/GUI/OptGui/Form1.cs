@@ -138,12 +138,122 @@ namespace OptGui
                 default: return Modes.Text;
             }
         }
-        private void UpdateTab(Modes m, TextBox txt) {
+        private void DrawCFG(PictureBox box, SimpleLang.ControlFlowGraph.Graph graph, List<LinkedList<SimpleLang.Visitors.ThreeCode>> code, Panel panel)
+        {
+            List<List<int>> matr = graph.GetAdjacencyList();
+            int depth = matr.Count;
+            List<Point> points = new List<Point>(matr.Count);
+            List<Point> pointsEnd = new List<Point>(matr.Count);
+            int new_width = code[0].Count * 13;
+
+            const int WEIGHT = 180;
+            const int DELIMER = 30;
+
+            List<Point> weigh_count = new List<Point>();
+            Dictionary<int, int> levels = new Dictionary<int, int>();
+            levels[0] = 0;
+            weigh_count.Add(new Point(0, 1));
+            weigh_count.Add(new Point(code[0].Count * 13 + DELIMER, 1));
+
+            for (int i = 0; i < matr.Count; i++)
+            {
+                int tmp = matr[i].Count - 1;
+                depth -= tmp < 0 ? 0 : tmp;
+                points.Add(new Point(0,0));
+                pointsEnd.Add(new Point(0, 0));
+
+                int max = 0;
+
+                int cc = 0;
+
+                for (int j = 0; j < matr[i].Count; j++) {
+                    max = Math.Max(max, code[matr[i][j]].Count);
+                    if (!levels.ContainsKey(matr[i][j]))
+                    {
+                        cc++;
+                        levels.Add(matr[i][j], i+1);
+                    }
+                }
+                new_width += max * 13 + DELIMER;
+                weigh_count.Add(new Point(weigh_count[levels[i] + 1].X +  max * 13 + DELIMER, cc));
+            }
+
+
+            Bitmap bitmap = new Bitmap(panel.Width, new_width);
+            Graphics grap = Graphics.FromImage(bitmap);
+
+            System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 8);
+            System.Drawing.SolidBrush drawBrush = new System.Drawing.SolidBrush(System.Drawing.Color.Black);
+            System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
+            Pen pen = new Pen(drawBrush);
+
+            //grap.DrawString("sssss", drawFont, drawBrush, new PointF(450, 100));
+
+            
+            {
+                Point first =  new Point(panel.Height / 2 - WEIGHT / 2, 0);
+                points[0] = first;
+                string text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(code[0]);
+                grap.DrawString(text, drawFont, drawBrush, first);
+                grap.DrawRectangle(pen, first.X, first.Y, WEIGHT, code[0].Count * 13);
+                pointsEnd[0] = new Point(first.X + WEIGHT, first.Y + code[0].Count * 13);
+            }
+            
+
+            for (int i = 0; i < matr.Count; i++) {
+                Point parent = pointsEnd[i];
+                for (int j = 0; j < matr[i].Count; j++) {
+                    if (points[matr[i][j]].X != 0 && points[matr[i][j]].Y != 0) {
+                        //ToDo can be 2 out in blocks
+                        Point cur = points[matr[i][j]];
+                        Point c = new Point(cur.X + WEIGHT / 2, cur.Y);
+
+                        grap.DrawLines(pen, new Point[] { parent, c });
+
+                    } else {
+                        int x = (parent.X - WEIGHT / 2) / matr[i].Count;
+
+                        //ToDo can be 2 out in blocks
+                        Point cur;
+                        if (matr[i].Count > 1)
+                            cur = new Point(parent.X - x + (j * 2) * x - WEIGHT, weigh_count[levels[matr[i][j]]].X);//parent.Y + DELIMER);
+                        else {
+                            if (weigh_count[levels[matr[i][j]] + 1].Y == 1)
+                                cur = new Point(panel.Height / 2 - WEIGHT / 2, weigh_count[levels[matr[i][j]]].X);//parent.Y + DELIMER);
+                            else
+                                cur = new Point(parent.X - WEIGHT, weigh_count[levels[matr[i][j]]].X);// parent.Y + DELIMER);
+                        }
+
+                        points[matr[i][j]] = cur;
+                        string text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(code[matr[i][j]]);
+                        grap.DrawString(text, drawFont, drawBrush, cur);
+                        grap.DrawRectangle(pen, cur.X, cur.Y, WEIGHT, code[matr[i][j]].Count * 13);
+
+                        Point c = new Point(cur.X + WEIGHT / 2, cur.Y);
+                        grap.DrawLines(pen, new Point[]{parent, c});
+
+                        pointsEnd[matr[i][j]] = new Point(cur.X + WEIGHT, cur.Y + code[matr[i][j]].Count * 13);
+                        
+                    }
+                }
+            }
+
+            box.Image = bitmap;
+            box.Invalidate();
+        }
+        private void UpdateTab(Modes m, TextBox txt, PictureBox box, Panel panel) {
             if (FileName.Length == 0) {
                 txt.Text = "File is not set";
                 return;
             }
             try {
+                if (m == Modes.AfterGraph || m == Modes.BeforeGraph) {
+                    panel.Visible = true;
+                    txt.Visible = false;
+                } else {
+                    panel.Visible = false;
+                    txt.Visible = true;
+                }
                 string tt = System.IO.File.ReadAllText(FileName);
                 if (m == Modes.Text) {
                     txt.Text = tt;
@@ -202,6 +312,13 @@ namespace OptGui
                     txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(blocks);
                     return;
                 }
+                if (m == Modes.BeforeGraph)
+                {
+                    var blocks = new SimpleLang.Block.Block(threeCodeVisitor).GenerateBlocks();
+                    SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(blocks);
+                    DrawCFG(box, gra.cfg, blocks, panel);
+                    return;
+                }
 
                 SimpleLang.Visitors.AutoApplyVisitor optAst = GetASTOptimizer();
                 optAst.Apply(r);
@@ -220,6 +337,11 @@ namespace OptGui
 
                 if (m == Modes.AfterBlocks) {
                     txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(outcode);
+                    return;
+                }
+                if (m == Modes.AfterGraph) {
+                    SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(outcode);
+                    DrawCFG(box, gra.cfg, outcode, panel);
                     return;
                 }
                 if (m == Modes.AfterTbreeCode) {
@@ -266,6 +388,8 @@ namespace OptGui
                 txt.Text = "Is not implemented";
 
             } catch (Exception e) {
+                panel.Visible = false;
+                txt.Visible = true;
                 txt.Text = e.ToString();
             }
         }
@@ -273,8 +397,8 @@ namespace OptGui
             Modes m1 = DetectMode(comboBox1);
             Modes m2 = DetectMode(comboBox2);
 
-            UpdateTab(m1, textBox1);
-            UpdateTab(m2, textBox2);
+            UpdateTab(m1, textBox1, pictureBox1, panel1);
+            UpdateTab(m2, textBox2, pictureBox2, panel2);
 
         }
 
@@ -302,14 +426,14 @@ namespace OptGui
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             Modes m1 = DetectMode(comboBox1);
-            UpdateTab(m1, textBox1);
+            UpdateTab(m1, textBox1, pictureBox1, panel1);
             UpdateForms();
         }
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             Modes m1 = DetectMode(comboBox2);
-            UpdateTab(m1, textBox2);
+            UpdateTab(m1, textBox2, pictureBox2, panel2);
             UpdateForms();
         }
 
