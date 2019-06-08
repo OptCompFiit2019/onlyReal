@@ -126,6 +126,7 @@
     <Compile Include="AstOptimisations\ElseStVisitor.cs" />
     <Compile Include="ControlFlowGraph\DetectReversibleEdges.cs" />
     <Compile Include="Dominators\DominatorsFinder.cs" />
+    <Compile Include="IterationAlgorithm\AttainableVariables.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
