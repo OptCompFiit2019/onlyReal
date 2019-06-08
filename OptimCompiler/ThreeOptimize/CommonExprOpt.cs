@@ -52,6 +52,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                             program[j].operation = ThreeOperator.Assign;
                             program[j].arg1 = new ThreeAddressStringValue(program[i].result);
                             program[j].arg2 = null;
+			   _apply = true;
                         }
                         if (program[j].result == program[i].result || program[j].result == program[i].arg1.ToString() || (program[i].arg2 != null && program[j].result == program[i].arg2.ToString()))
                             break;

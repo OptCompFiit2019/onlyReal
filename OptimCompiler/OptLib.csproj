@@ -38,8 +38,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AstOptimisations\Opt_7_12.cs" />
+    <Compile Include="AstOptimisations\AssignVisitor.cs" />
+    <Compile Include="AstOptimisations\DeleteNullVisitor.cs" />
+    <Compile Include="AstOptimisations\FalseExprMoreAndNonEqualVisitor.cs" />
     <Compile Include="AstOptimisations\Opt_8_13.cs" />
     <Compile Include="AstOptimisations\LinearizeBlocks.cs" />
+    <Compile Include="ThreeOptimize\DAGOpt.cs" />
+    <Compile Include="ThreeOptimize\CommonExprOpt.cs" />
+    <Compile Include="ThreeOptimize\EliminationTranToTranOpt.cs" />
     <Compile Include="AstOptimisations\IfFalseVisitor.cs" />
     <Compile Include="AstOptimisations\MultiplicationComputeVisitor.cs" />
     <Compile Include="ControlFlowGraph\GraphDepth.cs" />
@@ -107,6 +113,9 @@
     <Compile Include="Visitors\AutoApplyVisitor.cs" />
     <Compile Include="AstOptimisations\LessOptVisitor.cs" />
     <Compile Include="AstOptimisations\ElseStVisitor.cs" />
+    <Compile Include="ControlFlowGraph\DetectReversibleEdges.cs" />
+    <Compile Include="Dominators\DominatorsFinder.cs" />
+
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

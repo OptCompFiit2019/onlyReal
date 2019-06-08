@@ -48,4 +48,9 @@
   } else {
     println(2);
   }
+  if (33 != 33) {
+    println(332);
+  } else {
+    println(33);
+  }
 }

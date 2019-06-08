@@ -65,6 +65,10 @@ namespace OptGui
                 res.Add(new SimpleLang.Visitors.Opt7Visitor());
             if (checkBox64.Checked)
                 res.Add(new SimpleLang.AstOptimisations.LinearizeBlocks());
+            if (checkBox65.Checked)
+                res.Add(new SimpleLang.AstOptimisations.FalseExprMoreAndNonEqualVisitor());
+            if (checkBox66.Checked)
+                res.Add(new SimpleLang.Visitors.DeleteNullVisitor());
             return res;
         }
         public SimpleLang.ThreeCodeOptimisations.AutoThreeCodeOptimiser GetOptimiser() {
@@ -89,6 +93,14 @@ namespace OptGui
                 res.Add(new SimpleLang.ThreeCodeOptimisations.PullOfCopiesOpt());
             if (checkBox10.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.UnreachableCodeOpt());
+            if (checkBox11.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.LVNOptimization());
+            if (checkBox12.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.DAGOpt());
+            if (checkBox13.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.CommonExprOpt());
+            if (checkBox14.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.EliminationTranToTranOpt());
             return res;
         }
         void UpdateForms() {

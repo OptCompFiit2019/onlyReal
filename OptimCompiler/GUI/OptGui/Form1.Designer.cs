@@ -36,6 +36,8 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.checkBox66 = new System.Windows.Forms.CheckBox();
+            this.checkBox65 = new System.Windows.Forms.CheckBox();
             this.checkBox64 = new System.Windows.Forms.CheckBox();
             this.checkBox63 = new System.Windows.Forms.CheckBox();
             this.checkBox62 = new System.Windows.Forms.CheckBox();
@@ -50,6 +52,10 @@
             this.checkBox53 = new System.Windows.Forms.CheckBox();
             this.checkBox52 = new System.Windows.Forms.CheckBox();
             this.checkBox51 = new System.Windows.Forms.CheckBox();
+            this.checkBox14 = new System.Windows.Forms.CheckBox();
+            this.checkBox13 = new System.Windows.Forms.CheckBox();
+            this.checkBox12 = new System.Windows.Forms.CheckBox();
+            this.checkBox11 = new System.Windows.Forms.CheckBox();
             this.checkBox10 = new System.Windows.Forms.CheckBox();
             this.checkBox9 = new System.Windows.Forms.CheckBox();
             this.checkBox8 = new System.Windows.Forms.CheckBox();
@@ -195,6 +201,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.checkBox66);
+            this.tabPage2.Controls.Add(this.checkBox65);
             this.tabPage2.Controls.Add(this.checkBox64);
             this.tabPage2.Controls.Add(this.checkBox63);
             this.tabPage2.Controls.Add(this.checkBox62);
@@ -209,6 +217,10 @@
             this.tabPage2.Controls.Add(this.checkBox53);
             this.tabPage2.Controls.Add(this.checkBox52);
             this.tabPage2.Controls.Add(this.checkBox51);
+            this.tabPage2.Controls.Add(this.checkBox14);
+            this.tabPage2.Controls.Add(this.checkBox13);
+            this.tabPage2.Controls.Add(this.checkBox12);
+            this.tabPage2.Controls.Add(this.checkBox11);
             this.tabPage2.Controls.Add(this.checkBox10);
             this.tabPage2.Controls.Add(this.checkBox9);
             this.tabPage2.Controls.Add(this.checkBox8);
@@ -226,6 +238,28 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Optimizations";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // checkBox66
+            // 
+            this.checkBox66.AutoSize = true;
+            this.checkBox66.Location = new System.Drawing.Point(300, 351);
+            this.checkBox66.Name = "checkBox66";
+            this.checkBox66.Size = new System.Drawing.Size(124, 17);
+            this.checkBox66.TabIndex = 3;
+            this.checkBox66.Text = "Delete NULL (15)";
+            this.checkBox66.UseVisualStyleBackColor = true;
+            this.checkBox66.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            // 
+            // checkBox65
+            // 
+            this.checkBox65.AutoSize = true;
+            this.checkBox65.Location = new System.Drawing.Point(300, 328);
+            this.checkBox65.Name = "checkBox65";
+            this.checkBox65.Size = new System.Drawing.Size(124, 17);
+            this.checkBox65.TabIndex = 3;
+            this.checkBox65.Text = "a > a, a != a (9)";
+            this.checkBox65.UseVisualStyleBackColor = true;
+            this.checkBox65.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // checkBox64
             // 
@@ -380,6 +414,50 @@
             this.checkBox51.Text = "Mull on Null (2)";
             this.checkBox51.UseVisualStyleBackColor = true;
             this.checkBox51.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            // 
+            // checkBox14
+            // 
+            this.checkBox14.AutoSize = true;
+            this.checkBox14.Location = new System.Drawing.Point(4, 306);
+            this.checkBox14.Name = "checkBox14";
+            this.checkBox14.Size = new System.Drawing.Size(115, 17);
+            this.checkBox14.TabIndex = 3;
+            this.checkBox14.Text = "EliminationTranToTranOptf";
+            this.checkBox14.UseVisualStyleBackColor = true;
+            this.checkBox14.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            // 
+            // checkBox13
+            // 
+            this.checkBox13.AutoSize = true;
+            this.checkBox13.Location = new System.Drawing.Point(4, 283);
+            this.checkBox13.Name = "checkBox13";
+            this.checkBox13.Size = new System.Drawing.Size(115, 17);
+            this.checkBox13.TabIndex = 3;
+            this.checkBox13.Text = "CommonExprOpt";
+            this.checkBox13.UseVisualStyleBackColor = true;
+            this.checkBox13.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            // 
+            // checkBox12
+            // 
+            this.checkBox12.AutoSize = true;
+            this.checkBox12.Location = new System.Drawing.Point(4, 260);
+            this.checkBox12.Name = "checkBox12";
+            this.checkBox12.Size = new System.Drawing.Size(115, 17);
+            this.checkBox12.TabIndex = 3;
+            this.checkBox12.Text = "DAGOpt";
+            this.checkBox12.UseVisualStyleBackColor = true;
+            this.checkBox12.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
+            // 
+            // checkBox11
+            // 
+            this.checkBox11.AutoSize = true;
+            this.checkBox11.Location = new System.Drawing.Point(4, 237);
+            this.checkBox11.Name = "checkBox11";
+            this.checkBox11.Size = new System.Drawing.Size(115, 17);
+            this.checkBox11.TabIndex = 3;
+            this.checkBox11.Text = "LVNOptimization";
+            this.checkBox11.UseVisualStyleBackColor = true;
+            this.checkBox11.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // checkBox10
             // 
@@ -623,6 +701,8 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.CheckBox checkBox66;
+        private System.Windows.Forms.CheckBox checkBox65;
         private System.Windows.Forms.CheckBox checkBox64;
         private System.Windows.Forms.CheckBox checkBox63;
         private System.Windows.Forms.CheckBox checkBox62;
@@ -637,6 +717,10 @@
         private System.Windows.Forms.CheckBox checkBox53;
         private System.Windows.Forms.CheckBox checkBox52;
         private System.Windows.Forms.CheckBox checkBox51;
+        private System.Windows.Forms.CheckBox checkBox14;
+        private System.Windows.Forms.CheckBox checkBox13;
+        private System.Windows.Forms.CheckBox checkBox12;
+        private System.Windows.Forms.CheckBox checkBox11;
         private System.Windows.Forms.CheckBox checkBox10;
         private System.Windows.Forms.CheckBox checkBox9;
         private System.Windows.Forms.CheckBox checkBox8;
