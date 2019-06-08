@@ -1,5 +1,5 @@
 {
-var a, b, c, d;
+int a, b, c, d;
 a = (1 + (5 / 1));
 b = a;
 c = 0;

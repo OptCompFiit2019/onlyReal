@@ -1,10 +1,10 @@
 {
     int x,y;
-    NULL;
+    #NULL;
     x = 1;
     if ((x > (0 - (6 * 15))))
     {
-        NULL;
+        #NULL;
     }
     else
     {
@@ -16,7 +16,7 @@
     }
     else
     {
-        NULL;
+        #NULL;
     }
-    NULL;
+    #NULL;
 }
