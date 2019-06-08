@@ -12,7 +12,8 @@ label_4:j = j + 2
 label_5: temp_3 = i == j
 		if temp_3 goto label_6
 		goto label_7
-label_6:println i
+label_6:
+		println i
 label_7: i = i +1
 		goto label_0
 label_2:

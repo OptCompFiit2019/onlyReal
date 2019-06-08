@@ -5,4 +5,3 @@ label_1: 	a =23
 			println a
 			goto label_0
 label_2:
-

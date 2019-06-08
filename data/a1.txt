@@ -1,8 +1,9 @@
 {
+   bool a, b;
 	if ((a==true) && (b == false))
 	{
-		b=3.14;
+		b=false;
 	}
 	else
-		b=2;
+		b=true;
 }
