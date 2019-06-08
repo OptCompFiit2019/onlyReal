@@ -37,7 +37,6 @@ namespace SimpleLang.ThreeCodeOptimisations
 
         public void DeleteDeadCode()
         {
-            this._apply = false;
             string a;
             bool abool;
             List<int> removeIndexList = new List<int>();
@@ -51,14 +50,12 @@ namespace SimpleLang.ThreeCodeOptimisations
                     a = list[i].arg2.ToString();
                     abool = true;
                     Deleting(list, i, ref removeIndexList, a, abool);
-                    this._apply = true;
                     arg2IsNull = false;
                 }
 
                 a = list[i].arg1.ToString();
                 abool = true;
-                Deleting(list, i, ref removeIndexList, a, abool);
-                this._apply = true;
+                Deleting(list, i, ref removeIndexList, a, abool);                
 
                 if (arg2IsNull)
                 {
@@ -67,7 +64,6 @@ namespace SimpleLang.ThreeCodeOptimisations
                         a = list[i].result;
                         abool = false;
                         Deleting(list, i, ref removeIndexList, a, abool);
-                        this._apply = true;
                     }
                 }
                 else
@@ -77,7 +73,6 @@ namespace SimpleLang.ThreeCodeOptimisations
                         a = list[i].result;
                         abool = false;
                         Deleting(list, i, ref removeIndexList, a, abool);
-                        this._apply = true;
                     }
                 }
                 i--;
@@ -86,7 +81,9 @@ namespace SimpleLang.ThreeCodeOptimisations
             for (int ii = 0; ii < Program.Count; ii++)
             {
                 if (removeIndexList.IndexOf(ii) == -1)
+                {
                     newlist.Add(list[ii]);
+                }
             }
             Program = new LinkedList<ThreeCode>(newlist);
         }
@@ -111,7 +108,10 @@ namespace SimpleLang.ThreeCodeOptimisations
                     if (ab == true)
                         ab = false;
                     else
+                    {
                         listInt.Add(j);
+                        _apply = true;
+                    }
                 }
                 j--;
             }
