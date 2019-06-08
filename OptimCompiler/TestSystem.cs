@@ -1233,8 +1233,6 @@ namespace SimpleLang
 
                     //здесь будет
                     //ConstantPropagation       Roslyn
-                    //ControlFlowGraph          Nvidia
-                    //BaseBlocks                Nvidia
 
                     default:
                         break;
