@@ -62,6 +62,7 @@ namespace SimpleLang.ThreeCodeOptimisations
             for (int i = 0; i < program.Count; i++)
                 result.Add(program[i]);
             Program = new LinkedList<ThreeCode>(result);
+            _apply = true;
         }
     }
 }

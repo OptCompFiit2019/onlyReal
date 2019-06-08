@@ -34,6 +34,7 @@ namespace SimpleLang.ThreeCodeOptimisations
             var dag = new DAG(Program.ToList());
             Program = dag.Optimize();
             program = Program;
+            _apply = true;
         }
     }
 }
