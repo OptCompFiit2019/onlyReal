@@ -1,0 +1,162 @@
+IN
+Block 1 :
+
+Block 2 :
+               i = m - 1
+               j = n
+               a = u1
+               t = 1
+    label_4:   i = u3
+               t = t + 1
+               j = j - 1
+               temp_1 = x > 1
+    label_0:   temp_0 = t < 5
+               a = u2
+
+Block 3 :
+    label_0:   temp_0 = t < 5
+               i = m - 1
+               j = n
+               a = u1
+               t = 1
+    label_4:   i = u3
+               t = t + 1
+               j = j - 1
+               temp_1 = x > 1
+               a = u2
+
+Block 4 :
+    label_0:   temp_0 = t < 5
+               i = m - 1
+               j = n
+               a = u1
+               t = 1
+    label_4:   i = u3
+               t = t + 1
+               j = j - 1
+               temp_1 = x > 1
+               a = u2
+
+Block 5 :
+    label_1:   i = i + 1
+               j = j - 1
+               temp_1 = x > 1
+    label_0:   temp_0 = t < 5
+               a = u1
+               t = 1
+               t = t + 1
+               a = u2
+
+Block 6 :
+    label_1:   i = i + 1
+               j = j - 1
+               temp_1 = x > 1
+    label_0:   temp_0 = t < 5
+               a = u1
+               t = 1
+               t = t + 1
+               a = u2
+
+Block 7 :
+    label_1:   i = i + 1
+               j = j - 1
+               temp_1 = x > 1
+    label_0:   temp_0 = t < 5
+               a = u1
+               t = 1
+               a = u2
+               t = t + 1
+
+Block 8 :
+    label_0:   temp_0 = t < 5
+               i = m - 1
+               j = n
+               a = u1
+               t = 1
+    label_4:   i = u3
+               t = t + 1
+               j = j - 1
+               temp_1 = x > 1
+               a = u2
+
+
+OUT
+Block 1 :
+               i = m - 1
+               j = n
+               a = u1
+               t = 1
+
+Block 2 :
+    label_0:   temp_0 = t < 5
+               i = m - 1
+               j = n
+               a = u1
+               t = 1
+    label_4:   i = u3
+               t = t + 1
+               j = j - 1
+               temp_1 = x > 1
+               a = u2
+
+Block 3 :
+    label_0:   temp_0 = t < 5
+               i = m - 1
+               j = n
+               a = u1
+               t = 1
+    label_4:   i = u3
+               t = t + 1
+               j = j - 1
+               temp_1 = x > 1
+               a = u2
+
+Block 4 :
+    label_1:   i = i + 1
+               j = j - 1
+               temp_1 = x > 1
+    label_0:   temp_0 = t < 5
+               a = u1
+               t = 1
+               t = t + 1
+               a = u2
+
+Block 5 :
+    label_1:   i = i + 1
+               j = j - 1
+               temp_1 = x > 1
+    label_0:   temp_0 = t < 5
+               a = u1
+               t = 1
+               t = t + 1
+               a = u2
+
+Block 6 :
+               a = u2
+    label_1:   i = i + 1
+               j = j - 1
+               temp_1 = x > 1
+    label_0:   temp_0 = t < 5
+               t = 1
+               t = t + 1
+
+Block 7 :
+    label_4:   i = u3
+               t = t + 1
+               j = j - 1
+               temp_1 = x > 1
+    label_0:   temp_0 = t < 5
+               a = u1
+               a = u2
+
+Block 8 :
+    label_0:   temp_0 = t < 5
+               i = m - 1
+               j = n
+               a = u1
+               t = 1
+    label_4:   i = u3
+               t = t + 1
+               j = j - 1
+               temp_1 = x > 1
+               a = u2

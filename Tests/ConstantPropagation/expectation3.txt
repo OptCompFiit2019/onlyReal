@@ -1,0 +1,9 @@
+{
+    int a,b,c;
+    b = 5;
+    a = 1;
+    a = 2;
+    a = 3;
+	println(1);
+	println(3);
+}

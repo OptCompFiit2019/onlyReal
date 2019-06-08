@@ -60,6 +60,9 @@
     <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
     <Compile Include="IterationAlgorithm\AttainableVariables.cs" />
     <Compile Include="IterativeAlgorithm.cs" />
+    <Compile Include="PullOfCopies.cs" />
+    <Compile Include="ReachingDefsAnalysis\ReachingDefsAnalysis.cs" />
+    <Compile Include="ReachingDefsAnalysis\ReachingDefsTransferFunction.cs" />
     <Compile Include="TestSystem.cs" />
     <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
     <Compile Include="ThreeCodeOptimisations\ConstantPropagationOptimization.cs" />
@@ -76,8 +79,6 @@
     <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="TransferFunction %28Intel%29\TransferFunction.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
-    <Compile Include="TransferFunction\ReachingDefsTest.cs" />
-    <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />

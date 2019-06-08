@@ -188,8 +188,12 @@ namespace SimpleLang.ControlFlowGraph
         {
             var sb = new StringBuilder();
             foreach (var block in blocks)
+            {
                 foreach (var line in block)
-                    sb.Append(line.ToString() + "\n");
+                    sb.AppendLine(line.ToString());
+                sb.AppendLine();
+            }
+            sb.Remove(sb.Length - 1, 1);
             return sb.ToString();
         }
     }
