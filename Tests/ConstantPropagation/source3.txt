@@ -4,6 +4,11 @@
     a = 1;
     a = 2;
     a = 3;
-	println(1);
-	println(a);
+	if (false)
+	{
+		println(1);
+		println(a);
+		a = 5;
+		println(a);
+	}
 }
