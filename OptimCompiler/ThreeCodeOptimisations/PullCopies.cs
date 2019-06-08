@@ -29,8 +29,9 @@ namespace SimpleLang.Visitors
             {
                 if (blocks[i].Count > 1)
                 {
+                    bool _apply = false;
                     var graph = new PullCopies(blocks[i].ToList());
-                    var prog = graph.Optimize();
+                    var prog = graph.Optimize(ref _apply);
                     foreach (var cmd in prog)
                         result.Add(cmd);
                 }
@@ -72,7 +73,7 @@ namespace SimpleLang.Visitors
             return program;
         }
 
-        public LinkedList<ThreeCode> Optimize()
+        public LinkedList<ThreeCode> Optimize(ref bool _apply)
         {
             for (int i = 0; i < program.Count - 1; i++)
             {
@@ -95,10 +96,16 @@ namespace SimpleLang.Visitors
                         same_def = true;
 
                     if (program[j].arg1 != null && program[j].arg1.ToString() == def)
+                    {
                         program[j].arg1 = newArg;
+                        _apply = true;
+                    }
 
                     if (program[j].arg2 != null && program[j].arg2.ToString() == def)
+                    {
                         program[j].arg2 = newArg;
+                        _apply = true;
+                    }
 
                     if (same_def)
                         break;

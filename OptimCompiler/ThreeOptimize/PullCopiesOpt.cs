@@ -6,7 +6,7 @@ using SimpleLang.Visitors;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    public class DAGOpt : ThreeCodeOptimiser
+    public class PullCopiesOpt : ThreeCodeOptimiser
     {
         private bool _apply = false;
 
@@ -31,8 +31,8 @@ namespace SimpleLang.ThreeCodeOptimisations
         {
             _apply = false;
             Program = program;
-            var dag = new DAG(Program.ToList());
-            Program = dag.Optimize(ref _apply);
+            var pc = new PullCopies(Program.ToList());
+            Program = pc.Optimize(ref _apply);
             program = Program;
         }
     }
