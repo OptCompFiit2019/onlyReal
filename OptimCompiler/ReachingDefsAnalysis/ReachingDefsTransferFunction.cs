@@ -21,10 +21,10 @@ namespace SimpleLang
         public TransferFunction<BlockInfo<ThreeCode>> TransferFunction()
             => new TransferFunction<BlockInfo<ThreeCode>>(bi =>
             {
-                var newIn = new BlockInfo<ThreeCode>(bi);
-                newIn.IN = tf.BlockTransferFunction(bi.Commands)
-                    (new HashSet<ThreeCode>(bi.OUT));
-                return newIn;
+                var Out = new BlockInfo<ThreeCode>(bi);
+                Out.OUT = tf.BlockTransferFunction(bi.Commands)
+                    (new HashSet<ThreeCode>(bi.IN));
+                return Out;
             });
     }
 

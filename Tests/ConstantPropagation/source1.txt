@@ -1,0 +1,14 @@
+{
+    int a,b,c;
+    b = 6;
+    a = 1;
+    a = 2;
+    a = 3;
+	println(1);
+    while ((c > (a - b)))
+    {
+        c = (c + 1);
+        a = 30;
+    }
+    println(a);
+}
