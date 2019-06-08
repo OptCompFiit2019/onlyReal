@@ -18,6 +18,7 @@ ControlFlowGraph
 	var blocks = block.GenerateBlocks();
 	Console.WriteLine(block.ToString());
 	
-	Console.WriteLine("\nGenerate Control Flow Graph\n");
-	CFG controlFlowGraph = new CFG(blocks);
-	Console.WriteLine(controlFlowGraph.ToString());
+	Console.WriteLine("\nControl flow graph:");
+	var ucfg = new CFG(treeCode);
+	var cfg = new CFG(treeCode).GetAsGraph();
+	Console.WriteLine(cfg);

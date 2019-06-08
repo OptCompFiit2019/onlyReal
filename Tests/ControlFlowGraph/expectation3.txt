@@ -1,17 +1,9 @@
-Generate Control Flow Graph
-
-           c = 1
-           b = 8,56
-           if True goto label_0
-           j = 0
-label_2:   temp_0 = j < 10
-           if temp_0 goto label_3
-           goto label_4
-label_3:   b = b + 1,4
-           j = j + 1
-           goto label_2
-label_4:   c = c + 1
-           goto label_1
-label_0:
-           b = 3,14
-label_1:
+Control flow graph:
+0: 1 6
+1: 2
+2: 3 4
+3: 5
+4: 2
+5: 7
+6: 7
+7:
