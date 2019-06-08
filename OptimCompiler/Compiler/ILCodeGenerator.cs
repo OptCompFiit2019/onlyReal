@@ -362,5 +362,17 @@ namespace SimpleLang.Compiler
         {
             return genc.RunProgram();
         }
+
+        public string PrintCommandsInString()
+        {
+            string result = "";
+            var lst = genc.commands;
+            foreach (string cmd in lst)
+            {
+                //Console.WriteLine(cmd); 
+                result += cmd + '\n';
+            }
+            return result;
+        }
     }
 }
