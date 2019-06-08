@@ -64,7 +64,6 @@
     <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
     <Compile Include="IterationAlgorithm\AttainableVariables.cs" />
     <Compile Include="IterativeAlgorithm.cs" />
-    <Compile Include="PullOfCopies.cs" />
     <Compile Include="ReachingDefsAnalysis\ReachingDefsAnalysis.cs" />
     <Compile Include="ReachingDefsAnalysis\ReachingDefsTransferFunction.cs" />
     <Compile Include="TestSystem.cs" />
@@ -78,7 +77,6 @@
     <Compile Include="ThreeCodeOptimisations\PullOfCopies.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="ThreeOptimize\DeleteOfDeadCodeOpt.cs" />
-    <Compile Include="ThreeOptimize\EliminationTranToTranOpt.cs" />
     <Compile Include="ThreeOptimize\PullOfCopiesOpt.cs" />
     <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="TransferFunction %28Intel%29\TransferFunction.cs" />
@@ -131,7 +129,6 @@
     <Compile Include="AstOptimisations\ElseStVisitor.cs" />
     <Compile Include="ControlFlowGraph\DetectReversibleEdges.cs" />
     <Compile Include="Dominators\DominatorsFinder.cs" />
-    <Compile Include="IterationAlgorithm\AttainableVariables.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

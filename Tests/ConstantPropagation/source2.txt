@@ -2,7 +2,7 @@
     int a,b,c;
     b = 5;
     a = 1;
-    c = 2;
+    c = 2 * b;
 	if (true)
 	{
 		a = c * b - a + 3;
