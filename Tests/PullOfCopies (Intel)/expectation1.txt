@@ -1,6 +1,6 @@
 {
   int a, b, c, d;
   a = b;
-  c = a;
+  c = b;
   d = b + b;
 }

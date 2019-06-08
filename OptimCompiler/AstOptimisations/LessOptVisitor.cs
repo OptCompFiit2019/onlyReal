@@ -7,7 +7,7 @@ using ProgramTree;
 
 namespace SimpleLang.Visitors
 {
-    public class LessOptVisitor : ChangeVisitor
+    public class LessOptVisitor : AutoApplyVisitorInterface
     {
         public override void VisitLogicOpNode(LogicOpNode lop)
         {
@@ -23,12 +23,15 @@ namespace SimpleLang.Visitors
                 //Посчитаем сам знак
                 bool nbool = lop.Operation == ">" ? l.Num > r.Num : l.Num < r.Num;
                 //Проверим, что выражение не является условиев if
-                if (lop.Parent is IfNode ifn)
+                if (lop.Parent is IfNode ifn) {
                     ifn.Cond = new BooleanNode(nbool);
+                    SetApply();
+                }
                 //Проверим, что выражение не является условиев while
-                else if (lop.Parent is WhileNode w)
+                else if (lop.Parent is WhileNode w) { 
                     w.Expr = new BooleanNode(nbool);
-                else
+                    SetApply();
+                }else
                     ReplaceExpr(lop, new BooleanNode(nbool));
             }
             else // Если оптимизаций нет, то

@@ -11,7 +11,7 @@ namespace SimpleLang.Visitors
     /// Выполняет замену на null узла WhileNode в случае 
     /// while (false) st;
     /// </summary>
-    class OptWhileVisitor: ChangeVisitor
+    public class OptWhileVisitor : AutoApplyVisitorInterface
     {
         private bool IsPerformed { get; set; }
 

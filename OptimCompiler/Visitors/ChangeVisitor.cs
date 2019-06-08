@@ -9,7 +9,7 @@ namespace SimpleLang.Visitors
 {
 	public class ChangeVisitor : AutoVisitor
 	{
-		public void ReplaceExpr(ExprNode from, ExprNode to)
+		public virtual void ReplaceExpr(ExprNode from, ExprNode to)
 		{
 			var p = from.Parent;
 			if (to != null)
@@ -57,7 +57,7 @@ namespace SimpleLang.Visitors
 				throw new Exception("Родительский узел не содержит выражений");
 			}
 		}
-		public void ReplaceStat(StatementNode from, StatementNode to)
+		public virtual void ReplaceStat(StatementNode from, StatementNode to)
 		{
 			var p = from.Parent;
 			if (p is AssignNode || p is ExprNode)

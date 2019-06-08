@@ -7,8 +7,10 @@ using System.Text;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class LVNOptimization
+    public class LVNOptimization : ThreeCodeOptimiser
     {
+        private static bool IsApplyed = false;
+
         /// <summary>
         /// Возвращает результат применения к блоку <paramref name="sourceBlock"/> оптимизацию LVN как новый блок.
         /// </summary>
@@ -41,7 +43,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                 if (strCode.Value.arg2 != null && !dict.Keys.Contains(strCode.Value.arg2.ToString()))
                     dict[strCode.Value.arg2.ToString()] = i++;
 
-                Key = strCode.Value.arg2 == null? strCode.Value.arg1.ToString() : 
+                Key = strCode.Value.arg2 == null ? strCode.Value.arg1.ToString() :
                     dict[strCode.Value.arg1.ToString()].ToString() + strCode.Value.operation + dict[strCode.Value.arg2.ToString()];
 
                 if (!dict.Keys.Contains(Key))
@@ -58,6 +60,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                     strCode.Value.operation = ThreeOperator.Assign;
                     strCode.Value.arg2 = null;
                     strCode.Value.arg1 = new ThreeAddressStringValue(ValueDict[dict[Key]].Value.result);
+                    IsApplyed = true;
                 }
 
                 dict[strCode.Value.result] = dict[Key];
@@ -87,5 +90,22 @@ namespace SimpleLang.ThreeCodeOptimisations
 
             return resGraph;
         }
+
+        public void Apply(ref LinkedList<ThreeCode> program)
+        {
+            IsApplyed = false;
+            program = LVNOptimize(program);
+        }
+
+        public void Apply(ref List<LinkedList<ThreeCode>> res)
+        {
+            IsApplyed = false;
+            for (int i = 0; i < res.Count; i++)
+                res[i] = LVNOptimize(res[i]);
+        }
+
+        public bool Applyed() => IsApplyed;
+
+        public bool NeedFullCode() => false;
     }
 }

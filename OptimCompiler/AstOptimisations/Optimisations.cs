@@ -8,58 +8,13 @@ using SimpleLang.Visitors;
 
 namespace SimpleLang.Optimisations
 {
-    class ChangeVisitor : AutoVisitor {
-        public void ReplaceExpr(ExprNode from, ExprNode to) {
-            var p = from.Parent;
-            to.Parent = p;
-            if (p is AssignNode assn)
-            {
-                assn.Expr = to;
-            }
-            else if (p is BinOpNode binopn)
-            {
-                if (binopn.Left == from) // Поиск подузла в Parent
-                    binopn.Left = to;
-                else if (binopn.Right == from)
-                    binopn.Right = to;
-            }
-            else if (p is BlockNode)
-            {
-                throw new Exception("Родительский узел не содержит выражений");
-            }
-        }
-        
-        public void ReplaceStat(StatementNode from, StatementNode to) {
-            var p = from.Parent;
-            if (p is AssignNode || p is ExprNode) {
-                throw new Exception("Родительский узел не содержит операторов");
-            }
-            if(to != null)
-                to.Parent = p;
-            if (p is BlockNode bln) // Можно переложить этот код на узлы!
-            {
-                for (var i=0; i<bln.StList.Count-1; i++)
-                    if (bln.StList[i] == from) {
-                        bln.StList[i] = to;
-                        break;
-                    }
-            }
-            else if (p is IfNode ifn) {
-                if (ifn.If == from) // Поиск подузла в Parent
-                    ifn.Else = to;
-                else if (ifn.Else == from)
-                    ifn.Else = to;
-            }
-        }
-    }
-    
-    class OptSimilarDifference : ChangeVisitor
+    public class OptSimilarDifference : AutoApplyVisitorInterface
     {
         public override void VisitBinOpNode(BinOpNode binop)
         {
             if ((binop.Left is IdNode) && (binop.Right is IdNode) &&
                 String.Equals((binop.Left as IdNode).Name, (binop.Right as IdNode).Name) &&
-                (binop.Op == '-'))
+                (binop.Op == "-"))
             {
                 ReplaceExpr(binop, new IntNumNode(0));
             }
@@ -83,7 +38,7 @@ namespace SimpleLang.Optimisations
         }
     }
     
-    class OptSimilarAssignment : ChangeVisitor
+    public class OptSimilarAssignment : AutoApplyVisitorInterface
     {
         public override void VisitAssignNode(AssignNode a)
         {

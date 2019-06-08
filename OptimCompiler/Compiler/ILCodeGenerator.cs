@@ -37,14 +37,14 @@ namespace SimpleLang.Compiler
         /// </summary>
         /// <returns>The variable.</returns>
         /// <param name="type">тип переменной (0, 1, 2)</param>
-        private LocalBuilder CreateVariable(type t) {
+        private LocalBuilder CreateVariable(type t, string name = null) {
             switch (t) {
                 case type.tint:
-                    return genc.DeclareLocal(typeof(int));
+                    return genc.DeclareLocal(typeof(int), name);
                 case type.tbool:
-                    return genc.DeclareLocal(typeof(bool));
+                    return genc.DeclareLocal(typeof(bool), name);
                 case type.treal:
-                    return genc.DeclareLocal(typeof(double));
+                    return genc.DeclareLocal(typeof(double), name);
                 default:
                     throw new Exception("Unknown type");
             }
@@ -96,7 +96,7 @@ namespace SimpleLang.Compiler
                     throw new Exception("Previous declaration is different");
                 return;
             }
-            var v = CreateVariable(t);
+            var v = CreateVariable(t, name);
             variables.Add(name, v);
             varTypes.Add(name, t);
         }
@@ -126,7 +126,7 @@ namespace SimpleLang.Compiler
                     return;
                 }
 
-                var v = CreateVariable(t);
+                var v = CreateVariable(t, name);
                 variables.Add(name, v);
                 varTypes.Add(name, t);
                 return;
@@ -143,7 +143,7 @@ namespace SimpleLang.Compiler
 
                 type t = isLogic ? type.tbool : type.treal;
 
-                var v = CreateVariable(t);
+                var v = CreateVariable(t, name);
                 variables.Add(name, v);
                 varTypes.Add(name, t);
                 return;
@@ -163,7 +163,7 @@ namespace SimpleLang.Compiler
             foreach (var v in SymbolTable.vars)
             {
                 type t = v.Value;
-                variables.Add(v.Key, CreateVariable(t));
+                variables.Add(v.Key, CreateVariable(t, v.Key));
                 varTypes.Add(v.Key, t);
             }
 

@@ -1,0 +1,22 @@
+{
+    int x,y;
+    NULL;
+    x = 1;
+    if ((x > (0 - 0)))
+    {
+        NULL;
+    }
+    else
+    {
+        y = 228;
+    }
+    if ((x < 0))
+    {
+        y = 1488;
+    }
+    else
+    {
+        NULL;
+    }
+    NULL;
+}

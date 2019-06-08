@@ -5,11 +5,40 @@ using System.Text;
 using System.Reflection.Emit;
 using System.Reflection;
 using SimpleParser;
+using System.Security;
 
+[assembly: SecurityTransparent]
 namespace SimpleLang.Compiler
 {
+    public static class GenCodeConsole
+    {
+        public static StringBuilder stringBuilder = new StringBuilder();
+
+        public static void WriteLine(int value)
+        {
+            InternalWriteLine(value);
+        }
+
+        public static void WriteLine(double value)
+        {
+            InternalWriteLine(value);
+        }
+
+        public static void WriteLine(bool value)
+        {
+            InternalWriteLine(value);
+        }
+
+        private static void InternalWriteLine(object value)
+        {
+            stringBuilder.AppendLine(value.ToString());
+            Console.WriteLine(value);
+        }
+    }
+
     public class GenCodeCreator
     {
+        private Dictionary<LocalBuilder, string> variables = new Dictionary<LocalBuilder, string>(); 
         private DynamicMethod dyn;
         private ILGenerator gen;
         private bool write_commands = true;
@@ -21,7 +50,7 @@ namespace SimpleLang.Compiler
         {
             dyn = new DynamicMethod("My", null, null, typeof(void));
 
-            Type tcons = typeof(Console);
+            Type tcons = typeof(GenCodeConsole);
             string wl = "WriteLine";
 
             writeLineInt = tcons.GetMethod(wl, new Type[] { typeof(int) });
@@ -66,7 +95,8 @@ namespace SimpleLang.Compiler
         {
             gen.Emit(op, lb);
             if (write_commands)
-                commands.Add(op.ToString() + " var" + lb.LocalIndex);
+                commands.Add(op.ToString() + " " +
+                    (variables.ContainsKey(lb) ? variables[lb] : "var" + lb.LocalIndex));
         }
 
         public void Emit(OpCode op, Label l)
@@ -76,11 +106,12 @@ namespace SimpleLang.Compiler
                 commands.Add(op.ToString() + " Label" + l.GetHashCode());
         }
 
-        public LocalBuilder DeclareLocal(Type t)
+        public LocalBuilder DeclareLocal(Type t, string name = null)
         {
             var lb = gen.DeclareLocal(t);
+            variables.Add(lb, name);
             if (write_commands)
-                commands.Add("DeclareLocal " + "var" + lb.LocalIndex + ": " + t);
+                commands.Add("DeclareLocal " + (name ?? "var" + lb.LocalIndex) + ": " + t);
             return lb;
         }
 
@@ -114,15 +145,9 @@ namespace SimpleLang.Compiler
 
         public string RunProgram()
         {
-            var tw = Console.Out;
-            System.IO.MemoryStream stre = new System.IO.MemoryStream();
-            System.IO.TextWriter wr = new System.IO.StreamWriter(stre);
-            Console.SetOut(wr);
+            GenCodeConsole.stringBuilder.Clear();
             dyn.Invoke(null, null);
-            Console.SetOut(tw);
-            wr.Flush();
-            stre.Flush();
-            return Encoding.UTF8.GetString(stre.ToArray());
+            return GenCodeConsole.stringBuilder.ToString();
         }
 
         public void WriteCommandsOn()
