@@ -1,5 +1,5 @@
 {
-  int a, b, c, d, e, k, l, m, x;
+  int a, b, c, d, e, k, l, m, x, p;
   x = x;
   a = b + c;
   b = a - d;

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SimpleLang.AstOptimisations
 {
-    class LinearizeBlocks : AutoApplyVisitorInterface
+    public class LinearizeBlocks : AutoApplyVisitorInterface
     {
         public override void VisitBlockNode(BlockNode bl)
         {
@@ -16,6 +16,7 @@ namespace SimpleLang.AstOptimisations
                 if (bl.StList[i] is BlockNode)
                 {
                     BlockNode bl1= (BlockNode)bl.StList[i];
+                    SetApply();
 
                     bl.StList.RemoveAt(i);
                     for (int j = 0; j < bl1.StList.Count; j++)

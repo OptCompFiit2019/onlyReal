@@ -29,8 +29,9 @@ namespace SimpleLang.Visitors
             {
                 if (blocks[i].Count > 1)
                 {
+                    bool _apply = false;
                     var graph = new CommonExpr(blocks[i].ToList());
-                    var prog = graph.Optimize();
+                    var prog = graph.Optimize(ref _apply);
                     foreach (var cmd in prog)
                         result.Add(cmd);
                 }
@@ -73,7 +74,7 @@ namespace SimpleLang.Visitors
             return program;
         }
 
-        public LinkedList<ThreeCode> Optimize()
+        public LinkedList<ThreeCode> Optimize(ref bool _apply)
         {
             var result = new List<ThreeCode>();
 
@@ -90,6 +91,7 @@ namespace SimpleLang.Visitors
                             program[j].operation = ThreeOperator.Assign;
                             program[j].arg1 = new ThreeAddressStringValue(program[i].result);
                             program[j].arg2 = null;
+                            _apply = true;
                         }
                         if (program[j].result == program[i].result || program[j].result == program[i].arg1.ToString() || (program[i].arg2 != null && program[j].result == program[i].arg2.ToString()))
                             break;

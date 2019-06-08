@@ -10,6 +10,8 @@ namespace SimpleLang.Block
     public class Block
     {
         public LinkedList<ThreeCode> code;
+        public List<LinkedList<ThreeCode>> _blocks;
+
         public Block(ThreeAddressCodeVisitor _code)
         {
             this.code = _code.GetCode();
@@ -59,8 +61,21 @@ namespace SimpleLang.Block
                 Blocks.Last().AddLast(line);
                 i += 1;
             }
+            _blocks = Blocks;
 
             return Blocks;
+        }
+
+        public override string ToString()
+        {
+            var result = "";
+            for (var idx = 0; idx < _blocks.Count; ++idx)
+            {
+                result += "Block #" + idx.ToString() + ":\n";
+                foreach (var line in _blocks[idx])
+                    result += line + "\n";
+            }
+            return result;
         }
     }
 }

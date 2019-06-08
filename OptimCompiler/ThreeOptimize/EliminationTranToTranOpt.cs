@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class EliminationTranToTranOpt : ThreeCodeOptimiser
+    public class EliminationTranToTranOpt : ThreeCodeOptimiser
     {
         public EliminationTranToTranOpt() { }
 
