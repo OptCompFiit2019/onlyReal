@@ -66,8 +66,6 @@
     <Compile Include="ThreeOptimize\PullOfCopiesOpt.cs" />
     <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
-    <Compile Include="TransferFunction\ReachingDefsTest.cs" />
-    <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />
