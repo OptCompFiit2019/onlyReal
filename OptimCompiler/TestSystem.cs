@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using SimpleLang.ThreeCodeOptimisations;
 using SimpleLang.Visitors;
+using SimpleLang.AstOptimisations;
 using SimpleScanner;
 using SimpleParser;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
@@ -14,6 +15,7 @@ using SimpleLang.ControlFlowGraph;
 using SimpleLang.GenericIterativeAlgorithm;
 using GenericTransferFunction;
 using ProgramTree;
+using SimpleLang.Optimisations;
 
 namespace SimpleLang
 {
@@ -325,6 +327,28 @@ namespace SimpleLang
             return program;
         }
 
+        private void LaunchASTOptTest(string pathToFolder, string source, string expectation, Visitor v)
+        {
+            var source_root = GetRootOfAST(pathToFolder + source);
+
+            source_root.Visit(new FillParentVisitor());
+            source_root.Visit(v);
+
+            var source_print = new PrettyPrintVisitor();
+            source_root.Visit(source_print);
+
+            var expectation_root = GetRootOfAST(pathToFolder + expectation);
+            var expectation_print = new PrettyPrintVisitor();
+            expectation_root.Visit(expectation_print);
+
+            string opt_program = DeleteEmptyLines(source_print.Text);
+            string target = DeleteEmptyLines(expectation_print.Text);
+
+            if (opt_program == target)
+                Console.WriteLine("Тест {0} успешно пройден!", source);
+            else
+                Console.WriteLine("Тест {0} не пройден!\nПолучено:\n{1}\n\nОжидалось:\n{2}\n\n", source, opt_program, target);
+        }
         public void LaunchTest(string testName)
         {
             string pathToFolder = string.Format(@"../../../Tests/{0}/", testName);
@@ -345,9 +369,10 @@ namespace SimpleLang
                         bool flag = true;
                         for (int j = 0; j < sourceBlocks.Count; j++)
                         {
+                            bool _apply = false;
                             bool testFault = false;
                             var optimizer = new DAG(sourceBlocks[j].ToList());
-                            var opt_program = optimizer.Optimize();
+                            var opt_program = optimizer.Optimize(ref _apply);
                             var target = optimizer.MakeProgram(expectationBlocks[j].ToList());
                             CheckResults(opt_program.ToList(), target, ref flag, ref testFault, source, j);
                         }
@@ -363,10 +388,11 @@ namespace SimpleLang
                         flag = true;
                         for (int j = 0; j < sourceBlocks.Count; j++)
                         {
+                            bool _apply = false;
                             bool testFault = false;
                             var optimizer = new PullCopies(sourceBlocks[j].ToList());
 
-                            var opt_program = optimizer.Optimize();
+                            var opt_program = optimizer.Optimize(ref _apply);
                             var target = expectationBlocks[j].ToList();
                             CheckResults(opt_program.ToList(), target, ref flag, ref testFault, source, j);
                         }
@@ -382,10 +408,11 @@ namespace SimpleLang
                         flag = true;
                         for (int j = 0; j < sourceBlocks.Count; j++)
                         {
+                            bool _apply = false;
                             bool testFault = false;
                             var optimizer = new CommonExpr(sourceBlocks[j].ToList());
 
-                            var opt_program = optimizer.Optimize();
+                            var opt_program = optimizer.Optimize(ref _apply);
                             var target = optimizer.MakeProgram(expectationBlocks[j].ToList());
                             CheckResults(opt_program.ToList(), target, ref flag, ref testFault, source, j);
                         }
@@ -962,123 +989,135 @@ namespace SimpleLang
                             Console.WriteLine("Тест {0} успешно пройден!", source);
                         break;
 
+                    case "UnreachableCodeOpt": //Boom
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                            var optimizer = new UnreachableCodeOpt();
+                            flag = true;
+
+                            bool testFault = false;
+                            var opt_program = optimizer.DeleteUnreachCode(sourceCode.GetCode());
+                            var target = ParseThreeCode(pathToFolder + expectation);
+                            CheckResults(opt_program.ToList(), target, ref flag, ref testFault, source);
+                            if (flag)
+                                Console.WriteLine("Тест {0} успешно пройден!", source);
+                        }
+                        break;
+
                     case "AST_Opt8Visitor":  //qwerty
                         {
-                            var source_root = GetRootOfAST(pathToFolder + source);
-                            FillParentVisitor generateParrent = new FillParentVisitor();
-                            source_root.Visit(generateParrent);
-
-                            var opt8_visitor = new OptVisitor_8();
-                            source_root.Visit(opt8_visitor);
-
-                            var source_print = new PrettyPrintVisitor();
-                            source_root.Visit(source_print);
-
-                            var expectation_root = GetRootOfAST(pathToFolder + expectation);
-                            var expectation_print = new PrettyPrintVisitor();
-                            expectation_root.Visit(expectation_print);
-
-                            string opt_program = source_print.Text;
-                            string target = expectation_print.Text;
-
-                            if (opt_program == target)
-                                Console.WriteLine("Тест {0} успешно пройден!", source);
-                            else
-                                Console.WriteLine("Тест {0} не пройден!\nПолучено:\n{1}\n\nОжидалось:\n{2}\n\n", source, opt_program, target);
+                            LaunchASTOptTest(pathToFolder, source, expectation, new OptVisitor_8());
                         }
                         break;
 
                     case "AST_Opt13Visitor":  //qwerty
                         {
-                            var source_root = GetRootOfAST(pathToFolder + source);
-
-                            var opt13_visitor = new OptVisitor_13();
-                            source_root.Visit(opt13_visitor);
-
-                            var source_print = new PrettyPrintVisitor();
-                            source_root.Visit(source_print);
-
-                            var expectation_root = GetRootOfAST(pathToFolder + expectation);
-                            var expectation_print = new PrettyPrintVisitor();
-                            expectation_root.Visit(expectation_print);
-
-                            string opt_program = source_print.Text;
-                            string target = expectation_print.Text;
-
-                            if (opt_program == target)
-                                Console.WriteLine("Тест {0} успешно пройден!", source);
-                            else
-                                Console.WriteLine("Тест {0} не пройден!\nПолучено:\n{1}\n\nОжидалось:\n{2}\n\n", source, opt_program, target);
+                            LaunchASTOptTest(pathToFolder, source, expectation, new OptVisitor_13());
                         }
                         break;
 
                     case "AST_OptWhileVisitor":  //Roll
                         {
-                            var source_root = GetRootOfAST(pathToFolder + source);
-                            FillParentVisitor generateParrent = new FillParentVisitor();
-                            source_root.Visit(generateParrent);
-
-                            source_root.Visit(new FillParentVisitor());
-                            source_root.Visit(new OptWhileVisitor());
-
-                            var source_print = new PrettyPrintVisitor();
-                            source_root.Visit(source_print);
-
-                            var expectation_root = GetRootOfAST(pathToFolder + expectation);
-                            var expectation_print = new PrettyPrintVisitor();
-                            expectation_root.Visit(expectation_print);
-
-                            string opt_program = DeleteEmptyLines(source_print.Text);
-                            string target = DeleteEmptyLines(expectation_print.Text);
-
-                            if (opt_program == target)
-                                Console.WriteLine("Тест {0} успешно пройден!", source);
-                            else
-                                Console.WriteLine("Тест {0} не пройден!\nПолучено:\n{1}\n\nОжидалось:\n{2}\n\n", source, opt_program, target);
+                            LaunchASTOptTest(pathToFolder, source, expectation, new OptWhileVisitor());
                         }
                         break;
 
                     case "AST_OptMulDivOneVisitor":  //Roll
                         {
-                            var source_root = GetRootOfAST(pathToFolder + source);
-
-                            source_root.Visit(new FillParentVisitor());
-                            source_root.Visit(new OptMulDivOneVisitor());
-
-                            var source_print = new PrettyPrintVisitor();
-                            source_root.Visit(source_print);
-
-                            var expectation_root = GetRootOfAST(pathToFolder + expectation);
-                            var expectation_print = new PrettyPrintVisitor();
-                            expectation_root.Visit(expectation_print);
-
-                            string opt_program = source_print.Text;
-                            string target = expectation_print.Text;
-
-                            if (opt_program == target)
-                                Console.WriteLine("Тест {0} успешно пройден!", source);
-                            else
-                                Console.WriteLine("Тест {0} не пройден!\nПолучено:\n{1}\n\nОжидалось:\n{2}\n\n", source, opt_program, target);
+                            LaunchASTOptTest(pathToFolder, source, expectation, new OptMulDivOneVisitor());
                         }
                         break;
 
-                    //здесь будет
-                    //AST_LinearizeBlocks           SouthPark
-                    //AST_PlusNonZero               SouthPark
-                    //AST_ElseStVisitor             Roslyn
-                    //AST_IfFalseVisitor            12
-                    //AST_LessOptVisitor            6
-                    //AST_MultiplicationComputeVisitor 3
-                    //AST_Opt2Visitor               Roslyn
-                    //AST_Opt11Visitor              Roslyn
-                    //AST_Opt7Visitor               Intel
-                    //AST_Opt12Visitor              Intel
-                    //AST_AssignVisitor             Boom
-                    //AST_DeleteNullVisitor         Boom
-                    //AST_FalseExprMoreAndNonEqualVisitor 9
-                    //AST_Opt10SimilarAssignment    Nvidia
-                    //AST_Opt5SimilarDifference     Nvidia
+                    case "AST_LinearizeBlocks":  //SouthPark
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new LinearizeBlocks());
+                        }
+                        break;
 
+                    case "AST_PlusNonZero":  //SouthPark
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new PlusNonZero());
+                        }
+                        break;
+
+                    case "AST_Opt2Visitor":  //Roslyn
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new Opt2Visitor());
+                        }
+                        break;
+
+                    case "AST_Opt11Visitor":  //Roslyn
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new Opt11Visitor());
+                        }
+                        break;
+
+                    case "AST_Opt7Visitor":  //Intel
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new Opt7Visitor());
+                        }
+                        break;
+
+                    case "AST_Opt12Visitor":  //Intel
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new Opt12Visitor());
+                        }
+                        break;
+
+                    case "AST_AssignVisitor":  //Boom
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new AssignVisitor());
+                        }
+                        break;
+
+                    case "AST_DeleteNullVisitor":  //Boom
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new DeleteNullVisitor());
+                        }
+                        break;
+
+                    case "AST_FalseExprMoreAndNonEqualVisitor": //komanda
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new FalseExprMoreAndNonEqualVisitor());
+                        }
+                        break;
+
+                    case "AST_MultiplicationComputeVisitor": //komanda
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new MultiplicationComputeVisitor());
+                        }
+                        break;
+
+                    case "AST_IfFalseVisitor": //komanda
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new IfFalseVisitor());
+                        }
+                        break;
+
+                    case "AST_ElseStVisitor": //GreatBean
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new ElseStVisitor());
+                        }
+                        break;
+
+                    case "AST_LessOptVisitor": //GreatBean
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new LessOptVisitor());
+                        }
+                        break;
+
+                    case "AST_Opt5SimilarDifference": //Nvidia
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new OptSimilarDifference());
+                        }
+                        break;
+
+                    case "AST_Opt10SimilarAssignment": //Nvidia
+                        {
+                            LaunchASTOptTest(pathToFolder, source, expectation, new OptSimilarAssignment());
+                        }
+                        break;
 
                     default:
                         break;
