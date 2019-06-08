@@ -6,7 +6,7 @@ Block 2 :
                j = n
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
     label_1:   i = i + 1
                j = j - 1
                temp_1 = x > 1
@@ -19,7 +19,7 @@ Block 3 :
                j = n
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
     label_1:   i = i + 1
                j = j - 1
                temp_1 = x > 1
@@ -31,7 +31,7 @@ Block 4 :
                j = n
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
     label_1:   i = i + 1
                j = j - 1
                temp_1 = x > 1
@@ -44,7 +44,7 @@ Block 5 :
     label_0:   temp_0 = t < 5
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
                a = u2
 
 Block 6 :
@@ -54,7 +54,7 @@ Block 6 :
     label_0:   temp_0 = t < 5
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
                a = u2
 
 Block 7 :
@@ -65,7 +65,7 @@ Block 7 :
                a = u1
                t = 1
                a = u2
-    label_4:   t = t + 1
+               t = t + 1
 
 Block 8 :
     label_0:   temp_0 = t < 5
@@ -73,7 +73,7 @@ Block 8 :
                j = n
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
     label_1:   i = i + 1
                j = j - 1
                temp_1 = x > 1
@@ -93,7 +93,7 @@ Block 2 :
                j = n
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
     label_1:   i = i + 1
                j = j - 1
                temp_1 = x > 1
@@ -105,7 +105,7 @@ Block 3 :
                j = n
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
     label_1:   i = i + 1
                j = j - 1
                temp_1 = x > 1
@@ -118,7 +118,7 @@ Block 4 :
     label_0:   temp_0 = t < 5
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
                a = u2
 
 Block 5 :
@@ -128,7 +128,7 @@ Block 5 :
     label_0:   temp_0 = t < 5
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
                a = u2
 
 Block 6 :
@@ -138,10 +138,10 @@ Block 6 :
                temp_1 = x > 1
     label_0:   temp_0 = t < 5
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
 
 Block 7 :
-    label_4:   t = t + 1
+               t = t + 1
     label_1:   i = i + 1
                j = j - 1
                temp_1 = x > 1
@@ -155,7 +155,7 @@ Block 8 :
                j = n
                a = u1
                t = 1
-    label_4:   t = t + 1
+               t = t + 1
     label_1:   i = i + 1
                j = j - 1
                temp_1 = x > 1

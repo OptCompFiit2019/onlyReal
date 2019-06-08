@@ -56,26 +56,6 @@ namespace SimpleLang.ThreeCodeOptimisations
             PrintSets(Outs);
         }
 
-        public string GetOutput()
-        {
-            string result = "IN\n";
-            for (int i = 0; i < Ins.Count; ++i)
-            {
-                var sets = Ins[i].Select(c => $"    {c.ToString()}\n");
-                if (sets.Count() == 0)
-                    sets = new string[] { "" };
-                result += $"Block {i + 1} :\n" + sets.Aggregate((s1, s2) => s1 + s2) + '\n';
-            }
-            result += "\nOUT\n";
-            for (int i = 0; i < Outs.Count; ++i)
-            {
-                var sets = Outs[i].Select(c => $"    {c.ToString()}\n");
-                if (sets.Count() == 0)
-                    sets = new string[] { "" };
-                result += $"Block {i + 1} :\n" + sets.Aggregate((s1, s2) => s1 + s2) + '\n';
-            }
-            return result;
-        }
         private void PrintSets(List<HashSet<ThreeCode>> Sets)
         {
             for (int i = 0; i < Sets.Count; ++i)

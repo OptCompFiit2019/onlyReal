@@ -1,0 +1,192 @@
+DeclareLocal a: System.Boolean
+DeclareLocal b: System.Boolean
+DeclareLocal gg: System.Boolean
+DeclareLocal c: System.Double
+DeclareLocal d: System.Int32
+DeclareLocal e: System.Int32
+DeclareLocal hh: System.Int32
+DeclareLocal temp_0: System.Boolean
+DeclareLocal temp_2: System.Boolean
+DeclareLocal temp_3: System.Boolean
+DeclareLocal temp_1: System.Boolean
+DefineLabel Label0
+DeclareLocal temp_6: System.Boolean
+DeclareLocal temp_7: System.Boolean
+DeclareLocal temp_5: System.Boolean
+DeclareLocal temp_4: System.Boolean
+DefineLabel Label1
+DeclareLocal temp_9: System.Boolean
+DeclareLocal temp_10: System.Boolean
+DeclareLocal temp_8: System.Boolean
+DefineLabel Label2
+DefineLabel Label3
+DeclareLocal temp_14: System.Int32
+DeclareLocal temp_16: System.Int32
+DeclareLocal temp_15: System.Int32
+DeclareLocal temp_13: System.Int32
+DeclareLocal temp_12: System.Int32
+DeclareLocal temp_11: System.Boolean
+DefineLabel Label4
+DefineLabel Label5
+DefineLabel Label6
+DefineLabel Label7
+DefineLabel Label8
+DefineLabel Label9
+DeclareLocal temp_19: System.Boolean
+DeclareLocal temp_20: System.Boolean
+DeclareLocal temp_18: System.Boolean
+DeclareLocal temp_17: System.Boolean
+DefineLabel Label10
+DefineLabel Label11
+DefineLabel Label12
+ldc.i4.1
+stloc a
+ldloc a
+ldc.i4.1
+xor
+stloc temp_0
+ldloc temp_0
+stloc b
+ldc.i4.0
+stloc gg
+ldc.i4 2
+stloc d
+ldc.i4 7
+stloc e
+ldc.i4 777
+stloc hh
+ldloc a
+ldc.i4.1
+ceq
+stloc temp_2
+ldloc b
+ldc.i4.0
+ceq
+stloc temp_3
+ldloc temp_2
+ldloc temp_3
+and
+stloc temp_1
+ldloc temp_1
+brtrue Label8
+ldc.i4 2
+stloc e
+MarkLabel Label0
+ldloc gg
+ldc.i4.1
+xor
+stloc temp_6
+ldloc d
+ldloc e
+clt
+stloc temp_7
+ldloc temp_6
+ldloc temp_7
+and
+stloc temp_5
+ldloc temp_5
+stloc temp_4
+ldloc temp_4
+brtrue Label1
+br Label7
+MarkLabel Label1
+ldc.i4 23
+stloc hh
+ldloc a
+ldc.i4.1
+ceq
+stloc temp_9
+ldloc b
+ldc.i4.0
+ceq
+stloc temp_10
+ldloc temp_9
+ldloc temp_10
+and
+stloc temp_8
+ldloc temp_8
+brtrue Label2
+br Label6
+MarkLabel Label2
+ldc.r8 3,14
+stloc c
+ldc.i4 1
+stloc d
+MarkLabel Label3
+ldc.i4 555
+ldc.i4 33
+mul
+stloc temp_14
+ldc.i4 22
+ldc.i4 2
+div
+stloc temp_16
+ldloc temp_16
+ldc.i4 4
+mul
+stloc temp_15
+ldloc temp_14
+ldloc temp_15
+add
+stloc temp_13
+ldloc temp_13
+ldc.i4 1
+sub
+stloc temp_12
+ldloc d
+ldloc temp_12
+clt
+stloc temp_11
+ldloc temp_11
+brtrue Label4
+br Label5
+MarkLabel Label4
+ldc.i4 23
+stloc hh
+ldloc d
+ldc.i4 1
+add
+stloc d
+br Label3
+MarkLabel Label5
+MarkLabel Label6
+br Label0
+MarkLabel Label7
+br Label12
+MarkLabel Label8
+ldc.r8 3,14
+stloc c
+MarkLabel Label9
+ldloc gg
+ldc.i4.1
+xor
+stloc temp_19
+ldloc d
+ldloc e
+clt
+stloc temp_20
+ldloc temp_19
+ldloc temp_20
+and
+stloc temp_18
+ldloc temp_18
+stloc temp_17
+ldloc temp_17
+brtrue Label10
+br Label11
+MarkLabel Label10
+ldc.i4 23
+stloc hh
+ldc.i4.1
+stloc gg
+br Label9
+MarkLabel Label11
+MarkLabel Label12
+ldloc hh
+WriteLine
+ldloc e
+WriteLine
+
+Execute:
+23
+7

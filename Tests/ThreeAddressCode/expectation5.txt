@@ -1,7 +1,9 @@
-		temp_0 = 23 < 55
-		c = temp_0
-		if c goto label_0
-		b = 3.14
-		goto label_1
-label_0: a = 1
-label_1:
+		t = 0
+		i = 1
+label_0: temp_0 = i < 100
+		if temp_0 goto label_1
+		goto label_2
+label_1:t = t + i
+		i = i + 1
+		goto label_0
+label_2:

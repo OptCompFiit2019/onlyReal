@@ -5,17 +5,19 @@
 	c = true;
 	d = !c;
 	e = 1.1;
-	gg = true;
+	gg = false;
+	a = 3;
 	b = 5;
 	hh = 13;
 	while (!gg && (a < b)) {
 		hh=23;
-	if ((c==true) && (d == false))
-	{
-		e=3.14;
-	}
-	else
-		b=2;
+		println(((c==true) && (d == false)));
+		if ((c==true) && (d == false))
+		{
+			b=2;
+		}
+		else
+			e=3.14;
 	}
 	println(e);
 	println(b);
