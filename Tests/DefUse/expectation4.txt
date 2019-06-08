@@ -1,8 +1,5 @@
 {
-  int a,b,c,d,e;
-  a = 1;
-  b = 2;
-  c = 3;
-  d = a + b - c;
-  e = d + a + b + c;
+  int a, b, c, d, e;
+  d = 1 + 2 - 3;
+  e = d + 1 + 2 + 3;
 }

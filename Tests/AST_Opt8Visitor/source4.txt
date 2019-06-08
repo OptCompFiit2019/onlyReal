@@ -1,0 +1,9 @@
+{
+    bool b,c;	
+	int a, x;
+	c = x==x;
+    if(a>=a)
+    {
+        b = 1>=1;
+    }
+}

@@ -1,0 +1,7 @@
+{
+    int a, b;
+    while(true)
+    {
+        a = b;
+    }
+}

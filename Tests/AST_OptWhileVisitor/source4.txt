@@ -13,7 +13,7 @@ while(false) {
 println(a);
 }
 
-while(true) {
+while(false) {
 println(a);
 }
 
