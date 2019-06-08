@@ -30,8 +30,9 @@ namespace SimpleLang.Visitors
             {
                 if (blocks[i].Count > 1)
                 {
+                    bool _apply = false;
                     var graph = new DAG(blocks[i].ToList());
-                    var prog = graph.Optimize();
+                    var prog = graph.Optimize(ref _apply);
                     foreach (var cmd in prog)
                         result.Add(cmd);
                 }
@@ -223,7 +224,7 @@ namespace SimpleLang.Visitors
             }
         }
 
-        public LinkedList<ThreeCode> Optimize()
+        public LinkedList<ThreeCode> Optimize(ref bool _apply)
         {
             var result = new List<ThreeCode>();
             foreach (var cmd in this.program)
@@ -238,7 +239,11 @@ namespace SimpleLang.Visitors
                 if (vars[sameCommand.Value][0].Equals(cmd.result))
                     result.Add(cmd);
                 else
+                {
                     result.Add(new ThreeCode(cmd.result, ThreeOperator.Assign, new ThreeAddressStringValue(vars[sameCommand.Value][0])));
+                    _apply = true;
+                }
+                    
             }
             RemoveVarNumbers(result);
             return new LinkedList<ThreeCode>(result);
