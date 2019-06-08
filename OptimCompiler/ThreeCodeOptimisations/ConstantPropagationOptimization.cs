@@ -96,6 +96,8 @@ namespace SimpleLang.ThreeCodeOptimisations
                     if (command.arg2 is ThreeAddressStringValue v2 && m.ContainsKey(v2.Value)
                             && m[v2.Value].Value.Constantness == ValConstType.Const)
                         command.arg2 = new ThreeAddressIntValue(m[v2.Value].Value.Value);
+                    m.Remove(command.result);
+
                     if (it == bs[i].Last)
                         break;
                 }
