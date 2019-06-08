@@ -1119,14 +1119,6 @@ namespace SimpleLang
                         }
                         break;
 
-
-
-
-                    //здесь будет
-                    //AST_Opt10SimilarAssignment Nvidia 
-                    //AST_Opt5SimilarDifference Nvidia 
-
-
                     default:
                         break;
 
