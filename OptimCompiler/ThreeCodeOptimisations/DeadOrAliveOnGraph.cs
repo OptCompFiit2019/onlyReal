@@ -4,7 +4,7 @@ using SimpleLang.ThreeCodeOptimisations;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class ControlFlowOptimisations
+    public class ControlFlowOptimisations
     {
         /// <summary>
         /// Применяет к графу <paramref name="graph"/> удаление мертвых переменных на основе

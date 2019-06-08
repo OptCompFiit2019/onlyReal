@@ -5,5 +5,4 @@
            p = p + 5,98
            if True goto label_3
            p = 50,67
-label_3:
 label_1:

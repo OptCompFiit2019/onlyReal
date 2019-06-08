@@ -1,0 +1,25 @@
+{
+    int a, b;
+    if(a!=0)
+    {
+        if(b<=0)
+        {
+            #NULL;
+        }
+        else
+        {
+            #NULL;
+        }
+    }
+    else
+    {
+        if(b>0)
+        {
+            #NULL;
+        }
+        else
+        {
+            #NULL;
+        }
+    }
+}

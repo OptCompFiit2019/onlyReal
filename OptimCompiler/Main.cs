@@ -60,6 +60,11 @@ namespace SimpleCompiler
 
                         var blockwss = ap2p.Apply(treeCod2e);
                         Console.WriteLine(ThreeAddressCodeVisitor.ToString(blockwss));
+
+                        CFG controlFlowGraph2 = new CFG(blockwss);
+
+                        Console.WriteLine("\nГлубина графа:\n" + GraphDepth.GetGraphDepth(controlFlowGraph2));
+                        Console.WriteLine(controlFlowGraph2.cfg.ToString());
                     }
 
 

@@ -106,8 +106,11 @@ namespace SimpleLang.ThreeCodeOptimisations
             {
                 if (def.VarUses.Count == 0)
                 {
-                    program.Remove(def.Def);
-                    _applyed = true;
+                    if (!(def.Def.Value.arg1 is ThreeAddressStringValue label && label.Value.StartsWith("t")))
+                    {
+                        program.Remove(def.Def);
+                        _applyed = true;
+                    }
                 }
             }
         }

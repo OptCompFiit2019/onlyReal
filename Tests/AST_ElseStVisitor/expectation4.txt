@@ -1,5 +1,5 @@
 {
-    var a;
+    int a;
     {
         if (true)
         {
