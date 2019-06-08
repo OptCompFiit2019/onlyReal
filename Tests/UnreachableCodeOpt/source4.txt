@@ -1,0 +1,10 @@
+{
+    int a,b,c,d;
+    a = 5;
+    if (true){
+	c = 2;
+    }
+    d = 7;
+    b = d;
+    a = b + d;
+}
