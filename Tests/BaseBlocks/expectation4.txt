@@ -1,0 +1,33 @@
+Block #0
+           c = 1
+           b = 8,56
+           if True goto label_0
+Block #1
+           j = 0
+Block #2
+label_2:   temp_0 = j < 10
+           if temp_0 goto label_3
+Block #3
+           goto label_4
+Block #4
+label_3:   b = b + 1,4
+           j = j + 1
+           goto label_2
+Block #5
+label_4:   c = c + 1
+           if False goto label_5
+Block #6
+           c = 100
+           b = 7,5
+           goto label_6
+Block #7
+label_5:
+           c = 0
+           b = 0,01
+Block #8
+label_6:   goto label_1
+Block #9
+label_0:
+           b = 3,14
+Block #10
+label_1:

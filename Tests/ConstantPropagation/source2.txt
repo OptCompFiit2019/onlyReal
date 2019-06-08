@@ -1,0 +1,11 @@
+{
+    int a,b,c;
+    b = 5;
+    a = 1;
+    c = 2;
+	if (true)
+	{
+		a = c * b - a + 3;
+		println(a);
+	}
+}

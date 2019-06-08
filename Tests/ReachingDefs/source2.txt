@@ -1,0 +1,15 @@
+{
+	int i, j, m, n, a, u1, u2, u3, t, x;
+	i = m - 1;
+	j = n;
+	a = u1;
+	for (t = 1 to 5)
+	{
+		j = j - 1;
+		if (x > 1)
+		{
+			a = u2;
+		}
+		i = u3;
+	}
+}

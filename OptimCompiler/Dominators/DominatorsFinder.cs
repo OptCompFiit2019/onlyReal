@@ -87,5 +87,16 @@ namespace SimpleLang.Dominators
 
             return dominators;
         }
+
+        public override string ToString()
+        {
+            if (dominators == null)
+                return "null";
+
+            string res = "";
+            foreach (var item in dominators)
+                res += $"{item.Key}: {{{string.Join(" ", item.Value) }}} {Environment.NewLine}";
+            return res;
+        }
     }
 }
