@@ -92,8 +92,8 @@ namespace SimpleLang.Compiler
 
             type t = DetectType(val);
             if (varTypes.ContainsKey(name)) {
-                if (varTypes[name] != t)
-                    throw new Exception("Previous declaration is different");
+                //if (varTypes[name] != t)
+                //    throw new Exception("Previous declaration is different");
                 return;
             }
             var v = CreateVariable(t, name);
@@ -244,15 +244,18 @@ namespace SimpleLang.Compiler
                     break;
                 case ThreeOperator.Logic_geq:
                     genc.Emit(OpCodes.Clt);
-                    genc.Emit(OpCodes.Not);
+                    genc.Emit(OpCodes.Ldc_I4_1);
+                    genc.Emit(OpCodes.Xor);
                     break;
                 case ThreeOperator.Logic_leq:
                     genc.Emit(OpCodes.Cgt);
-                    genc.Emit(OpCodes.Not);
+                    genc.Emit(OpCodes.Ldc_I4_1);
+                    genc.Emit(OpCodes.Xor);
                     break;
                 case ThreeOperator.Logic_neq:
                     genc.Emit(OpCodes.Ceq);
-                    genc.Emit(OpCodes.Not);
+                    genc.Emit(OpCodes.Ldc_I4_1);
+                    genc.Emit(OpCodes.Xor);
                     break;
             }
         }
@@ -285,7 +288,7 @@ namespace SimpleLang.Compiler
             switch (res_type)
             {
                 case type.treal: return CastOptions.ToDouble;
-                case type.tint: return CastOptions.ToInt;
+                //case type.tint: return CastOptions.ToInt;
                 default: return CastOptions.No;
             }
         }
@@ -294,8 +297,8 @@ namespace SimpleLang.Compiler
         {
             if (opts == CastOptions.ToDouble && t == type.tint)
                 genc.Emit(OpCodes.Conv_R8);
-            else if (opts == CastOptions.ToInt && t == type.treal)
-                genc.Emit(OpCodes.Conv_I4);
+            //else if (opts == CastOptions.ToInt && t == type.treal)
+            //    genc.Emit(OpCodes.Conv_I4);
         }
 
         private type ResultType(ThreeAddressValueType v1, ThreeAddressValueType v2)
@@ -330,7 +333,7 @@ namespace SimpleLang.Compiler
                         continue;
                     case ThreeOperator.IfGoto:
                         LoadValue(command.arg1);
-                        genc.Emit(OpCodes.Brtrue_S, labels[command.arg2.ToString()]);
+                        genc.Emit(OpCodes.Brtrue, labels[command.arg2.ToString()]);
                         continue;
                     case ThreeOperator.Println:
                         LoadValue(command.arg1);
@@ -338,11 +341,12 @@ namespace SimpleLang.Compiler
                         continue;
 
                     case ThreeOperator.Assign:
-                        LoadValue(command.arg1/*, CastToResultOpt(varTypes[command.result])*/);
+                        LoadValue(command.arg1, CastToResultOpt(varTypes[command.result]));
                         break;
                     case ThreeOperator.Logic_not:
                         LoadValue(command.arg1);
-                        genc.Emit(OpCodes.Not);
+                        genc.Emit(OpCodes.Ldc_I4_1);
+                        genc.Emit(OpCodes.Xor);
                         break;
                     default:
                         type rt = ResultType(command.arg1, command.arg2);
@@ -350,7 +354,7 @@ namespace SimpleLang.Compiler
                         LoadValue(command.arg1, castOpt);
                         LoadValue(command.arg2, castOpt);
                         GenBinOpCode(command.operation);
-                        //CastToResult(rt, CastToResultOpt(varTypes[command.result]));
+                        CastToResult(rt, CastToResultOpt(varTypes[command.result]));
                         break;
                 }
                 genc.Emit(OpCodes.Stloc, variables[command.result]);
@@ -361,6 +365,18 @@ namespace SimpleLang.Compiler
         public string Execute()
         {
             return genc.RunProgram();
+        }
+
+        public string PrintCommandsInString()
+        {
+            string result = "";
+            var lst = genc.commands;
+            foreach (string cmd in lst)
+            {
+                //Console.WriteLine(cmd); 
+                result += cmd + '\n';
+            }
+            return result;
         }
     }
 }

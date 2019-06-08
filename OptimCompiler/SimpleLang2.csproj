@@ -77,6 +77,7 @@
     <Compile Include="ThreeCodeOptimisations\PullOfCopies.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="ThreeOptimize\DeleteOfDeadCodeOpt.cs" />
+    <Compile Include="ThreeOptimize\PullCopiesOpt.cs" />
     <Compile Include="ThreeOptimize\PullOfCopiesOpt.cs" />
     <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="TransferFunction %28Intel%29\TransferFunction.cs" />

@@ -430,7 +430,6 @@ namespace SimpleLang
 
                         if (expectationSets.Length != 3 * sourceBlocks.Count)
                         {
-
                             Console.WriteLine("Тест {0} не пройден: кол-во ББл не совпадает с ожидаемым", source);
                             flag = false;
                             break;
@@ -493,6 +492,7 @@ namespace SimpleLang
                             sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
                             sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
                             var optimizer = new NonZero_JTJ(sourceCode);
+                            optimizer.DeleteEmptyOp();
                             optimizer.DeleteJumpThroughJump();
                             flag = true;
 
@@ -1005,6 +1005,118 @@ namespace SimpleLang
                         }
                         break;
 
+                    case "ReachingDefs":  //Roslyn 
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                            expectationText = File.ReadAllText(pathToFolder + expectation);
+
+                            flag = true;
+
+                            // Запуск итеративного алгоритма для анализа достигающих определений 
+                            var reachingDefsAnalysis = new ReachingDefsAnalysis();
+                            reachingDefsAnalysis.IterativeAlgorithm(sourceBlocks);
+
+                            var opt_program = reachingDefsAnalysis.GetOutput().Split('\n').Select(x => x.Replace("\r", "")).Where(x => x != "").ToList();
+                            var target = expectationText.Split('\n').Select(x => x.Replace("\r", "")).Where(x => x != "").ToList();
+
+                            for (int k = 0; k < opt_program.Count; k++)
+                                if (opt_program[k] != target[k])
+                                {
+                                    Console.WriteLine("Тест {0} не пройден! Ошибка в строке {1}!", source, k);
+                                    Console.WriteLine(opt_program[k] + '\n' + "-----------\n" + target[k]);
+                                    flag = false;
+                                    break;
+                                }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "ILCode":  //Roslyn 
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            expectationText = File.ReadAllText(pathToFolder + expectation);
+
+                            Compiler.ILCodeGenerator generator = new Compiler.ILCodeGenerator();
+                            generator.Generate(sourceCode.GetCode());
+
+                            string gen_code = generator.PrintCommandsInString() + "\nExecute:\n" + generator.Execute();
+                            var opt_program = gen_code.Split('\n').Select(x => x.Replace("\r", "")).Where(x => x != "").ToList();
+                            var target = expectationText.Split('\n').Select(x => x.Replace("\r", "")).Where(x => x != "").ToList();
+                            flag = true;
+                            for (int k = 0; k < opt_program.Count; k++)
+                                if (opt_program[k] != target[k])
+                                {
+                                    Console.WriteLine("Тест {0} не пройден! Ошибка в строке {1}!", source, k);
+                                    Console.WriteLine(opt_program[k] + '\n' + "-----------\n" + target[k]);
+                                    flag = false;
+                                    break;
+                                }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "BaseBlocks":  //Nvidia
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            expectationText = File.ReadAllText(pathToFolder + expectation);
+
+                            var block = new Block.Block(sourceCode);
+                            blocks = block.GenerateBlocks();
+
+                            var opt_program = block.ToString().Split('\n').Select(x => x.Replace("\r", "").TrimEnd(' ')).Where(x => x != "").ToList();
+
+                            var target = expectationText.Split('\n').Select(x => x.Replace("\r", "").TrimEnd(' ')).Where(x => x != "").ToList();
+                            flag = true;
+                            for (int k = 0; k < opt_program.Count; k++)
+                                if (opt_program[k] != target[k])
+                                {
+                                    Console.WriteLine("Тест {0} не пройден! Ошибка в строке {1}!", source, k);
+                                    Console.WriteLine(opt_program[k] + '\n' + "-----------\n" + target[k]);
+                                    flag = false;
+                                    break;
+                                }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "ControlFlowGraph": //Nvidia
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                            expectationSets = File.ReadAllLines(pathToFolder + expectation);
+                            flag = true;
+                            var ucfg = new CFG(sourceCode);
+                            var cfg = new CFG(sourceCode).GetAsGraph().GetAdjacencyList();
+                            if (expectationSets.Length - 1 != cfg.Count)
+                            {
+                                Console.WriteLine("Тест {0} не пройден: кол-во ББл не совпадает с ожидаемым", source);
+                                flag = false;
+                                break;
+                            }
+                            for(int j = 0; j < cfg.Count; j++)
+                            {
+                                var edges0 = expectationSets[j + 1].Split(' ');
+                                for (int k = 0; k < cfg[j].Count; k++)
+                                {
+                                    if (cfg.ElementAt(j).ElementAt(k).ToString() != edges0[k+1])
+                                    {
+                                        Console.WriteLine("Тест {0} не пройден: вершины не совпадают", source);
+                                        flag = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+
                     case "AST_Opt8Visitor":  //qwerty
                         {
                             LaunchASTOptTest(pathToFolder, source, expectation, new OptVisitor_8());
@@ -1118,6 +1230,9 @@ namespace SimpleLang
                             LaunchASTOptTest(pathToFolder, source, expectation, new OptSimilarAssignment());
                         }
                         break;
+
+                    //здесь будет
+                    //ConstantPropagation       Roslyn
 
                     default:
                         break;

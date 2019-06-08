@@ -15,27 +15,34 @@ DefineLabel Label1
 DeclareLocal temp_6: System.Boolean
 DeclareLocal temp_7: System.Boolean
 DeclareLocal temp_5: System.Boolean
+DeclareLocal temp_9: System.Boolean
+DeclareLocal temp_10: System.Boolean
+DeclareLocal temp_8: System.Boolean
 DefineLabel Label2
 DefineLabel Label3
 DefineLabel Label4
 ldc.i4.1
 stloc c
 ldloc c
-not
+ldc.i4.1
+xor
 stloc temp_0
 ldloc temp_0
 stloc d
 ldc.r8 1,1
 stloc e
-ldc.i4.1
+ldc.i4.0
 stloc gg
+ldc.i4 3
+stloc a
 ldc.i4 5
 stloc b
 ldc.i4 13
 stloc hh
 MarkLabel Label0
 ldloc gg
-not
+ldc.i4.1
+xor
 stloc temp_3
 ldloc a
 ldloc b
@@ -48,7 +55,7 @@ stloc temp_2
 ldloc temp_2
 stloc temp_1
 ldloc temp_1
-brtrue.s Label1
+brtrue Label1
 br Label4
 MarkLabel Label1
 ldc.i4 23
@@ -66,13 +73,27 @@ ldloc temp_7
 and
 stloc temp_5
 ldloc temp_5
-brtrue.s Label2
-ldc.i4 2
-stloc b
-br Label3
-MarkLabel Label2
+WriteLine
+ldloc c
+ldc.i4.1
+ceq
+stloc temp_9
+ldloc d
+ldc.i4.0
+ceq
+stloc temp_10
+ldloc temp_9
+ldloc temp_10
+and
+stloc temp_8
+ldloc temp_8
+brtrue Label2
 ldc.r8 3,14
 stloc e
+br Label3
+MarkLabel Label2
+ldc.i4 2
+stloc b
 MarkLabel Label3
 br Label0
 MarkLabel Label4
@@ -84,6 +105,7 @@ ldloc hh
 WriteLine
 
 Execute:
+True
 1,1
-5
-13
+2
+23

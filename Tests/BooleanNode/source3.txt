@@ -1,0 +1,9 @@
+{
+  bool a, b, r;
+	a = true;
+	b = !a;
+  int c, d;
+  c = 1;
+  d = 2;
+	r = a && (c < d) || b;
+}
