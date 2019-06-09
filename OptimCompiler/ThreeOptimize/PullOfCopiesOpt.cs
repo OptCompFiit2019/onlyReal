@@ -55,7 +55,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                 {
                     if (list[j].result == left)
                         break;
-                    if (list[j].arg1.ToString() == left)
+                    if (list[j].arg1 != null && list[j].arg1.ToString() == left)
                     {
                         list[j].arg1 = right;
                         _apply = true;
