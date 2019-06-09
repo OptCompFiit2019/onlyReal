@@ -1,0 +1,12 @@
+Block1
+InB:
+OutB: a d
+Block2
+InB:
+OutB:
+Block3
+InB: a d
+OutB:
+Block4
+InB:
+OutB:
