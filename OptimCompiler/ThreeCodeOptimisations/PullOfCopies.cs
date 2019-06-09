@@ -29,7 +29,6 @@ namespace SimpleLang.Visitors
                 } else continue;
 
                 for (int j = i + 1; j < Program.Count; j++) {
-                    int k;
                     if (list[j].result == left)
                         break;
 
