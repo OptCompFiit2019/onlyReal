@@ -24,7 +24,8 @@ namespace SimpleLang.AstOptimisations
                         bl.StList.Insert(i+j, bl1.StList[j]);
                     }
                 }
-                bl.StList[i].Visit(this);
+                if (bl.StList[i] != null)
+                    bl.StList[i].Visit(this);
             }    
         }
     }

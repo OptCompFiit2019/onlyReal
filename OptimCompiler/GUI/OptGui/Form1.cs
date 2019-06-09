@@ -143,10 +143,11 @@ namespace OptGui
                 case 3: return Modes.BeforeGraph;
                 case 4: return Modes.BeforeRun;
                 case 5: return Modes.ASTOpt;
-                case 6: return Modes.AfterTbreeCode;
-                case 7: return Modes.AfterBlocks;
-                case 8: return Modes.AfterGraph;
-                case 9: return Modes.AfterRun;
+                case 6: return Modes.ASTOpt;
+                case 7: return Modes.AfterTbreeCode;
+                case 8: return Modes.AfterBlocks;
+                case 9: return Modes.AfterGraph;
+                case 10: return Modes.AfterRun;
                 default: return Modes.Text;
             }
         }
@@ -308,10 +309,10 @@ namespace OptGui
                         datas2.Add(timer.ElapsedTicks);
                     }
 
-                    res = res + "\n\nExecuted avg: " + (datas.Min()).ToString() + " ms"
-                            + " or " + (datas2.Min()).ToString() + " ticks\n";
+                    res = res + Environment.NewLine + Environment.NewLine + "Executed avg: " + (datas.Min()).ToString() + " ms"
+                            + " or " + (datas2.Min()).ToString() + " ticks" + Environment.NewLine;
                     for (int i = 0; i < datas.Count; i++) {
-                        res = res + i.ToString() + ": " + datas[i].ToString() + " ms or " + datas2[i].ToString() + " ticks\n";
+                        res = res + i.ToString() + ": " + datas[i].ToString() + " ms or " + datas2[i].ToString() + " ticks" + Environment.NewLine;
                     }
 
 
@@ -387,11 +388,11 @@ namespace OptGui
                         datas2.Add(timer.ElapsedTicks);
                     }
 
-                    re2 = re2 + "\n\nExecuted avg: " + (datas.Min()).ToString() + " ms"
-                            + " or " + (datas2.Min()).ToString() + " ticks\n";
+                    re2 = re2 + Environment.NewLine + Environment.NewLine +"Executed avg: " + (datas.Min()).ToString() + " ms"
+                            + " or " + (datas2.Min()).ToString() + " ticks" + Environment.NewLine;
                     for (int i = 0; i < datas.Count; i++)
                     {
-                        re2 = re2 + i.ToString() + ": " + datas[i].ToString() + " ms or " + datas2[i].ToString() + " ticks\n";
+                        re2 = re2 + i.ToString() + ": " + datas[i].ToString() + " ms or " + datas2[i].ToString() + " ticks" + Environment.NewLine;
                     }
                     txt.Text = re2;
                     return;

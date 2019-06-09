@@ -56,8 +56,10 @@ namespace SimpleLang.Visitors
         }
         public override void VisitBlockNode(BlockNode bl) 
         {
-            for (int i = 0; i < bl.StList.Count; i++)
-                bl.StList[i].Visit(this);
+            for (int i = 0; i < bl.StList.Count; i++) {
+                if (!(bl.StList[i] is null))
+                    bl.StList[i].Visit(this);
+            }
         }
         public override void VisitPrintlnNode(PrintlnNode w) 
         {
