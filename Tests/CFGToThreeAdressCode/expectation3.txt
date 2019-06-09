@@ -1,0 +1,10 @@
+           t1 = 4 * i
+           u1 = 5 * i
+           if True goto label_0
+           goto label_1
+label_0:
+           t3 = 4 * i
+           u3 = 5 * i
+label_1:   t2 = 4 * i
+           u2 = 5 * i
+           u4 = 6 * i
