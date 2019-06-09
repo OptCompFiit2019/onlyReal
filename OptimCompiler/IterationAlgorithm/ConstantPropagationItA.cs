@@ -47,20 +47,6 @@ namespace SimpleLang.GenericIterativeAlgorithm
                     else if (line.operation != ThreeOperator.None && line.operation != ThreeOperator.Println
                     && line.operation != ThreeOperator.Goto && line.operation != ThreeOperator.IfGoto)
                     {
-                        if (!res.ContainsKey(line.arg1.ToString()))
-                        {
-                            Console.Write("\n3addrCode line: ");
-                            Console.WriteLine(line.ToString());
-                            Console.Write("Not in 'res': ");
-                            Console.WriteLine(line.arg1.ToString());
-                        }
-                        if (!res.ContainsKey(line.arg2.ToString()))
-                        {
-                            Console.Write("\n3addrCode line: ");
-                            Console.WriteLine(line.ToString());
-                            Console.Write("Not in 'res': ");
-                            Console.WriteLine(line.arg2.ToString());
-                        }
                         if (res.ContainsKey(line.arg1.ToString())
                                 && res.ContainsKey(line.arg2.ToString())
                                 && IsConstant(res, res[line.arg1.ToString()]) 
