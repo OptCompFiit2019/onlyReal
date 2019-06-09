@@ -1,0 +1,24 @@
+Block1
+InB: c
+OutB: c
+Block2
+InB: c
+OutB: c
+Block3
+InB:
+OutB: c
+Block4
+InB: c
+OutB: i c
+Block5
+InB: i c
+OutB: c i
+Block6
+InB:
+OutB:
+Block7
+InB: c i
+OutB: i c
+Block8
+InB:
+OutB:

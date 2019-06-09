@@ -1,0 +1,36 @@
+Block1
+InB:
+OutB: i
+Block2
+InB: i
+OutB: i
+Block3
+InB:
+OutB:
+Block4
+InB: i
+OutB: i c a
+Block5
+InB: i
+OutB: i
+Block6
+InB: c a i
+OutB: i
+Block7
+InB: i
+OutB:
+Block8
+InB:
+OutB: j i
+Block9
+InB: j i
+OutB: i j
+Block10
+InB:
+OutB:
+Block11
+InB: i j
+OutB: j i
+Block12
+InB:
+OutB:
