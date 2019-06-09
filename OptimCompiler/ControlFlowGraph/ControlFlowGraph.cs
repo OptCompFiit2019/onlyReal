@@ -184,6 +184,12 @@ namespace SimpleLang.ControlFlowGraph
             return this.cfg;
         }
 
+        public LinkedList<ThreeCode> ToThreeAddressCode()
+        {
+            return blocks.Aggregate((b1, b2) =>
+                new LinkedList<ThreeCode>(b1.Concat(b2)));
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
