@@ -1,0 +1,20 @@
+{
+	bool w;
+	w = (1 < 2) && (3 < 5);
+
+	int a;
+	int b;
+	int c;
+
+	a = 0;
+	b = 1;
+
+	while (w) {
+		c = a;		
+		a = b;
+		b = c + a;
+		println(a);
+		
+		w = (a < 1000000);
+	}
+}
