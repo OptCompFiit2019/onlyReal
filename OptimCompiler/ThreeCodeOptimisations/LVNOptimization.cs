@@ -57,10 +57,13 @@ namespace SimpleLang.ThreeCodeOptimisations
                             new ThreeCode("t" + tmpNum++, ValueDict[dict[Key]].Value.arg1));
                         ValueDict[dict[Key]] = ValueDict[dict[Key]].Next;
                     }
+                    var prevStr = strCode.Value.ToString();
                     strCode.Value.operation = ThreeOperator.Assign;
                     strCode.Value.arg2 = null;
                     strCode.Value.arg1 = new ThreeAddressStringValue(ValueDict[dict[Key]].Value.result);
-                    IsApplyed = true;
+                    var newStr = strCode.Value.ToString();
+                    if(prevStr != newStr)
+                        IsApplyed = true;
                 }
 
                 dict[strCode.Value.result] = dict[Key];
