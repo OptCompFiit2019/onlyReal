@@ -32,7 +32,7 @@ namespace SimpleLang.Visitors
                     if (list[j].result == left)
                         break;
 
-                    if (list[j].arg1.ToString() == left)
+                    if (list[j].arg1 != null && list[j].arg1.ToString() == left)
                         list[j].arg1 = right;
 
                     if (list[j].arg2 != null && list[j].arg2.ToString() == left)
