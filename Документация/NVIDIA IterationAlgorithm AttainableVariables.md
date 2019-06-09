@@ -12,73 +12,19 @@ Nvidia
 - генерации графа потока управления.
 
 # Теория
-Базовый блок - это максимальная последовательность команд трехадресного кода, удовлетворяющая следующим условиям:
-- поток управления может входить в ББл только через первую команду 
-- управление покидает ББл без останова или ветвления, за исключением, возможно, последней команды
-Для находления базовых блоков необходимо найти все команды-лидеры, которыми явзяются:
-- первая команда
-- любая команда, на которую есть переход
-- любая команда, непосредственно следующая за переходом
-
-Базовый блок - это блок команд от лидера до лидера.
+Основными этапами данного итерационного алгоритма являются:
+1. Инициализация множеств gen_b, kill_b
+2. OUT всех базовых блоков, отличных от входного, помечается пустым
+3. Основной цикл алгоритма, на каждой итерации которого производится обновление IN и OUT для всего графа. Анализ заканчивается когда множества IN, OUT более не претерпевают изменений.
 
 # Особенности реализации
+Ниже представлен код использования данного класса:
+```csharp
+using SimpleCompiler.IterationAlgorithm;
+
+var cfg = new CFG(treeCode);  // Generate Control Flow Graph
+
+var av = new AttainableVariables(cfg);  // Initialize class instance with CFG
+var att_vars = av.GenerateAttainableVariables();  // Run algorithm
+Console.WriteLine(att_vars);  // Write byte representation of attainable variables for each block
 ```
-	public class Block
-	{
-        public LinkedList<ThreeCode> code;
-        public Block(ThreeAddressCodeVisitor _code)
-        {
-            this.code = _code.GetCode();
-        }
-
-        public List<int> FindLeaders()
-        {
-            var Leaders = new List<int>();
-            int i = 1;
-
-            bool PreviousIsGoto = false;
-
-            foreach (var line in this.code)
-            {
-                if (i == 1)
-                    Leaders.Add(i);
-                else
-                    if (!String.IsNullOrEmpty(line.label))
-                        Leaders.Add(i);
-                    else
-                        if (PreviousIsGoto)
-                            Leaders.Add(i);
-
-                PreviousIsGoto = line.operation == ThreeOperator.Goto || line.operation == ThreeOperator.IfGoto;
-                
-                i += 1;
-            }
-
-            return Leaders;
-        }
-
-        public List<LinkedList<ThreeCode>> GenerateBlocks()
-        {
-            var Leaders = FindLeaders();
-            int i = 1;
-            int LiderInd = 0;
-            
-            var Blocks = new List<LinkedList<ThreeCode>>();
-
-            foreach (var line in this.code)
-            {
-                if (LiderInd < Leaders.Count && i == Leaders[LiderInd])
-                {
-                    Blocks.Add(new LinkedList<ThreeCode>());
-                    LiderInd += 1;
-                }
-                Blocks.Last().AddLast(line);
-                i += 1;
-            }
-
-            return Blocks;
-        }
-    }
-```
-Был определен класс `Block`, инициализирующийся трехадресным кодом, с методом `GenerateBlocks`, который возращает `List<LinkedList<ThreeCode>>`, то есть, список блоков.
