@@ -26,8 +26,8 @@ namespace OptGui
             "Блоки трехадресного кода",
             "Граф потока управления",
             "Запуск",*/
-        enum Modes { Text, BeforeThreeCode, BeforeBlocks,  BeforeGraph, BeforeRun,
-            ASTOpt, AfterTbreeCode, AfterBlocks, AfterGraph, AfterRun}
+        enum Modes { Text, BeforeThreeCode, BeforeBlocks,  BeforeGraph, BeforeRun, BeforeMass,
+            AfterMass, ASTOpt, AfterTbreeCode, AfterBlocks, AfterGraph, AfterRun}
 
         public Form1()
         {
@@ -101,6 +101,8 @@ namespace OptGui
                 res.Add(new SimpleLang.ThreeCodeOptimisations.CommonExprOpt());
             if (checkBox14.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.EliminationTranToTranOpt());
+            if (checkBox15.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.PullCopiesOpt());
             return res;
         }
         void UpdateForms() {
@@ -126,28 +128,33 @@ namespace OptGui
         }
         Modes DetectMode(ComboBox box) {
             /*
-             *             "Исходный код",
+            "Исходный код",
             "Трехадресный код",
             "Блоки трехадресного кода",
             "Граф потока управления",
+            "Множества",
             "Запуск",
-            "Оптимизации по дереву",            
+            "",
+            "Оптимизации по дереву",
             "Полученный трехадресный код",
             "Блоки трехадресного кода",
             "Граф потока управления",
-            "Запуск",*/
+            "Множества",
+            "Запуск"});*/
             switch (box.SelectedIndex)
             {
                 case 1: return Modes.BeforeThreeCode;
                 case 2: return Modes.BeforeBlocks;
                 case 3: return Modes.BeforeGraph;
-                case 4: return Modes.BeforeRun;
-                case 5: return Modes.ASTOpt;
+                case 4: return Modes.BeforeMass;
+                case 5: return Modes.BeforeRun;
                 case 6: return Modes.ASTOpt;
-                case 7: return Modes.AfterTbreeCode;
-                case 8: return Modes.AfterBlocks;
-                case 9: return Modes.AfterGraph;
-                case 10: return Modes.AfterRun;
+                case 7: return Modes.ASTOpt;
+                case 8: return Modes.AfterTbreeCode;
+                case 9: return Modes.AfterBlocks;
+                case 10: return Modes.AfterGraph;
+                case 11: return Modes.AfterMass;
+                case 12: return Modes.AfterRun;
                 default: return Modes.Text;
             }
         }
@@ -254,6 +261,125 @@ namespace OptGui
             box.Image = bitmap;
             box.Invalidate();
         }
+
+        private void DrawMass(List<LinkedList<SimpleLang.Visitors.ThreeCode>> code, TextBox txt) {
+            if (radioButton1.Checked) {
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SimpleLang.Dominators.DominatorsFinder finder = new SimpleLang.Dominators.DominatorsFinder(gra);
+                finder.Find();
+                txt.Text = finder.ToString();
+            }
+            if (radioButton2.Checked)
+            {
+                SimpleLang.ThreeCodeOptimisations.ReachingDefsAnalysis defs = new SimpleLang.ThreeCodeOptimisations.ReachingDefsAnalysis();
+                defs.IterativeAlgorithm(code);
+                txt.Text = defs.GetOutput();
+            }
+            if (radioButton3.Checked)
+            {
+                var tmp = System.Console.Out;
+                System.IO.MemoryStream stre = new System.IO.MemoryStream();
+                System.IO.TextWriter wr = new System.IO.StreamWriter(stre);
+                Console.SetOut(wr);
+
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SimpleLang.DetectReversibleEdges find = new SimpleLang.DetectReversibleEdges(gra);
+                find.PrintIsReverseDic();
+                
+
+                Console.SetOut(tmp);
+                wr.Flush();
+                stre.Flush();
+                string res = Encoding.UTF8.GetString(stre.ToArray());
+                txt.Text = res;
+            }
+            if (radioButton4.Checked)
+            {
+                var tmp = System.Console.Out;
+                System.IO.MemoryStream stre = new System.IO.MemoryStream();
+                System.IO.TextWriter wr = new System.IO.StreamWriter(stre);
+                Console.SetOut(wr);
+
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SimpleLang.DetectReversibleEdges find = new SimpleLang.DetectReversibleEdges(gra);
+                find.PrintisReducible();
+
+
+                Console.SetOut(tmp);
+                wr.Flush();
+                stre.Flush();
+                string res = Encoding.UTF8.GetString(stre.ToArray());
+                txt.Text = res;
+            }
+            if (radioButton5.Checked)
+            {
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SimpleLang.ThreeCodeOptimisations.DefUseBlocks def = new SimpleLang.ThreeCodeOptimisations.DefUseBlocks(gra);
+                var d1 = def.DefBs;
+                var d2 = def.UseBs;
+
+                string res = "";
+
+                if (d1.Count == d2.Count) {
+                    for (int i = 0; i < d1.Count; i++) {
+                        res = res + "----------------------" + Environment.NewLine + "Block " + i.ToString() + Environment.NewLine;
+                        var a1 = d1[i];
+                        var a2 = d2[i];
+                        res = res +  "\tDefB:" + Environment.NewLine;
+                        foreach (string t in a1)
+                        {
+                            res = res + "\t\t" + t + Environment.NewLine;
+                        }
+                        res = res + "\tUseB:" + Environment.NewLine;
+                        foreach (string t in a2)
+                        {
+                            res = res + "\t\t" + t + Environment.NewLine;
+                        }
+                    }
+                }
+                txt.Text = res;
+            }
+            if (radioButton6.Checked)
+            {
+                var tmp = System.Console.Out;
+                System.IO.MemoryStream stre = new System.IO.MemoryStream();
+                System.IO.TextWriter wr = new System.IO.StreamWriter(stre);
+                Console.SetOut(wr);
+
+
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SpanTree span = new SpanTree(gra);
+                span.buildSpanTree();
+                span.writeAllSpanTreeEdges();
+                Console.WriteLine();
+                Console.WriteLine("\t\tTypes:");
+                span.writeAllEdgesWithTypes();
+
+                Console.SetOut(tmp);
+                wr.Flush();
+                stre.Flush();
+                string res = Encoding.UTF8.GetString(stre.ToArray());
+                txt.Text = res;
+            }
+            if (radioButton7.Checked) {
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SimpleLang.ThreeCodeOptimisations.DefUseBlocks def = new SimpleLang.ThreeCodeOptimisations.DefUseBlocks(gra);
+                var ou = new SimpleLang.ThreeCodeOptimisations.InOutActiveVariables(def, gra);
+                List<HashSet<string>> _in = ou.InBlocks;
+                List<HashSet<string>> _out = ou.OutBlocks;
+                string res = "";
+                for (int i = 0; i < _in.Count; i++) {
+                    res = res + "----------------------" + Environment.NewLine + "Block " + i.ToString() + Environment.NewLine;
+                    res = res + "\tIN:" + Environment.NewLine;
+                    foreach (string t in _in[i])
+                        res = res + "\t\t" + t + Environment.NewLine;
+                    res = res + "\tOUT:" + Environment.NewLine;
+                    foreach (string t in _out[i])
+                        res = res + "\t\t" + t + Environment.NewLine;
+                }
+                txt.Text = res;
+            }
+        }
         private void UpdateTab(Modes m, TextBox txt, PictureBox box, Panel panel) {
             if (FileName.Length == 0) {
                 txt.Text = "File is not set";
@@ -325,6 +451,11 @@ namespace OptGui
                     txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(blocks);
                     return;
                 }
+                if (m == Modes.BeforeMass) {
+                    var blocks = new SimpleLang.Block.Block(threeCodeVisitor).GenerateBlocks();
+                    DrawMass(blocks, txt);
+                    return;
+                }
                 if (m == Modes.BeforeGraph)
                 {
                     var blocks = new SimpleLang.Block.Block(threeCodeVisitor).GenerateBlocks();
@@ -347,6 +478,11 @@ namespace OptGui
                 r.Visit(threeCodeVisitor);
                 var opt = GetOptimiser();
                 var outcode = opt.Apply(threeCodeVisitor);
+
+                if (m == Modes.AfterMass) {
+                    DrawMass(outcode, txt);
+                    return;
+                }
 
                 if (m == Modes.AfterBlocks) {
                     txt.Text = SimpleLang.Visitors.ThreeAddressCodeVisitor.ToString(outcode);
@@ -480,6 +616,46 @@ namespace OptGui
 
         private void checkBox3_CheckedChanged(object sender, EventArgs e)
         {
+            UpdateMode();
+        }
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            checkBox51.Checked = checkBox67.Checked;
+            checkBox52.Checked = checkBox67.Checked;
+            checkBox53.Checked = checkBox67.Checked;
+            checkBox54.Checked = checkBox67.Checked;
+            checkBox55.Checked = checkBox67.Checked;
+            checkBox56.Checked = checkBox67.Checked;
+            checkBox57.Checked = checkBox67.Checked;
+            checkBox58.Checked = checkBox67.Checked;
+            checkBox59.Checked = checkBox67.Checked;
+            checkBox60.Checked = checkBox67.Checked;
+            checkBox61.Checked = checkBox67.Checked;
+            checkBox62.Checked = checkBox67.Checked;
+            checkBox63.Checked = checkBox67.Checked;
+            checkBox64.Checked = checkBox67.Checked;
+            checkBox65.Checked = checkBox67.Checked;
+            checkBox66.Checked = checkBox67.Checked;
+            UpdateMode();
+        }
+
+        private void checkBox5_CheckedChanged(object sender, EventArgs e)
+        {
+            checkBox1.Checked = checkBox16.Checked;
+            checkBox2.Checked = checkBox16.Checked;
+            checkBox3.Checked = checkBox16.Checked;
+            checkBox4.Checked = checkBox16.Checked;
+            checkBox5.Checked = checkBox16.Checked;
+            checkBox6.Checked = checkBox16.Checked;
+            checkBox7.Checked = checkBox16.Checked;
+            checkBox8.Checked = checkBox16.Checked;
+            checkBox9.Checked = checkBox16.Checked;
+            checkBox10.Checked = checkBox16.Checked;
+            checkBox11.Checked = checkBox16.Checked;
+            checkBox12.Checked = checkBox16.Checked;
+            checkBox13.Checked = checkBox16.Checked;
+            checkBox14.Checked = checkBox16.Checked;
+            checkBox15.Checked = checkBox16.Checked;
             UpdateMode();
         }
     }
