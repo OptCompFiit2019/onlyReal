@@ -47,6 +47,11 @@ namespace SimpleLang.GenericIterativeAlgorithm
                     else if (line.operation != ThreeOperator.None && line.operation != ThreeOperator.Println
                     && line.operation != ThreeOperator.Goto && line.operation != ThreeOperator.IfGoto)
                     {
+						if (!res.ContainsKey(line.arg1.ToString())
+                            || !res.ContainsKey(line.arg2.ToString()))
+                        {
+                            res[line.result] = UNDEF;
+                        }
                         if (res.ContainsKey(line.arg1.ToString())
                                 && res.ContainsKey(line.arg2.ToString())
                                 && IsConstant(res, res[line.arg1.ToString()]) 
