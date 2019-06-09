@@ -52,7 +52,7 @@ namespace SimpleLang.ThreeCodeOptimisations
         {
             Console.WriteLine("IN");
             PrintSets(Ins);
-            Console.WriteLine("\nOUT");
+            Console.WriteLine(Environment.NewLine + "OUT");
             PrintSets(Outs);
         }
 
@@ -60,10 +60,10 @@ namespace SimpleLang.ThreeCodeOptimisations
         {
             for (int i = 0; i < Sets.Count; ++i)
             {
-                var sets = Sets[i].Select(c => $"    {c.ToString()}\n");
+                var sets = Sets[i].Select(c => $"    {c.ToString()}" + Environment.NewLine);
                 if (sets.Count() == 0)
                     sets = new string[] { "" };
-                Console.WriteLine($"Block {i + 1} :\n" + sets.Aggregate((s1, s2) => s1 + s2));
+                Console.WriteLine($"Block {i + 1} :" + Environment.NewLine + sets.Aggregate((s1, s2) => s1 + s2));
             }
         }
     }

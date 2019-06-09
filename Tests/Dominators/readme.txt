@@ -2,7 +2,7 @@ DominatorsFinder
 
 Поиск доминаторов для каждой вершины графа потока управления
 
-Для запуска оптимизаций необходимо добавить экземляр класса DefUseDeadCodeOp/DefUseConstOpt в экземпляр класса AutoThreeCodeOptimiser и вызывать метод Apply:
+Для запуска выполнить следующий код:
 
 var finder = new SimpleLang.Dominators.DominatorsFinder(controlFlowGraph);
 var dominators = finder.Find();

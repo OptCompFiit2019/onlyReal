@@ -1,0 +1,9 @@
+{
+    while(false){
+        while(true){
+	    while(false){
+	        println(1);
+	    }
+	}
+    }
+}

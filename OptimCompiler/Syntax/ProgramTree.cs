@@ -224,9 +224,9 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            string res = "if (" + Cond.ToString() + ")\n" + If.ToString();
+            string res = "if (" + Cond.ToString() + ")" + Environment.NewLine + If.ToString();
             if (Else != null)
-                res += "\nelse\n" + Else.ToString();
+                res += Environment.NewLine + "else" + Environment.NewLine + Else.ToString();
             return res;
         }
     }
@@ -246,7 +246,7 @@ namespace ProgramTree
 		}
         public override string ToString()
         {
-            return "while (" + Expr.ToString() + ")\n" + Stat.ToString();
+            return "while (" + Expr.ToString() + ")" + Environment.NewLine + Stat.ToString();
         }
     }
     public class ForNode : StatementNode
@@ -269,7 +269,7 @@ namespace ProgramTree
         public override string ToString()
         {
             return "for (" + Id.ToString() + " = " + Start.ToString()
-                + " to " + End.ToString() + ")\n" + Stat.ToString();
+                + " to " + End.ToString() + ")" + Environment.NewLine + Stat.ToString();
         }
     }
 
@@ -291,10 +291,10 @@ namespace ProgramTree
         }
         public override string ToString()
         {
-            string res = "{\n";
+            string res = "{" + Environment.NewLine;
             foreach (var it in StList)
             {
-                res += it.ToString() + "\n";
+                res += it.ToString() + Environment.NewLine;
             }
             res += "}";
             return res;

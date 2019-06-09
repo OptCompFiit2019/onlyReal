@@ -17,8 +17,11 @@ namespace SimpleLang.Visitors
 			if (p is AssignNode assn)
 			{
 				assn.Expr = to;
-			}
-			else if (p is BinOpNode binopn)
+			} else if (p is IfNode ifn) {
+                if (ifn.Cond == from)
+                    ifn.Cond = to;
+            }
+            else if (p is BinOpNode binopn)
 			{
 				if (binopn.Left == from) // Поиск подузла в Parent
 					binopn.Left = to;

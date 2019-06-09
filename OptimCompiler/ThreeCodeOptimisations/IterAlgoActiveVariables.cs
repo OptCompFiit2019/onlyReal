@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class InOutActiveVariables
+    public class InOutActiveVariables
     {
         public List<HashSet<string>> InBlocks { get; } // множества IN для блоков
         public List<HashSet<string>> OutBlocks { get; } // множества OUT для блоков

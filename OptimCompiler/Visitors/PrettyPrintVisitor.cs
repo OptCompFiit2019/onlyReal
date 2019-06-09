@@ -78,7 +78,7 @@ namespace SimpleLang.Visitors
         {
             Text += IndentStr() + "while (";
             w.Expr.Visit(this);
-            Text += ")\n";
+            Text += ")" + Environment.NewLine;
 
             if (!(w.Stat is BlockNode))
                 IndentPlus();
@@ -92,7 +92,7 @@ namespace SimpleLang.Visitors
             f.Start.Visit(this);
             Text += " to ";
             f.End.Visit(this);
-            Text += ")\n";
+            Text += ")" + Environment.NewLine;
 
             if (!(f.Stat is BlockNode))
                 IndentPlus();
@@ -104,7 +104,7 @@ namespace SimpleLang.Visitors
         {
             Text += IndentStr() + "if (";
             ifn.Cond.Visit(this);
-            Text += ")\n";
+            Text += ")" + Environment.NewLine;
 
             if (!(ifn.If is BlockNode))
                 IndentPlus();
@@ -114,7 +114,7 @@ namespace SimpleLang.Visitors
 
             if (ifn.Else != null)
             {
-                Text += "\n" + IndentStr() + "else\n";
+                Text += Environment.NewLine + IndentStr() + "else" + Environment.NewLine;
 
                 if (!(ifn.Else is BlockNode))
                     IndentPlus();

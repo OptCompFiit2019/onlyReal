@@ -10,10 +10,12 @@ namespace SimpleLang.Visitors
     {
         public override void VisitBlockNode(BlockNode bln)
         {
-            bool r = bln.StList.Exists(x => x is null);
+            bool r = bln.StList.Exists(x => x is NullNode);
+            r = r || bln.StList.Exists(x => x == null);
             if (r)
                 SetApply(r);
             bln.StList = bln.StList.Where(x =>!(x is NullNode)).ToList();
+            bln.StList = bln.StList.Where(x => (x != null)).ToList();
         }
         public override void VisitIfNode(IfNode ifn)
         {

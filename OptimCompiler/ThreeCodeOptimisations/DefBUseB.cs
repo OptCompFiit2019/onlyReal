@@ -7,7 +7,7 @@ using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    class DefUseBlocks
+    public class DefUseBlocks
     {
         public List<HashSet<string>> DefBs { get; }
         public List<HashSet<string>> UseBs { get; }

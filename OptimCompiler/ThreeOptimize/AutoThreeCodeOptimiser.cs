@@ -15,11 +15,14 @@ namespace SimpleLang.ThreeCodeOptimisations{
             while (need) {
                 need = false;
                 for (int i = 0; i < dd.Count; i++) {
-                    dd[i].Apply(ref program);
-                    if (dd[i].Applyed()) {
-                        need = true;
-                        b = true;
-                        break;
+                    if (!dd[i].NeedFullCode())
+                    {
+                        dd[i].Apply(ref program);
+                        if (dd[i].Applyed()){
+                            need = true;
+                            b = true;
+                            break;
+                        }
                     }
                 }
             }
