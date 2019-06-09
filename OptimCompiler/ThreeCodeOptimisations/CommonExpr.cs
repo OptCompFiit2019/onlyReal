@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SimpleLang.Visitors
 {
-    class CommonExprBlocks
+    public class CommonExprBlocks
     {
         private LinkedList<ThreeCode> program;
         public LinkedList<ThreeCode> Program
@@ -43,13 +43,13 @@ namespace SimpleLang.Visitors
     }
 
 
-    class CommonExpr
+    public class CommonExpr
     {
         public List<ThreeCode> program;
 
         public CommonExpr(List<ThreeCode> prog)
         {
-            program = MakeProgram(prog);
+            program = prog;
         }
 
         public List<ThreeCode> MakeProgram(List<ThreeCode> prog)

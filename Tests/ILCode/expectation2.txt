@@ -37,7 +37,7 @@ ldloc temp_1
 clt
 stloc temp_0
 ldloc temp_0
-brtrue.s Label1
+brtrue Label1
 br Label2
 MarkLabel Label1
 ldc.i4 1

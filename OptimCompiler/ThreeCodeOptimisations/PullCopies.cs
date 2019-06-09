@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SimpleLang.Visitors
 {
-    class PullCopiesBlocks
+    public class PullCopiesBlocks
     {
         private LinkedList<ThreeCode> program;
         public LinkedList<ThreeCode> Program
@@ -42,7 +42,7 @@ namespace SimpleLang.Visitors
         }
     }
 
-    class PullCopies
+    public class PullCopies
     {
         public List<ThreeCode> program;
 
@@ -79,6 +79,8 @@ namespace SimpleLang.Visitors
             {
                 string def;
                 ThreeAddressValueType newArg;
+                if (program[i].operation == ThreeOperator.None)
+                    continue;
                 if (program[i].arg2 == null && !program[i].arg1.ToString().Contains("temp_"))
                 {
                     def = program[i].result;
@@ -95,13 +97,13 @@ namespace SimpleLang.Visitors
                     if (program[j].result == def)
                         same_def = true;
 
-                    if (program[j].arg1 != null && program[j].arg1.ToString() == def)
+                    if (program[j].arg1 != null && program[j].arg1.ToString() == def && !newArg.Equals(program[j].arg1))
                     {
                         program[j].arg1 = newArg;
                         _apply = true;
                     }
 
-                    if (program[j].arg2 != null && program[j].arg2.ToString() == def)
+                    if (program[j].arg2 != null && program[j].arg2.ToString() == def && !newArg.Equals(program[j].arg2))
                     {
                         program[j].arg2 = newArg;
                         _apply = true;

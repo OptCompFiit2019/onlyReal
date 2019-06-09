@@ -90,35 +90,38 @@ namespace SimpleLang.Visitors
 
         public DAG(List<ThreeCode> prog)
         {
-            program = MakeProgram(prog);
+            //program = MakeProgram(prog);
+            program = prog;
             vars = new Dictionary<GraphNode, List<string>>();
             GraphNodes = new Dictionary<ThreeCode, GraphNode>();
             defs = new Dictionary<string, List<string>>();
             foreach (var cmd in program)
             {
                 if (cmd.operation == ThreeOperator.Assign || cmd.operation == ThreeOperator.Goto
-                    || (cmd.label != "" && cmd.arg1 == null))
+                    || cmd.operation == ThreeOperator.Println || cmd.operation == ThreeOperator.None)
                     continue;
                 //Переименовываем переменные, которые были переприсвоены
-                if (defs.ContainsKey(cmd.arg1.ToString()))
+                if (cmd.operation != ThreeOperator.None && defs.ContainsKey(cmd.arg1.ToString()))
                 {
                     var temp = defs[cmd.arg1.ToString()];
                     cmd.arg1 = new ThreeAddressStringValue(temp[temp.Count - 1]);
                 }
                 else
+                    if (cmd.operation != ThreeOperator.None)
                     defs[cmd.arg1.ToString()] = new List<string>() { cmd.arg1.ToString() };
 
-                if (defs.ContainsKey(cmd.arg2.ToString()))
+                if (cmd.operation != ThreeOperator.None && defs.ContainsKey(cmd.arg2.ToString()))
                 {
                     var temp = defs[cmd.arg2.ToString()];
                     cmd.arg2 = new ThreeAddressStringValue(temp[temp.Count - 1]);
                 }
                 else
+                    if (cmd.operation != ThreeOperator.None)
                     defs[cmd.arg2.ToString()] = new List<string>() { cmd.arg2.ToString() };
 
-                if (!defs.ContainsKey(cmd.result))
+                if (cmd.operation != ThreeOperator.None && !defs.ContainsKey(cmd.result))
                     defs[cmd.result] = new List<string>() { cmd.result };
-                else
+                else if (cmd.operation != ThreeOperator.None)
                 {
                     defs[cmd.result].Add(cmd.result + "#" + defs[cmd.result].Count.ToString());
                     cmd.result = defs[cmd.result][defs[cmd.result].Count - 1];
@@ -138,12 +141,12 @@ namespace SimpleLang.Visitors
                 //Ищем коды, результат которых является аргументом кода cmd
                 foreach (var res in GraphNodes.Keys)
                 {
-                    if (res.result.Equals(currentGraphNode.code.arg1.ToString()))
+                    if (cmd.operation != ThreeOperator.None && res.operation != ThreeOperator.None && res.result.Equals(currentGraphNode.code.arg1.ToString()))
                     {
                         currentGraphNode.left = GraphNodes[res];
                         continue;
                     }
-                    if (currentGraphNode.code.arg2 != null && res.result.Equals(currentGraphNode.code.arg2.ToString()))
+                    if (cmd.operation != ThreeOperator.None && res.operation != ThreeOperator.None && currentGraphNode.code.arg2 != null && res.result.Equals(currentGraphNode.code.arg2.ToString()))
                     {
                         currentGraphNode.right = GraphNodes[res];
                         continue;
@@ -196,14 +199,15 @@ namespace SimpleLang.Visitors
 
         public bool RightPartsEquals(ThreeCode x, ThreeCode y)
         {
-            return (x.arg1.ToString() == y.arg1.ToString() && x.arg2.ToString() == y.arg2.ToString());
+            return (x.arg1.ToString() == y.arg1.ToString() && x.arg2.ToString() == y.arg2.ToString() && x.operation == y.operation);
         }
 
         public void RemoveVarNumbers(List<ThreeCode> program)
         {
             for (int i = 0; i < program.Count; i++)
             {
-                if (program[i].label != "" && program[i].arg1 == null)
+                if (program[i].operation == ThreeOperator.None || program[i].operation == ThreeOperator.Println ||
+                    program[i].operation == ThreeOperator.Goto || program[i].operation == ThreeOperator.IfGoto)
                     continue;
                 var ind = program[i].result.IndexOf('#');
                 if (ind != -1)
@@ -211,15 +215,31 @@ namespace SimpleLang.Visitors
 
                 var arg = program[i].arg1.ToString();
                 ind = arg.IndexOf('#');
-                if (ind != -1)
-                    program[i].arg1 = new ThreeAddressStringValue(arg.Remove(ind));
 
-                if (program[i].arg2 != null)
+                if (ind != -1)
+                {
+                    var temp = arg.Remove(ind);
+                    int val;
+                    if (int.TryParse(temp, out val))
+                        program[i].arg1 = new ThreeAddressIntValue(val);
+                    else
+                        program[i].arg1 = new ThreeAddressStringValue(temp);
+                }
+
+                if (program[i].arg2 != null && program[i].operation != ThreeOperator.Assign)
                 {
                     arg = program[i].arg2.ToString();
                     ind = arg.IndexOf('#');
+
                     if (ind != -1)
-                        program[i].arg2 = new ThreeAddressStringValue(arg.Remove(ind));
+                    {
+                        var temp = arg.Remove(ind);
+                        int val;
+                        if (int.TryParse(temp, out val))
+                            program[i].arg2 = new ThreeAddressIntValue(val);
+                        else
+                            program[i].arg2 = new ThreeAddressStringValue(temp);
+                    }
                 }
             }
         }
@@ -229,21 +249,23 @@ namespace SimpleLang.Visitors
             var result = new List<ThreeCode>();
             foreach (var cmd in this.program)
             {
-                if (cmd.operation == ThreeOperator.Assign || cmd.operation == ThreeOperator.Goto || (cmd.label != "" && cmd.arg1 == null))
+                if (cmd.operation == ThreeOperator.Assign || cmd.operation == ThreeOperator.Goto || cmd.operation == ThreeOperator.Println || cmd.operation == ThreeOperator.None)
                 {
                     result.Add(cmd);
                     continue;
                 }
 
                 var sameCommand = GraphNodes.Where(x => RightPartsEquals(x.Key, cmd)).First();
-                if (vars[sameCommand.Value][0].Equals(cmd.result))
+                if (cmd.operation != ThreeOperator.None && vars[sameCommand.Value][0].Equals(cmd.result))
                     result.Add(cmd);
                 else
                 {
-                    result.Add(new ThreeCode(cmd.result, ThreeOperator.Assign, new ThreeAddressStringValue(vars[sameCommand.Value][0])));
+                    if (vars[sameCommand.Value][0] != null)
+                        result.Add(new ThreeCode(cmd.result, ThreeOperator.Assign, new ThreeAddressStringValue(vars[sameCommand.Value][0])));
+                    else
+                        result.Add(new ThreeCode(cmd.result, ThreeOperator.Assign, null));
                     _apply = true;
                 }
-                    
             }
             RemoveVarNumbers(result);
             return new LinkedList<ThreeCode>(result);
