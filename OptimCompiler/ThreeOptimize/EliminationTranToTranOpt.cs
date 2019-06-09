@@ -14,8 +14,21 @@ namespace SimpleLang.ThreeCodeOptimisations
         {
             return _apply;
         }
-        public bool NeedFullCode() { return false; }
-        public void Apply(ref System.Collections.Generic.List<System.Collections.Generic.LinkedList<SimpleLang.Visitors.ThreeCode>> res) { throw new Exception("Not implemented"); }
+        public bool NeedFullCode() { return true; }
+        public void Apply(ref List<LinkedList<ThreeCode>> res)
+        {
+            //throw new NotImplementedException();
+            _apply = false;
+            LinkedList<ThreeCode> program = new LinkedList<ThreeCode>();
+            foreach (LinkedList<ThreeCode> block in res)
+            {
+                foreach (ThreeCode code in block)
+                {
+                    program.AddLast(code);
+                }
+            }
+            program = TranToTranOpt(program);
+        }
 
         public void Apply(ref LinkedList<ThreeCode> program)
         {
