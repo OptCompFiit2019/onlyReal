@@ -40,6 +40,10 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.radioButton7 = new System.Windows.Forms.RadioButton();
+            this.radioButton6 = new System.Windows.Forms.RadioButton();
+            this.radioButton5 = new System.Windows.Forms.RadioButton();
+            this.radioButton4 = new System.Windows.Forms.RadioButton();
             this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
@@ -116,7 +120,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1016, 386);
+            this.tabPage1.Size = new System.Drawing.Size(1016, 483);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "View";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -138,7 +142,7 @@
             this.splitContainer2.Panel2.Controls.Add(this.panel2);
             this.splitContainer2.Panel2.Controls.Add(this.textBox2);
             this.splitContainer2.Panel2.Controls.Add(this.comboBox2);
-            this.splitContainer2.Size = new System.Drawing.Size(1010, 380);
+            this.splitContainer2.Size = new System.Drawing.Size(1010, 477);
             this.splitContainer2.SplitterDistance = 505;
             this.splitContainer2.TabIndex = 2;
             // 
@@ -149,7 +153,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 21);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(505, 359);
+            this.panel1.Size = new System.Drawing.Size(505, 456);
             this.panel1.TabIndex = 3;
             // 
             // pictureBox1
@@ -170,7 +174,7 @@
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(505, 359);
+            this.textBox1.Size = new System.Drawing.Size(505, 456);
             this.textBox1.TabIndex = 1;
             // 
             // comboBox1
@@ -205,7 +209,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 21);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(501, 359);
+            this.panel2.Size = new System.Drawing.Size(501, 456);
             this.panel2.TabIndex = 2;
             // 
             // pictureBox2
@@ -225,7 +229,7 @@
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
             this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox2.Size = new System.Drawing.Size(501, 359);
+            this.textBox2.Size = new System.Drawing.Size(501, 456);
             this.textBox2.TabIndex = 1;
             // 
             // comboBox2
@@ -255,6 +259,10 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.radioButton7);
+            this.tabPage2.Controls.Add(this.radioButton6);
+            this.tabPage2.Controls.Add(this.radioButton5);
+            this.tabPage2.Controls.Add(this.radioButton4);
             this.tabPage2.Controls.Add(this.radioButton3);
             this.tabPage2.Controls.Add(this.radioButton2);
             this.tabPage2.Controls.Add(this.radioButton1);
@@ -298,6 +306,49 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Optimizations";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // radioButton7
+            // 
+            this.radioButton7.AutoSize = true;
+            this.radioButton7.Location = new System.Drawing.Point(570, 144);
+            this.radioButton7.Name = "radioButton7";
+            this.radioButton7.Size = new System.Drawing.Size(54, 17);
+            this.radioButton7.TabIndex = 10;
+            this.radioButton7.Text = "In Out";
+            this.radioButton7.UseVisualStyleBackColor = true;
+            // 
+            // radioButton6
+            // 
+            this.radioButton6.AutoSize = true;
+            this.radioButton6.Location = new System.Drawing.Point(570, 121);
+            this.radioButton6.Name = "radioButton6";
+            this.radioButton6.Size = new System.Drawing.Size(139, 17);
+            this.radioButton6.TabIndex = 9;
+            this.radioButton6.TabStop = true;
+            this.radioButton6.Text = "Классификация ребер";
+            this.radioButton6.UseVisualStyleBackColor = true;
+            // 
+            // radioButton5
+            // 
+            this.radioButton5.AutoSize = true;
+            this.radioButton5.Location = new System.Drawing.Point(570, 98);
+            this.radioButton5.Name = "radioButton5";
+            this.radioButton5.Size = new System.Drawing.Size(78, 17);
+            this.radioButton5.TabIndex = 8;
+            this.radioButton5.TabStop = true;
+            this.radioButton5.Text = "DefB UseB";
+            this.radioButton5.UseVisualStyleBackColor = true;
+            // 
+            // radioButton4
+            // 
+            this.radioButton4.AutoSize = true;
+            this.radioButton4.Location = new System.Drawing.Point(570, 75);
+            this.radioButton4.Name = "radioButton4";
+            this.radioButton4.Size = new System.Drawing.Size(134, 17);
+            this.radioButton4.TabIndex = 7;
+            this.radioButton4.TabStop = true;
+            this.radioButton4.Text = "Приводимость графа";
+            this.radioButton4.UseVisualStyleBackColor = true;
             // 
             // radioButton3
             // 
@@ -526,7 +577,7 @@
             this.checkBox16.AutoSize = true;
             this.checkBox16.Location = new System.Drawing.Point(4, 375);
             this.checkBox16.Name = "checkBox16";
-            this.checkBox16.Size = new System.Drawing.Size(78, 17);
+            this.checkBox16.Size = new System.Drawing.Size(70, 17);
             this.checkBox16.TabIndex = 3;
             this.checkBox16.Text = "Select All";
             this.checkBox16.UseVisualStyleBackColor = true;
@@ -703,7 +754,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1016, 386);
+            this.tabPage3.Size = new System.Drawing.Size(1016, 483);
             this.tabPage3.TabIndex = 0;
             this.tabPage3.Text = "Settings";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -841,6 +892,10 @@
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.RadioButton radioButton3;
+        private System.Windows.Forms.RadioButton radioButton4;
+        private System.Windows.Forms.RadioButton radioButton5;
+        private System.Windows.Forms.RadioButton radioButton6;
+        private System.Windows.Forms.RadioButton radioButton7;
     }
 }
 

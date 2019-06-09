@@ -293,6 +293,92 @@ namespace OptGui
                 string res = Encoding.UTF8.GetString(stre.ToArray());
                 txt.Text = res;
             }
+            if (radioButton4.Checked)
+            {
+                var tmp = System.Console.Out;
+                System.IO.MemoryStream stre = new System.IO.MemoryStream();
+                System.IO.TextWriter wr = new System.IO.StreamWriter(stre);
+                Console.SetOut(wr);
+
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SimpleLang.DetectReversibleEdges find = new SimpleLang.DetectReversibleEdges(gra);
+                find.PrintisReducible();
+
+
+                Console.SetOut(tmp);
+                wr.Flush();
+                stre.Flush();
+                string res = Encoding.UTF8.GetString(stre.ToArray());
+                txt.Text = res;
+            }
+            if (radioButton5.Checked)
+            {
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SimpleLang.ThreeCodeOptimisations.DefUseBlocks def = new SimpleLang.ThreeCodeOptimisations.DefUseBlocks(gra);
+                var d1 = def.DefBs;
+                var d2 = def.UseBs;
+
+                string res = "";
+
+                if (d1.Count == d2.Count) {
+                    for (int i = 0; i < d1.Count; i++) {
+                        res = res + "----------------------" + Environment.NewLine + "Block " + i.ToString() + Environment.NewLine;
+                        var a1 = d1[i];
+                        var a2 = d2[i];
+                        res = res +  "\tDefB:" + Environment.NewLine;
+                        foreach (string t in a1)
+                        {
+                            res = res + "\t\t" + t + Environment.NewLine;
+                        }
+                        res = res + "\tUseB:" + Environment.NewLine;
+                        foreach (string t in a2)
+                        {
+                            res = res + "\t\t" + t + Environment.NewLine;
+                        }
+                    }
+                }
+                txt.Text = res;
+            }
+            if (radioButton6.Checked)
+            {
+                var tmp = System.Console.Out;
+                System.IO.MemoryStream stre = new System.IO.MemoryStream();
+                System.IO.TextWriter wr = new System.IO.StreamWriter(stre);
+                Console.SetOut(wr);
+
+
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SpanTree span = new SpanTree(gra);
+                span.buildSpanTree();
+                span.writeAllSpanTreeEdges();
+                Console.WriteLine();
+                Console.WriteLine("\t\tTypes:");
+                span.writeAllEdgesWithTypes();
+
+                Console.SetOut(tmp);
+                wr.Flush();
+                stre.Flush();
+                string res = Encoding.UTF8.GetString(stre.ToArray());
+                txt.Text = res;
+            }
+            if (radioButton7.Checked) {
+                SimpleLang.ControlFlowGraph.ControlFlowGraph gra = new SimpleLang.ControlFlowGraph.ControlFlowGraph(code);
+                SimpleLang.ThreeCodeOptimisations.DefUseBlocks def = new SimpleLang.ThreeCodeOptimisations.DefUseBlocks(gra);
+                var ou = new SimpleLang.ThreeCodeOptimisations.InOutActiveVariables(def, gra);
+                List<HashSet<string>> _in = ou.InBlocks;
+                List<HashSet<string>> _out = ou.OutBlocks;
+                string res = "";
+                for (int i = 0; i < _in.Count; i++) {
+                    res = res + "----------------------" + Environment.NewLine + "Block " + i.ToString() + Environment.NewLine;
+                    res = res + "\tIN:" + Environment.NewLine;
+                    foreach (string t in _in[i])
+                        res = res + "\t\t" + t + Environment.NewLine;
+                    res = res + "\tOUT:" + Environment.NewLine;
+                    foreach (string t in _out[i])
+                        res = res + "\t\t" + t + Environment.NewLine;
+                }
+                txt.Text = res;
+            }
         }
         private void UpdateTab(Modes m, TextBox txt, PictureBox box, Panel panel) {
             if (FileName.Length == 0) {
