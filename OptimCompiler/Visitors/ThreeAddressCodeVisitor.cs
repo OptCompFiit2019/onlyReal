@@ -222,10 +222,10 @@ namespace SimpleLang.Visitors
             string res = "";
 
             foreach (ThreeCode it in program)
-                res += it.ToString() + "\n";
+                res += it.ToString() + Environment.NewLine;
 
             if (currentLabel.Length > 0)
-                res += currentLabel + ":\n";
+                res += currentLabel + ":" + Environment.NewLine;
             return res;
         }
 
@@ -233,7 +233,7 @@ namespace SimpleLang.Visitors
             string res = "";
 
             foreach (ThreeCode it in code)
-                res += it.ToString() + "\n";
+                res += it.ToString() + Environment.NewLine;
 
             return res;
         }
@@ -241,7 +241,7 @@ namespace SimpleLang.Visitors
             string res = "";
 
             foreach (LinkedList<ThreeCode> it in code)
-                res += ToString(it) + "\n";
+                res += ToString(it) + Environment.NewLine + "-------------------" + Environment.NewLine;
 
             return res;
         }
