@@ -63,6 +63,7 @@
     <Compile Include="DeepSpanTree.cs" />
     <Compile Include="GenericIterativeAlgorithm\Test.cs" />
     <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
+    <Compile Include="IterationAlgorithm\ConstantPropagationItA.cs" />
     <Compile Include="IterationAlgorithm\AttainableVariables.cs" />
     <Compile Include="IterativeAlgorithm.cs" />
     <Compile Include="ReachingDefsAnalysis\ReachingDefsAnalysis.cs" />
