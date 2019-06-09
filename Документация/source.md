@@ -171,7 +171,7 @@
         <td>qwerty</td>
     </tr>
     <tr>
-        <td>14 - нет</td>
+        <td>14</td>
         <td>Для достигающих определений вычислить genB, killB для любого B и разработать структуру для хранения передаточной функции.
             fB = fSn*fSn-1*...*fS1 - вычислить fSi для каждой инструкции ББл и потом найти композицию</td>
         <td>Roslyn</td>
@@ -259,7 +259,7 @@
         <td>Intel</td>
     </tr>
     <tr>
-        <td>31 - нет</td>
+        <td>31</td>
         <td>Передаточная функция в задаче о распространении констант</td>
         <td>Roslyn</td>
     </tr>
@@ -326,7 +326,7 @@
 #include "tac/11-tac.md"
 #include "tac/12-tac.md"
 #include "tac/13-tac.md"
-include "tac/14-tac.md"
+#include "tac/14-tac.md"
 #include "tac/15-tac.md"
 #include "tac/16-tac.md"
 #include "tac/17-tac.md"
@@ -343,7 +343,7 @@ include "tac/25-tac.md"
 #include "tac/28-tac.md"
 include "tac/29-tac.md"
 include "tac/30-tac.md"
-include "tac/31-tac.md"
+#include "tac/31-tac.md"
 #include "tac/32-tac.md"
 #include "tac/33-tac.md"
 #include "tac/34-tac.md"

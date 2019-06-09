@@ -40,6 +40,7 @@
 * [Построение Графа Потока Управления](#построение-графа-потока-управления)
 * [Алгоритм LVN](#алгоритм-lvn)
 * [Устранение локальных общих подвыражений построением ациклического графа](#устранение-локальных-общих-подвыражений-построением-ациклического-графа)
+* [Достигающие определения множества genB killB Передаточная функция базового блока В](#достигающие-определения-множества-genb-killb-передаточная-функция-базового-блока-в)
 * [Хранение IN B и OUT B для ряда задач](#хранение-in-b-и-out-b-для-ряда-задач)
 * [Для достигающих определений вычислить genB killB для любого B](#для-достигающих-определений-вычислить-genb-killb-для-любого-b)
 * [Итерационный алгоритм для достигающих определений](#итерационный-алгоритм-для-достигающих-определений)
@@ -52,6 +53,7 @@
 * [Генерация CIL-кода по трехадресному программному коду](#генерация-cil-кода-по-трехадресному-программному-коду)
 * [Итерационный алгоритм в задаче растпространения констант](#итерационный-алгоритм-в-задаче-растпространения-констант)
 * [Класс обобщенного итерационного  алгоритма](#класс-обобщенного-итерационного--алгоритма)
+* [Передаточная функция в задаче о распространении констант](#передаточная-функция-в-задаче-о-распространении-констант)
 * [Поиск доминаторов для каждой вершины графа потока управления](#поиск-доминаторов-для-каждой-вершины-графа-потока-управления)
 * [Получение трехадресного кода из графа потока управления](#получение-трехадресного-кода-из-графа-потока-управления)
 * [Определение того, является ли ребро обратным и являеется ли CFG приводимым](#определение-того,-является-ли-ребро-обратным-и-являеется-ли-cfg-приводимым)
@@ -236,7 +238,7 @@
         <td>qwerty</td>
     </tr>
     <tr>
-        <td>14 - нет</td>
+        <td>14</td>
         <td>Для достигающих определений вычислить genB, killB для любого B и разработать структуру для хранения передаточной функции.
             fB = fSn*fSn-1*...*fS1 - вычислить fSi для каждой инструкции ББл и потом найти композицию</td>
         <td>Roslyn</td>
@@ -324,7 +326,7 @@
         <td>Intel</td>
     </tr>
     <tr>
-        <td>31 - нет</td>
+        <td>31</td>
         <td>Передаточная функция в задаче о распространении констант</td>
         <td>Roslyn</td>
     </tr>
@@ -3394,7 +3396,153 @@ p = k
 ```
 
 [Вверх](#содержание)
-include "tac/14-tac.md"
+# Достигающие определения множества genB killB Передаточная функция базового блока В
+
+### Команда Roslyn
+
+#### Постановка задачи
+
+Задача состояла в реализации вычисления множеств genB и killB для анализа достигающих определений, а также в разработке структуры для хранения передаточной функции.
+
+#### Зависимости задач в графе задач
+Данная задача зависит от задачи генерации базовых блоков.
+
+От задачи зависит:
+* Реализация итерационного алгоритма для достигающих определений
+
+#### Теория
+
+genB — множество определений, генерируемых и не переопределённых базовым блоком B.
+killB — множество остальных определений переменных, определяемых в определениях genB, в других базовых блоках.
+Передаточная функция вычислятся по формуле `fB(X) = genB ∪ (X − killB)`. 
+
+#### Особенности реализации
+
+```csharp
+using BasicBlock = LinkedList<ThreeCode>;
+// Адаптор для совместимости с обобщённым итерационным алгоритмом
+public class ReachingDefsAdaptor
+{
+	private ReachingDefsTransferFunction tf;
+	public ReachingDefsAdaptor(CFG cfg)
+		=> tf = new ReachingDefsTransferFunction(cfg);
+	public TransferFunction<BlockInfo<ThreeCode>> TransferFunction()
+		=> new TransferFunction<BlockInfo<ThreeCode>>(bi =>
+		{
+			var Out = new BlockInfo<ThreeCode>(bi);
+			Out.OUT = tf.BlockTransferFunction(bi.Commands)
+				(new HashSet<ThreeCode>(bi.IN));
+			return Out;
+		});
+}
+public class ReachingDefsTransferFunction
+{
+	private CFG cfg;
+	public ReachingDefsTransferFunction(CFG cfg) => this.cfg = cfg;
+	private IEnumerable<ThreeCode> Definitions(BasicBlock bb)
+		=> bb.Where(tc => tc.operation != ThreeOperator.Goto
+			&& tc.operation != ThreeOperator.IfGoto
+			&& tc.operation != ThreeOperator.None);
+	private List<HashSet<ThreeCode>> InstructionGens(BasicBlock bb)
+		=> Definitions(bb).Select(tc =>
+			new HashSet<ThreeCode>(new ThreeCode[] { tc })
+		).ToList();
+	private List<HashSet<ThreeCode>> InstructionKills(BasicBlock bb)
+		=> Definitions(bb).Select(tc =>
+			new HashSet<ThreeCode>(cfg.blocks.Where(b => b != bb)
+				.Select(b => Definitions(b))
+				.SelectMany(e => e).Where(tc_cur => tc_cur.result == tc.result))
+		).ToList();
+	public HashSet<ThreeCode> Kill(BasicBlock bb)
+	{
+		var kills = InstructionKills(bb);
+		if (kills.Count == 0)
+			return new HashSet<ThreeCode>();
+		else
+			return kills.Aggregate((s1, s2) =>
+				new HashSet<ThreeCode>(s1.Union(s2))
+		);
+	}
+	public HashSet<ThreeCode> Gen(BasicBlock bb)
+	{
+		var gens = InstructionGens(new LinkedList<ThreeCode>
+			(bb.GroupBy(tc => tc.result, (tc, e) => e.Last())));
+		var kills = InstructionKills(bb);
+		int n = gens.Count;
+		if (n <= 0)
+			return new HashSet<ThreeCode>();
+		HashSet<ThreeCode> gen = gens[n - 1];
+		for (int i = n - 2; i >= 0; --i)
+		{
+			var gen_cur = gens[i];
+			for (int j = i + 1; j < n; ++j)
+				gen_cur.ExceptWith(kills[j]);
+			gen.UnionWith(gen_cur);
+		}
+		return gen;
+	}
+	private IEnumerable<InstructionTransferFunction> InstructionTransferFunctions(BasicBlock bb)
+	{
+		var tf = InstructionGens(bb).Zip(InstructionKills(bb), (g, k) =>
+			new InstructionTransferFunction(g, k));
+		if (tf.Count() == 0)
+			tf = new InstructionTransferFunction[] { new InstructionTransferFunction() };
+		return tf;
+	}
+	public Func<HashSet<ThreeCode>, HashSet<ThreeCode>> BlockTransferFunction(BasicBlock bb)
+		=> InstructionTransferFunctions(bb).Aggregate((f, g) => f * g).Func;
+}
+public class InstructionTransferFunction
+{
+	public Func<HashSet<ThreeCode>, HashSet<ThreeCode>> Func;
+	public InstructionTransferFunction()
+		=> Func = defs => defs;
+	public InstructionTransferFunction(HashSet<ThreeCode> gen, HashSet<ThreeCode> kill)
+		=> Func = defs => new HashSet<ThreeCode>(gen.Union(defs.Except(kill)));
+	public InstructionTransferFunction(Func<HashSet<ThreeCode>, HashSet<ThreeCode>> Func)
+		=> this.Func = Func;
+	public static InstructionTransferFunction operator *
+			(InstructionTransferFunction f, InstructionTransferFunction g)
+		=> new InstructionTransferFunction(defs => f.Func(g.Func(defs)));
+}
+```
+Функция _Gen_ вычисляет множество определений (команд трёхадресного кода), генерируемых блоком. Функция _Kill_ вычисляет множество всех определений, уничтожаемых блоком. Функция _BlockTransferFunction_ возвращает делегат передаточной функции, вычисленной по формуле. Класс _ReachingDefsAdaptor_ предоставляет функцию _TransferFunction_ в формате, совместимом с обобщённым итерационным алгоритмом.
+
+#### Тесты
+Пример исходной программы:
+```
+{
+		int i, j, m, n, a, u1, u2, u3, t, x;
+/*d1*/	i = m - 1;
+/*d3*/	j = n;
+/*d4*/	a = u1;
+		while (true)
+		{
+/*d5*/		i = i + 1;
+/*d6*/		j = j - 1;
+			if (false)
+			{
+/*d7*/			a = u2;
+			}
+/*d8*/		i = u3;
+		}
+}
+```
+Пример формирования множеств genB и killB:
+```
+GenB
+Block 1: { d1, d2, d3 }
+Block 2: { d4, d5 }
+Block 3: { d6 }
+Block 4: { d7 }
+KillB
+Block 1: { d4, d5, d6, d7 }
+Block 2: { d1, d2, d7 }
+Block 3: { d3 }
+Block 4: { d1, d4 }
+```
+
+[Вверх](#содержание)
 # Хранение IN B и OUT B для ряда задач
 
 ### Команда South Park
@@ -4742,7 +4890,133 @@ label_2:   println a
 [Вверх](#содержание)
 include "tac/29-tac.md"
 include "tac/30-tac.md"
-include "tac/31-tac.md"
+# Передаточная функция в задаче о распространении констант
+
+### Команда Roslyn
+
+#### Постановка задачи
+
+Задача состояла в разработке структуры для хранения передаточной функции для задачи о распространении констант.
+
+#### Зависимости задач в графе задач
+Данная задача зависит от задачи генерации базовых блоков.
+
+От задачи зависит:
+* Реализация итерационного алгоритма для распространения констант
+
+#### Теория
+
+fS — передаточная функция одной команды S.
+1. Если S — не присваивание, то fS — тождественная: `fS(m) = m`
+2. Если S: x = ..., то ∀v ≠ x m′(v) = m(v), а m′(x) определяется так:
+a) если x := c, то m′ x = c
+b) если x = y + z, то
+m′(x) = m(y) + m(z), если m(y) − const и m(z) − const, иначе
+m′(x) = NAC, если m(y) = NAC или m(z) = NAC, иначе
+m′(x) = UNDEF
+c) если x = g(...), то m′(x) = NAC (консервативно)
+
+#### Особенности реализации
+
+```csharp
+using ConstPropBlockInfo = BlockInfo<KeyValuePair<string, ConstPropSemilatticeEl>>;
+using ConstPropKeyValue = KeyValuePair<string, ConstPropSemilatticeEl>;
+public partial class ConstantPropagationOptimizer
+{
+	public static TransferFunction<ConstPropBlockInfo> TransferFunction()
+		=> new TransferFunction<ConstPropBlockInfo>(bi =>
+		{
+			var m = bi.IN.ToDictionary(e => e.Key);
+			foreach (var command in bi.Commands)
+			{
+				if (command.arg1 is ThreeAddressLogicValue
+						|| command.arg1 is ThreeAddressDoubleValue
+						|| command.arg2 is ThreeAddressLogicValue
+						|| command.arg2 is ThreeAddressDoubleValue)
+					continue;
+				if (command.operation == ThreeOperator.Assign)
+					m[command.result] = new ConstPropKeyValue(command.result,
+						GetSemilatticeEl(command.arg1, m));
+				else if (command.operation == ThreeOperator.Plus
+						|| command.operation == ThreeOperator.Minus
+						|| command.operation == ThreeOperator.Mult
+						|| command.operation == ThreeOperator.Div)
+				{
+					var el1 = GetSemilatticeEl(command.arg1, m);
+					var el2 = GetSemilatticeEl(command.arg2, m);
+					if (el1.Constantness == ValConstType.Const
+							&& el2.Constantness == ValConstType.Const)
+						m[command.result] = new ConstPropKeyValue(command.result,
+							new ConstPropSemilatticeEl(ValConstType.Const,
+								EvalConst(el1.Value, el2.Value, command.operation)));
+					else if (el1.Constantness == ValConstType.NAC
+							|| el2.Constantness == ValConstType.NAC)
+						m[command.result] = new ConstPropKeyValue(command.result,
+							new ConstPropSemilatticeEl(ValConstType.NAC));
+					else
+						m[command.result] = new ConstPropKeyValue(command.result,
+							new ConstPropSemilatticeEl(ValConstType.Undef));
+				}
+			}
+			var Out = new ConstPropBlockInfo(bi);
+			Out.OUT = new HashSet<ConstPropKeyValue>(m.Values);
+			return Out;
+		});
+	private static int EvalConst(int c1, int c2, ThreeOperator op)
+	{
+		switch (op)
+		{
+			case ThreeOperator.Plus:  return c1 + c2;
+			case ThreeOperator.Minus: return c1 - c2;
+			case ThreeOperator.Mult:  return c1 * c2;
+			case ThreeOperator.Div:   return c1 / c2;
+			default: throw new Exception("Logic error");
+		}
+	}
+	private static ConstPropSemilatticeEl GetSemilatticeEl
+		(ThreeAddressValueType val,
+		 Dictionary<string, ConstPropKeyValue> m)
+	{
+		ConstPropSemilatticeEl semilatticeEl = null;
+		if (val is ThreeAddressStringValue v)
+			semilatticeEl = m[v.Value].Value;
+		else if (val is ThreeAddressIntValue c)
+			semilatticeEl = new ConstPropSemilatticeEl(ValConstType.Const, c.Value);
+		return semilatticeEl;
+	}
+}
+```
+Класс _ConstantPropagationOptimizer_ предоставляет функцию _TransferFunction_ в формате, совместимом с обобщённым итерационным алгоритмом. _ConstPropSemilatticeEl_ — это тип элементов полурешётки. Значения этого типа имеют два поля: _Constantness_ и _Value_. Поле _Constantness_ допускает значения _Const_, _NAC_ и _Undef_. Поле _Value_ используется, если _Constantness_ имеет значение _Const_, и хранит значение константы типа _int_.
+
+#### Тесты
+Пример исходной программы:
+```
+{
+	int t1, t2, i, x, u1;
+	i = 2;
+	t1 = 4 * i;
+	x = 3 + 17;
+	u1 = 5 * t1;
+	t2 = i;
+}
+```
+Пример работы передаточной функции:
+```
+Before
+i: (Undef, 0)
+t1: (Undef, 0)
+x: (Undef, 0)
+u1: (Undef, 0)
+t2: (Undef, 0)
+After
+i: (Const, 2)
+t1: (Const, 8)
+x: (Const, 20)
+u1: (Const, 40)
+t2: (Const, 2)
+```
+
+[Вверх](#содержание)
 # Поиск доминаторов для каждой вершины графа потока управления
 
 ### Команда Komanda
