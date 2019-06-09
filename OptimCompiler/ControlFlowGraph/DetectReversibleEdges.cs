@@ -8,7 +8,7 @@ using static SpanTree;
 
 namespace SimpleLang
 {
-    class DetectReversibleEdges
+    public class DetectReversibleEdges
     {
         Dictionary<int, List<int>> dominators;
         List<Edge> edges;

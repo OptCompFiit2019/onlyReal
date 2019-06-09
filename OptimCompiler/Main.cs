@@ -19,7 +19,7 @@ namespace SimpleCompiler
     public class SimpleCompilerMain
     {
         public static void Main(string[] args) {
-            string FileName = @"../../../data/a10.txt";
+            string FileName = @"../../../data/ASTOpt.txt";
             if (args.Length > 0)
                 FileName = args[0];
             try {
@@ -42,6 +42,29 @@ namespace SimpleCompiler
                     r.Visit(generateParrent);
 
                     {
+
+                        AutoApplyVisitor vis = new AutoApplyVisitor();
+                        vis.Add(new OptWhileVisitor());
+                        vis.Add(new SimpleLang.AstOptimisations.LinearizeBlocks());
+
+
+                        vis.Add(new SimpleLang.Visitors.Opt2Visitor());
+                            vis.Add(new SimpleLang.Visitors.Opt11Visitor());
+                            vis.Add(new SimpleLang.Visitors.OptVisitor_8());
+                            vis.Add(new SimpleLang.Visitors.OptVisitor_13());
+                            vis.Add(new SimpleLang.Optimisations.OptSimilarDifference());
+                            vis.Add(new SimpleLang.Optimisations.OptSimilarAssignment());
+                            vis.Add(new SimpleLang.Visitors.OptMulDivOneVisitor());
+                            vis.Add(new SimpleLang.Visitors.OptWhileVisitor());
+                            vis.Add(new SimpleLang.Visitors.PlusNonZero());
+                            vis.Add(new SimpleLang.Visitors.ElseStVisitor());
+                            vis.Add(new SimpleLang.Visitors.LessOptVisitor());
+                            vis.Add(new SimpleLang.Visitors.MultiplicationComputeVisitor());
+                            vis.Add(new SimpleLang.Visitors.Opt7Visitor());
+                            vis.Add(new SimpleLang.AstOptimisations.LinearizeBlocks());
+                            vis.Add(new SimpleLang.AstOptimisations.FalseExprMoreAndNonEqualVisitor());
+                            vis.Add(new SimpleLang.Visitors.DeleteNullVisitor());
+                        vis.Apply(r);
                         ThreeAddressCodeVisitor treeCod2e = new ThreeAddressCodeVisitor();
                         r.Visit(treeCod2e);
 
@@ -54,7 +77,7 @@ namespace SimpleCompiler
                         //var blocks = new Block(treeCod2e).GenerateBlocks();
 
                         AutoThreeCodeOptimiser ap2p = new AutoThreeCodeOptimiser();
-                        ap2p.Add(new SimpleLang.ThreeCodeOptimisations.DistributionOfConstants());
+                        ap2p.Add(new DistributionOfConstants());
                         ap2p.Add(new SimpleLang.ThreeCodeOptimisations.EvalConstExpr());
                         ap2p.Add(new SimpleLang.ThreeCodeOptimisations.DeadOrAliveOptimizationAdapter());
 

@@ -52,27 +52,27 @@ namespace SimpleLang.ThreeCodeOptimisations
         {
             Console.WriteLine("IN");
             PrintSets(Ins);
-            Console.WriteLine("\nOUT");
+            Console.WriteLine(Environment.NewLine + "OUT");
             PrintSets(Outs);
         }
 
         public string GetOutput()
         {
-            string result = "IN\n";
+            string result = "IN" + Environment.NewLine;
             for (int i = 0; i < Ins.Count; ++i)
             {
-                var sets = Ins[i].Select(c => $"    {c.ToString()}\n");
+                var sets = Ins[i].Select(c => $"    {c.ToString()}" + Environment.NewLine);
                 if (sets.Count() == 0)
                     sets = new string[] { "" };
-                result += $"Block {i + 1} :\n" + sets.Aggregate((s1, s2) => s1 + s2) + '\n';
+                result += $"Block {i + 1} :" + Environment.NewLine + sets.Aggregate((s1, s2) => s1 + s2) + Environment.NewLine;
             }
-            result += "\nOUT\n";
+            result += Environment.NewLine + "OUT" + Environment.NewLine;
             for (int i = 0; i < Outs.Count; ++i)
             {
-                var sets = Outs[i].Select(c => $"    {c.ToString()}\n");
+                var sets = Outs[i].Select(c => $"    {c.ToString()}" + Environment.NewLine);
                 if (sets.Count() == 0)
                     sets = new string[] { "" };
-                result += $"Block {i + 1} :\n" + sets.Aggregate((s1, s2) => s1 + s2) + '\n';
+                result += $"Block {i + 1} :" + Environment.NewLine + sets.Aggregate((s1, s2) => s1 + s2) + Environment.NewLine;
             }
             return result;
         }
@@ -80,10 +80,10 @@ namespace SimpleLang.ThreeCodeOptimisations
         {
             for (int i = 0; i < Sets.Count; ++i)
             {
-                var sets = Sets[i].Select(c => $"    {c.ToString()}\n");
+                var sets = Sets[i].Select(c => $"    {c.ToString()}" + Environment.NewLine);
                 if (sets.Count() == 0)
                     sets = new string[] { "" };
-                Console.WriteLine($"Block {i + 1} :\n" + sets.Aggregate((s1, s2) => s1 + s2));
+                Console.WriteLine($"Block {i + 1} :" + Environment.NewLine + sets.Aggregate((s1, s2) => s1 + s2));
             }
         }
     }

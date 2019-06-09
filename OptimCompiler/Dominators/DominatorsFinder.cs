@@ -6,7 +6,7 @@ using SimpleLang.ControlFlowGraph;
 
 namespace SimpleLang.Dominators
 {
-    class DominatorsFinder
+    public class DominatorsFinder
     {
         private readonly ControlFlowGraph.ControlFlowGraph cfg;
 
