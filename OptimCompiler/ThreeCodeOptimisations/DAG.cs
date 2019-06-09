@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SimpleLang.Visitors
 {
-    class DAGBlocks
+    public class DAGBlocks
     {
         private LinkedList<ThreeCode> program;
         public LinkedList<ThreeCode> Program
@@ -44,7 +44,7 @@ namespace SimpleLang.Visitors
     }
 
 
-    class GraphNode
+    public class GraphNode
     {
         public ThreeCode code;
         public GraphNode left;
@@ -80,7 +80,7 @@ namespace SimpleLang.Visitors
         }
     }
 
-    class DAG
+    public class DAG
     {
         public GraphNode root;
         public List<ThreeCode> program;

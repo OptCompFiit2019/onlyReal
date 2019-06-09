@@ -1,0 +1,10 @@
+{
+    int a,b;
+    a = 3;
+    while (a < 10){
+        a = a + 1;
+    }
+    if (true){
+        a = a - 5;
+    }
+}

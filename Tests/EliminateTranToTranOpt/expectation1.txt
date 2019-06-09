@@ -1,0 +1,12 @@
+           a = 3
+label_0:   temp_1 = a < 10
+           temp_0 = temp_1
+           if temp_0 goto label_1
+           goto label_2
+label_1:   a = a + 1
+           goto label_0
+label_2:   if True goto label_3
+           goto label_4
+label_3:   
+           a = a - 5
+label_4:   
