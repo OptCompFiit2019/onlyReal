@@ -64,6 +64,7 @@
             this.checkBox53 = new System.Windows.Forms.CheckBox();
             this.checkBox52 = new System.Windows.Forms.CheckBox();
             this.checkBox51 = new System.Windows.Forms.CheckBox();
+            this.checkBox17 = new System.Windows.Forms.CheckBox();
             this.checkBox16 = new System.Windows.Forms.CheckBox();
             this.checkBox15 = new System.Windows.Forms.CheckBox();
             this.checkBox14 = new System.Windows.Forms.CheckBox();
@@ -284,6 +285,7 @@
             this.tabPage2.Controls.Add(this.checkBox52);
             this.tabPage2.Controls.Add(this.checkBox51);
             this.tabPage2.Controls.Add(this.checkBox16);
+            this.tabPage2.Controls.Add(this.checkBox17);
             this.tabPage2.Controls.Add(this.checkBox15);
             this.tabPage2.Controls.Add(this.checkBox14);
             this.tabPage2.Controls.Add(this.checkBox13);
@@ -575,13 +577,24 @@
             // checkBox16
             // 
             this.checkBox16.AutoSize = true;
-            this.checkBox16.Location = new System.Drawing.Point(4, 375);
+            this.checkBox16.Location = new System.Drawing.Point(4, 398);
             this.checkBox16.Name = "checkBox16";
             this.checkBox16.Size = new System.Drawing.Size(70, 17);
             this.checkBox16.TabIndex = 3;
             this.checkBox16.Text = "Select All";
             this.checkBox16.UseVisualStyleBackColor = true;
             this.checkBox16.CheckedChanged += new System.EventHandler(this.checkBox5_CheckedChanged);
+            // 
+            // checkBox17
+            // 
+            this.checkBox17.AutoSize = true;
+            this.checkBox17.Location = new System.Drawing.Point(4, 352);
+            this.checkBox17.Name = "checkBox17";
+            this.checkBox17.Size = new System.Drawing.Size(78, 17);
+            this.checkBox17.TabIndex = 3;
+            this.checkBox17.Text = "Dead or Alive on Graph";
+            this.checkBox17.UseVisualStyleBackColor = true;
+            this.checkBox17.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // checkBox15
             // 
@@ -867,6 +880,7 @@
         private System.Windows.Forms.CheckBox checkBox53;
         private System.Windows.Forms.CheckBox checkBox52;
         private System.Windows.Forms.CheckBox checkBox51;
+        private System.Windows.Forms.CheckBox checkBox17;
         private System.Windows.Forms.CheckBox checkBox16;
         private System.Windows.Forms.CheckBox checkBox15;
         private System.Windows.Forms.CheckBox checkBox14;
