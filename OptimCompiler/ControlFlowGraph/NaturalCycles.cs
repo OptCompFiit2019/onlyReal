@@ -127,6 +127,8 @@ namespace SimpleLang.ControlFlowGraph
                     }
                 }
             }
+            for (int i = 0; i < ways.Count; i++)
+                ways[i].Sort();
             return ways;
         }
 
