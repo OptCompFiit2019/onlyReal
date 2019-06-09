@@ -18,7 +18,7 @@ InB: c a i
 OutB: i
 Block7
 InB: i
-OutB:
+OutB: i
 Block8
 InB:
 OutB: j i
