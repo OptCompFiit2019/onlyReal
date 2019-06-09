@@ -169,6 +169,19 @@ namespace SimpleLang.ControlFlowGraph
             return this;
         }
 
+        public LinkedList<ThreeCode> GetThreeAddressCode()
+        {
+            var res = new LinkedList<ThreeCode>();
+            foreach(var block in this.blocks)
+            {
+                foreach(var code in block)
+                {
+                    res.AddLast(code);
+                }
+            }
+            return res;
+        }
+
         public int[,] GetAsAdjacencyMatrix()
         {
             return this.cfg.GetAdjacencyMatrix();
