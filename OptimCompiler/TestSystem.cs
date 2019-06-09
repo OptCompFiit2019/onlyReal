@@ -213,7 +213,7 @@ namespace SimpleLang
         {
             var text = File.ReadAllLines(path);
             List<ThreeCode> program = new List<ThreeCode>();
-            var label_rx = new Regex(@"\s*(label_\d{1}):.*");
+            var label_rx = new Regex(@"\s*(label_\d+):.*");
             var if_rx = new Regex(@"\s*if (\S+) goto (label_\d+).*");
             var goto_rx = new Regex(@"\s*goto\s+(label_\d)");
             var binop_rx = new Regex(@"\s*(\w[\w\d]*)\s*=\s*(\w[\w\d.,]*)\s*([+\-*\/<>=!]{1,2})\s*(\w[\w\d.,]*)]?");
@@ -371,7 +371,27 @@ namespace SimpleLang
                         {
                             bool _apply = false;
                             bool testFault = false;
-                            var optimizer = new DAG(sourceBlocks[j].ToList());
+
+                            var make_program = new List<ThreeCode>();
+                            var prog = sourceBlocks[j].ToList();
+                            int r = 0;
+                            for (r = 0; r < prog.Count - 1; r++)
+                            {
+                                if (prog[r + 1].arg1 != null && prog[r].result.Equals(prog[r + 1].arg1.ToString()) && prog[r].result.Contains("temp_") && prog[r + 1].arg2 == null)
+                                {
+                                    if (prog[r].label != "")
+                                        make_program.Add(new ThreeCode(prog[r].label, prog[r + 1].result, prog[r].operation, prog[r].arg1, prog[r].arg2));
+                                    else
+                                        make_program.Add(new ThreeCode(prog[r + 1].result, prog[r].operation, prog[r].arg1, prog[r].arg2));
+                                    r++;
+                                }
+                                else
+                                    make_program.Add(prog[r]);
+                            }
+                            if (r == prog.Count - 1)
+                                make_program.Add(prog[r]);
+
+                            var optimizer = new DAG(make_program);
                             var opt_program = optimizer.Optimize(ref _apply);
                             var target = optimizer.MakeProgram(expectationBlocks[j].ToList());
                             CheckResults(opt_program.ToList(), target, ref flag, ref testFault, source, j);
@@ -1049,10 +1069,32 @@ namespace SimpleLang
                                 if (opt_program[k] != target[k])
                                 {
                                     Console.WriteLine("Тест {0} не пройден! Ошибка в строке {1}!", source, k);
-                                    Console.WriteLine(opt_program[k] + '\n' + "-----------\n" + target[k]);
+                                    Console.WriteLine("Получилось:\n" + opt_program[k] + '\n' + "-----------\nОжидалось:\n" + target[k]);
                                     flag = false;
                                     break;
                                 }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "ConstantPropagation": //Roslyn
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                            expectationCode = GetThreeAddressCodeVisitor(pathToFolder, expectation);
+                            expectationBlocks = new Block.Block(expectationCode).GenerateBlocks();
+                            flag = true;
+
+                            var constPropOptimizer = new ConstantPropagationOptimizer();
+                            var cfg = constPropOptimizer.ApplyOptimization(sourceBlocks).blocks;
+                            for (int j = 0; j < sourceBlocks.Count; j++)
+                            {
+                                bool testFault = false;
+                                var opt_program = cfg[j];
+                                var target = expectationBlocks[j].ToList();
+                                CheckResults(opt_program.ToList(), target, ref flag, ref testFault, source, j);
+                            }
                         }
                         if (flag)
                             Console.WriteLine("Тест {0} успешно пройден!", source);
@@ -1074,7 +1116,7 @@ namespace SimpleLang
                                 if (opt_program[k] != target[k])
                                 {
                                     Console.WriteLine("Тест {0} не пройден! Ошибка в строке {1}!", source, k);
-                                    Console.WriteLine(opt_program[k] + '\n' + "-----------\n" + target[k]);
+                                    Console.WriteLine("Получилось:\n" + opt_program[k] + '\n' + "-----------\nОжидалось:\n" + target[k]);
                                     flag = false;
                                     break;
                                 }
@@ -1089,7 +1131,6 @@ namespace SimpleLang
                             sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
                             expectationSets = File.ReadAllLines(pathToFolder + expectation);
                             flag = true;
-                            var ucfg = new CFG(sourceCode);
                             var cfg = new CFG(sourceCode).GetAsGraph().GetAdjacencyList();
                             if (expectationSets.Length - 1 != cfg.Count)
                             {
@@ -1104,18 +1145,88 @@ namespace SimpleLang
                                 {
                                     if (cfg.ElementAt(j).ElementAt(k).ToString() != edges0[k+1])
                                     {
-                                        Console.WriteLine("Тест {0} не пройден: вершины не совпадают", source);
+                                        Console.WriteLine("Тест {0} не пройден: в строке {1} ожидалось {2}, получилось {3}", source, j, edges0[k + 1], cfg.ElementAt(j).ElementAt(k));
                                         flag = false;
                                         break;
                                     }
                                 }
                             }
-
                         }
                         if (flag)
                             Console.WriteLine("Тест {0} успешно пройден!", source);
                         break;
 
+                    case "Dominators": //komanda
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                            expectationSets = File.ReadAllLines(pathToFolder + expectation);
+                            flag = true;
+
+                            var cfg = new CFG(sourceCode);
+                            var finder = new Dominators.DominatorsFinder(cfg);
+                            var dominators = finder.Find();
+
+                            if (expectationSets.Length != dominators.Count)
+                            {
+                                Console.WriteLine("Тест {0} не пройден: кол-во ББл не совпадает с ожидаемым", source);
+                                flag = false;
+                                break;
+                            }
+                            for (int j = 0; j < dominators.Count; j++)
+                            {
+                                var edges0 = expectationSets[j].Split(' ');
+                                for (int k = 0; k < dominators[j].Count; k++)
+                                {
+                                    if (dominators[j].ElementAt(k).ToString() != edges0[k + 1])
+                                    {
+                                        Console.WriteLine("Тест {0} не пройден: в строке {1} ожидалось {2}, получилось {3}", source, j, edges0[k + 1], dominators[j].ElementAt(k));
+                                        flag = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "EliminateTranToTranOpt": //Boom
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                            flag = true;
+                            bool testFault = false;
+                            var optimizer = new EliminationTranToTranOpt();
+                            var opt_program = optimizer.TranToTranOpt(sourceCode.GetCode());
+                            var target = ParseThreeCode(pathToFolder + expectation);
+                            CheckResults(opt_program.ToList(), target, ref flag, ref testFault, source);
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "BooleanNode": //GreatBean
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            flag = true;
+                            bool testFault = false;
+                            AutoThreeCodeOptimiser ap2p = new AutoThreeCodeOptimiser();
+                            ap2p.Add(new SimpleLang.ThreeCodeOptimisations.DistributionOfConstants());
+                            ap2p.Add(new SimpleLang.ThreeCodeOptimisations.EvalConstExpr());
+                            ap2p.Add(new SimpleLang.ThreeCodeOptimisations.DeadOrAliveOptimizationAdapter());
+                            var blockwss = ap2p.Apply(sourceCode);
+                            var opt_program = new List<ThreeCode>();
+                            for (int j = 0; j < blockwss.Count; j++)
+                                opt_program.AddRange(blockwss[j]);
+                            var target = ParseThreeCode(pathToFolder + expectation);
+                            CheckResults(opt_program.ToList(), target, ref flag, ref testFault, source);
+
+
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
 
                     case "AST_Opt8Visitor":  //qwerty
                         {
@@ -1232,7 +1343,9 @@ namespace SimpleLang
                         break;
 
                     //здесь будет
-                    //ConstantPropagation       Roslyn
+                    //DetectReversibleEdges         GreatBean
+                    //Reducibility_CFG              GreatBean
+                    //GenerateAttainableVariables   Nvidia
 
                     default:
                         break;
