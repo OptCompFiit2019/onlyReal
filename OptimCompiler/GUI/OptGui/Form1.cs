@@ -103,6 +103,8 @@ namespace OptGui
                 res.Add(new SimpleLang.ThreeCodeOptimisations.EliminationTranToTranOpt());
             if (checkBox15.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.PullCopiesOpt());
+            if (checkBox17.Checked)
+                res.Add(new SimpleLang.ThreeOptimize.DeadOrAliveOnGraphAdapter());
             return res;
         }
         void UpdateForms() {
@@ -656,6 +658,7 @@ namespace OptGui
             checkBox13.Checked = checkBox16.Checked;
             checkBox14.Checked = checkBox16.Checked;
             checkBox15.Checked = checkBox16.Checked;
+            checkBox17.Checked = checkBox16.Checked;
             UpdateMode();
         }
     }
