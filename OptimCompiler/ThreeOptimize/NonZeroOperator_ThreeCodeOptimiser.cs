@@ -7,90 +7,116 @@ using SimpleLang.Visitors;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    public class NonZero_JTJOpt :ThreeCodeOptimiser
+    public class NonZero_JTJOpt : ThreeCodeOptimiser
     {
-        public LinkedList<ThreeCode> code;
-        private bool _applyed = false;
+        public List<LinkedList<ThreeCode>> code;
+        public LinkedList<ThreeCode> realCode=new LinkedList<ThreeCode>();
+        private bool _apply = false;
 
         public void Apply(ref LinkedList<ThreeCode> program)
         {
-            _applyed = false;
-            code = program;
-            DeleteEmptyOp();
-            DeleteJumpThroughJump();
+
         }
 
         public void Apply(ref List<LinkedList<ThreeCode>> res)
         {
-            throw new NotImplementedException();
+            _apply = false;
+            code = res;
+            DeleteEmptyOp();
+            DeleteJumpThroughJump();
+            var tmp = new List<LinkedList<ThreeCode>>();
+            tmp.Add(realCode);
+            res = tmp;
+            realCode = new LinkedList<ThreeCode>();
         }
 
         public bool Applyed()
         {
-            return _applyed;
+            return _apply;
         }
 
         public void DeleteEmptyOp() //очистка от пустых операторов
         {
-            var line = this.code.First;
+
+            for (var k = 0; k < code.Count; k++)
+            {
+                var bl = code[k].ToList();
+                foreach (var l in bl)
+                {
+                    realCode.AddLast(l);
+                }
+
+            }
+            var line = realCode.First;
             while (line.Next != null)
             {
                 if (line.Next.Value.arg1 == null && line.Next.Value.arg2 == null && line.Next.Value.result == null)
                 {
                     line = line.Next.Next;
-                    _applyed = true;
+                    _apply = true;
                     continue;
                 }
                 line = line.Next;
             }
+          
         }
 
         public void DeleteJumpThroughJump() //устранение переходов через переходы
         {
-            var line = this.code.First;
-            string lblOld = "", lblNew = "";
-            bool inIf = false;
-            while (line != null)
+            realCode = new LinkedList<ThreeCode>();
+            for (var k = 0; k < code.Count; k++)
             {
-                if (inIf && line.Value.operation == ThreeOperator.Goto && line.Value.arg1.ToString() == lblNew)
+                var bl = code[k].ToList();
+                foreach (var l in bl)
                 {
-                    var nextLine = line.Next;
-                    code.Remove(line);
-                    line = nextLine;
-                    _applyed = true;
-                    continue;
+                    realCode.AddLast(l);
                 }
-
-                if (line.Value.operation == ThreeOperator.IfGoto && (line.Value.arg1 is ThreeAddressLogicValue))
-                {
-                    inIf = true;
-
-                    var tmp = line.Value.arg1 as ThreeAddressLogicValue;
-                    var t = !tmp.Value;
-                    (line.Value.arg1 as ThreeAddressLogicValue).Value = t;
-
-                    if (!string.IsNullOrEmpty(line.Value.arg2.ToString()))
-                    {
-                        var ee = line.Value.arg2.ToString();
-                        lblOld = line.Value.arg2.ToString();
-                        var nn = line.Next.Value.arg1;
-                        (line.Value.arg2 as ThreeAddressStringValue).Value = (line.Next.Value.arg1 as ThreeAddressStringValue).Value;
-                        code.Remove(line.Next);
-                        code.Remove(line.Next);
-                        line = line.Next;                      
-                    }
-                    line = line.Next.Next;
-                    _applyed = true;
-
-                    continue;
-                }
-                line = line.Next;
+                
             }
+                var line = realCode.First;
+                string lblOld = "", lblNew = "";
+                bool inIf = false;
+                while (line != null)
+                {
+                    if (inIf && line.Value.operation == ThreeOperator.Goto && line.Value.arg1.ToString() == lblNew)
+                    {
+                        var nextLine = line.Next;
+                        realCode.Remove(line);
+                        line = nextLine;
+                        _apply = true;
+                        continue;
+                    }
+
+                    if (line.Value.operation == ThreeOperator.IfGoto && (line.Value.arg1 is ThreeAddressLogicValue) && line.Next.Value.operation == ThreeOperator.Goto)
+                    {
+                        inIf = true;
+
+                        var tmp = line.Value.arg1 as ThreeAddressLogicValue;
+                        var t = !tmp.Value;
+                        (line.Value.arg1 as ThreeAddressLogicValue).Value = t;
+
+                        if (!string.IsNullOrEmpty(line.Value.arg2.ToString()))
+                        {
+                            var ee = line.Value.arg2.ToString();
+                            lblOld = line.Value.arg2.ToString();
+                            var nn = line.Next.Value.arg1;
+                            (line.Value.arg2 as ThreeAddressStringValue).Value = (line.Next.Value.arg1 as ThreeAddressStringValue).Value;
+                            realCode.Remove(line.Next);
+                            realCode.Remove(line.Next);
+                            line = line.Next;
+                        }
+                        line = line.Next.Next;
+                        _apply = true;
+
+                        continue;
+                    }
+                    line = line.Next;
+                }
         }
 
         public bool NeedFullCode()
         {
-            return false;
+            return true;
         }
     }
 }
