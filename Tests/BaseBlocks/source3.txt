@@ -1,0 +1,19 @@
+{
+	real b;
+	int c;
+	c=1;
+	b=8.56;
+	if (true)
+	{
+		b=3.14;
+	} 
+	else 
+	{
+		int j;
+		for (j=0 to 10)
+		{
+			b=b+1.4;
+		}
+		c=c+1;
+	}
+}

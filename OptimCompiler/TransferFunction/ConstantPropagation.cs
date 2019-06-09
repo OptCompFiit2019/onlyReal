@@ -39,11 +39,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                 var m = bi.IN.ToDictionary(e => e.Key);
                 foreach (var command in bi.Commands)
                 {
-                    if (command.operation == ThreeOperator.Goto
-                            || command.operation == ThreeOperator.IfGoto
-                            || command.operation == ThreeOperator.None
-                            || command.operation == ThreeOperator.Println
-                            || command.arg1 is ThreeAddressLogicValue
+                    if (command.arg1 is ThreeAddressLogicValue
                             || command.arg1 is ThreeAddressDoubleValue
                             || command.arg2 is ThreeAddressLogicValue
                             || command.arg2 is ThreeAddressDoubleValue)
@@ -51,7 +47,10 @@ namespace SimpleLang.ThreeCodeOptimisations
                     if (command.operation == ThreeOperator.Assign)
                         m[command.result] = new ConstPropKeyValue(command.result,
                             GetSemilatticeEl(command.arg1, m));
-                    else
+                    else if (command.operation == ThreeOperator.Plus
+                            || command.operation == ThreeOperator.Minus
+                            || command.operation == ThreeOperator.Mult
+                            || command.operation == ThreeOperator.Div)
                     {
                         var el1 = GetSemilatticeEl(command.arg1, m);
                         var el2 = GetSemilatticeEl(command.arg2, m);

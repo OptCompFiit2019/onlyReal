@@ -1,0 +1,56 @@
+DeclareLocal a: System.Boolean
+DeclareLocal b: System.Boolean
+DeclareLocal c: System.Double
+DeclareLocal d: System.Int32
+DeclareLocal temp_1: System.Boolean
+DeclareLocal temp_0: System.Boolean
+DeclareLocal temp_3: System.Boolean
+DeclareLocal temp_4: System.Boolean
+DeclareLocal temp_2: System.Boolean
+DefineLabel Label0
+DefineLabel Label1
+ldc.i4.1
+stloc a
+ldloc a
+ldc.i4.1
+xor
+stloc temp_1
+ldloc temp_1
+ldc.i4.1
+xor
+stloc temp_0
+ldloc temp_0
+stloc b
+ldc.r8 1,1
+stloc c
+ldloc a
+ldc.i4.1
+ceq
+stloc temp_3
+ldloc b
+ldc.i4.0
+ceq
+stloc temp_4
+ldloc temp_3
+ldloc temp_4
+and
+stloc temp_2
+ldloc temp_2
+brtrue Label0
+ldc.i4 2
+stloc d
+br Label1
+MarkLabel Label0
+ldc.r8 3,14
+stloc c
+ldc.i4 1
+stloc d
+MarkLabel Label1
+ldloc c
+WriteLine
+ldloc d
+WriteLine
+
+Execute:
+1,1
+2

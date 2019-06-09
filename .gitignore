@@ -6,4 +6,5 @@ SimpleLex.cs
 SimpleYacc.cs
 *.icloud
 *.jpg
+*.dll
 .idea/*

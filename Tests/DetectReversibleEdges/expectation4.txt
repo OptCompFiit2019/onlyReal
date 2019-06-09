@@ -1,0 +1,10 @@
+Edge 1 -> 2 is not reverse
+Edge 2 -> 3 is not reverse
+Edge 2 -> 4 is not reverse
+Edge 3 -> 9 is not reverse
+Edge 4 -> 5 is not reverse
+Edge 5 -> 6 is not reverse
+Edge 5 -> 7 is not reverse
+Edge 6 -> 8 is not reverse
+Edge 7 -> 5 is reverse
+Edge 8 -> 2 is reverse

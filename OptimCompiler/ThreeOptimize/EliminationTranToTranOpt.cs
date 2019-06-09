@@ -118,7 +118,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                     continue;
 
                 var nextNode = targetNode.Next;
-                if (nextNode == null)
+                if (nextNode == null || nextNode.Value.label == "")
                     continue;
                 
                 gotoNode2 = ConvertGotoToIfGotoWithoutLabel(targetNode);

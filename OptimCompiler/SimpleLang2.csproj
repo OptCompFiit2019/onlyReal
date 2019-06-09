@@ -64,6 +64,8 @@
     <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
     <Compile Include="IterationAlgorithm\AttainableVariables.cs" />
     <Compile Include="IterativeAlgorithm.cs" />
+    <Compile Include="ReachingDefsAnalysis\ReachingDefsAnalysis.cs" />
+    <Compile Include="ReachingDefsAnalysis\ReachingDefsTransferFunction.cs" />
     <Compile Include="TestSystem.cs" />
     <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
     <Compile Include="ThreeCodeOptimisations\ConstantPropagationOptimization.cs" />
@@ -75,13 +77,11 @@
     <Compile Include="ThreeCodeOptimisations\PullOfCopies.cs" />
     <Compile Include="ThreeOptimize\ApplyAlgebraicIdentities.cs" />
     <Compile Include="ThreeOptimize\DeleteOfDeadCodeOpt.cs" />
-    <Compile Include="ThreeOptimize\EliminationTranToTranOpt.cs" />
+    <Compile Include="ThreeOptimize\PullCopiesOpt.cs" />
     <Compile Include="ThreeOptimize\PullOfCopiesOpt.cs" />
     <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="TransferFunction %28Intel%29\TransferFunction.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
-    <Compile Include="TransferFunction\ReachingDefsTest.cs" />
-    <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />

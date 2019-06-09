@@ -1,0 +1,25 @@
+{
+	int a, b, hh;
+	bool c, d, gg;
+	real e;
+	c = true;
+	d = !c;
+	e = 1.1;
+	gg = false;
+	a = 3;
+	b = 5;
+	hh = 13;
+	while (!gg && (a < b)) {
+		hh=23;
+		println(((c==true) && (d == false)));
+		if ((c==true) && (d == false))
+		{
+			b=2;
+		}
+		else
+			e=3.14;
+	}
+	println(e);
+	println(b);
+	println(hh);
+}

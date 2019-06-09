@@ -1,0 +1,111 @@
+DeclareLocal a: System.Int32
+DeclareLocal b: System.Int32
+DeclareLocal hh: System.Int32
+DeclareLocal c: System.Boolean
+DeclareLocal d: System.Boolean
+DeclareLocal gg: System.Boolean
+DeclareLocal e: System.Double
+DeclareLocal temp_0: System.Boolean
+DefineLabel Label0
+DeclareLocal temp_3: System.Boolean
+DeclareLocal temp_4: System.Boolean
+DeclareLocal temp_2: System.Boolean
+DeclareLocal temp_1: System.Boolean
+DefineLabel Label1
+DeclareLocal temp_6: System.Boolean
+DeclareLocal temp_7: System.Boolean
+DeclareLocal temp_5: System.Boolean
+DeclareLocal temp_9: System.Boolean
+DeclareLocal temp_10: System.Boolean
+DeclareLocal temp_8: System.Boolean
+DefineLabel Label2
+DefineLabel Label3
+DefineLabel Label4
+ldc.i4.1
+stloc c
+ldloc c
+ldc.i4.1
+xor
+stloc temp_0
+ldloc temp_0
+stloc d
+ldc.r8 1,1
+stloc e
+ldc.i4.0
+stloc gg
+ldc.i4 3
+stloc a
+ldc.i4 5
+stloc b
+ldc.i4 13
+stloc hh
+MarkLabel Label0
+ldloc gg
+ldc.i4.1
+xor
+stloc temp_3
+ldloc a
+ldloc b
+clt
+stloc temp_4
+ldloc temp_3
+ldloc temp_4
+and
+stloc temp_2
+ldloc temp_2
+stloc temp_1
+ldloc temp_1
+brtrue Label1
+br Label4
+MarkLabel Label1
+ldc.i4 23
+stloc hh
+ldloc c
+ldc.i4.1
+ceq
+stloc temp_6
+ldloc d
+ldc.i4.0
+ceq
+stloc temp_7
+ldloc temp_6
+ldloc temp_7
+and
+stloc temp_5
+ldloc temp_5
+WriteLine
+ldloc c
+ldc.i4.1
+ceq
+stloc temp_9
+ldloc d
+ldc.i4.0
+ceq
+stloc temp_10
+ldloc temp_9
+ldloc temp_10
+and
+stloc temp_8
+ldloc temp_8
+brtrue Label2
+ldc.r8 3,14
+stloc e
+br Label3
+MarkLabel Label2
+ldc.i4 2
+stloc b
+MarkLabel Label3
+br Label0
+MarkLabel Label4
+ldloc e
+WriteLine
+ldloc b
+WriteLine
+ldloc hh
+WriteLine
+
+Execute:
+True
+1,1
+2
+23

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -27,7 +27,7 @@
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-<ItemGroup>
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,6 +43,9 @@
     <Compile Include="AstOptimisations\FalseExprMoreAndNonEqualVisitor.cs" />
     <Compile Include="AstOptimisations\Opt_8_13.cs" />
     <Compile Include="AstOptimisations\LinearizeBlocks.cs" />
+    <Compile Include="ReachingDefsAnalysis\ReachingDefsAnalysis.cs" />
+	<Compile Include="ReachingDefsAnalysis\ReachingDefsTransferFunction.cs" />
+    <Compile Include="ThreeCodeOptimisations\PullOfCopies.cs" />
     <Compile Include="ThreeOptimize\DAGOpt.cs" />
     <Compile Include="ThreeOptimize\CommonExprOpt.cs" />
     <Compile Include="ThreeOptimize\EliminationTranToTranOpt.cs" />
@@ -54,7 +57,6 @@
     <Compile Include="GenericIterativeAlgorithm\Test.cs" />
     <Compile Include="GenericIterativeAlgorithm\IterativeAlgorithm.cs" />
     <Compile Include="IterativeAlgorithm.cs" />
-    <Compile Include="PullOfCopies.cs" />
     <Compile Include="ThreeCodeOptimisations\CommonExpr.cs" />
     <Compile Include="ThreeCodeOptimisations\ConstantPropagationOptimization.cs" />
     <Compile Include="ThreeCodeOptimisations\DeadOrAliveOnGraph.cs" />
@@ -66,8 +68,6 @@
     <Compile Include="ThreeOptimize\PullOfCopiesOpt.cs" />
     <Compile Include="ThreeOptimize\UnreachableCodeOpt.cs" />
     <Compile Include="TransferFunction\ConstantPropagation.cs" />
-    <Compile Include="TransferFunction\ReachingDefsTest.cs" />
-    <Compile Include="TransferFunction\ReachingDefsTransferFunction.cs" />
     <Compile Include="Visitors\AssignCountVisitor.cs" />
     <Compile Include="Visitors\AutoVisitor.cs" />
     <Compile Include="Visitors\CycleNestedToIfVisitor.cs" />
@@ -115,7 +115,6 @@
     <Compile Include="AstOptimisations\ElseStVisitor.cs" />
     <Compile Include="ControlFlowGraph\DetectReversibleEdges.cs" />
     <Compile Include="Dominators\DominatorsFinder.cs" />
-
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

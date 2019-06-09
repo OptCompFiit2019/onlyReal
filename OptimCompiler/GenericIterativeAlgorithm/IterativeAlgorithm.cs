@@ -45,7 +45,8 @@ namespace SimpleLang.GenericIterativeAlgorithm
 
         public BlockInfo(BlockInfo<T> source)
         {
-            Commands = new LinkedList<ThreeCode>(source.Commands);
+            if (source.Commands != null)
+                Commands = new LinkedList<ThreeCode>(source.Commands);
             IN = new HashSet<T>(source.IN);
             OUT = new HashSet<T>(source.OUT);
             HelpFirst = new HashSet<T>(source.HelpFirst);
@@ -119,7 +120,7 @@ namespace SimpleLang.GenericIterativeAlgorithm
             else
                 BlocksInfo[countBlocks - 1].IN = InitEntryExit;
 
-            int startIndex = IsForward ? 1 : 0;
+            int startIndex = 0;
             int endIndex = IsForward ? countBlocks : countBlocks - 1;
 
             bool isChanged = true;

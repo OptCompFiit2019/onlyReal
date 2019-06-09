@@ -23,17 +23,25 @@ namespace SimpleLang
 
             var spt = new SpanTree(cfg);
             edges = spt.buildSpanTree();
+
+            foreach (var e in edges)
+                isReversible[e] = dominators.Keys.Contains(e.v1.num)
+                    && dominators[e.v1.num].Contains(e.v2.num);
         }
 
         // возвращает заполненный словарь isReversible
         public Dictionary<Edge, bool> isRevers()
         {
-            foreach (var e in edges)
-                isReversible[e] = (e.type == EdgeType.Back)
-                    && dominators.Keys.Contains(e.v1.num)
-                    && dominators[e.v1.num].Contains(e.v2.num);
-
             return isReversible;
+        }
+
+        // Выводит словарь isReversible в консоль
+        public void PrintIsReverseDic()
+        {
+            var dic = isRevers();
+            foreach (var x in dic)
+                Console.WriteLine("Edge {0} -> {1} is {2}", x.Key.v1.num.ToString(),  
+                    x.Key.v2.num.ToString(), x.Value? "reverse" : "not reverse");
         }
 
         //Функция определяет, является ли граф приводимым.
@@ -47,10 +55,16 @@ namespace SimpleLang
                     countBack++;
 
             foreach (var i in isReversible)
-                if (i.Value == true)
+                if (i.Value)
                     countReversible++;
 
             return countBack == countReversible;
+        }
+
+        // Выводит в консоль факт приводимости CFG
+        public void PrintisReducible()
+        {
+            Console.WriteLine("CFG is {0}", isReducible() ? "reducibile" : "not reducibile");
         }
     }
 }

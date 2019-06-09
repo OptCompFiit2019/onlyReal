@@ -1,0 +1,14 @@
+{
+    int a,b,c;
+    b = 5;
+    a = 1;
+    a = 2;
+    a = 3;
+	if (false)
+	{
+		println(1);
+		println(3);
+		a = 5;
+		println(a);
+	}
+}

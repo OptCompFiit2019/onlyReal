@@ -8,7 +8,7 @@ using SimpleLang.GenericIterativeAlgorithm;
 
 namespace SimpleLang.ThreeCodeOptimisations
 {
-    public class ReachingDefsTest
+    public class ReachingDefsAnalysis
     {
         private CFG controlFlowGraph;
 
@@ -31,7 +31,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                     var inputIndexes = graph.cfg.GetInputNodes(index);
                     var resInfo = new BlockInfo<ThreeCode>(blocksInfos[index]);
                     foreach (var i in inputIndexes)
-                        resInfo.OUT.UnionWith(blocksInfos[i].IN);
+                        resInfo.IN.UnionWith(blocksInfos[i].OUT);
                     return resInfo;
                 };
 
