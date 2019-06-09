@@ -54,7 +54,7 @@
 var blocks = new Block(treeCode).GenerateBlocks();
 // Применение оптимизации (итеративный алгоритм запускается внутри метода ApplyOptimization)
 var constPropOptimizer = new ConstantPropagationOptimizer();
-CFG cfg1 = constPropOptimizer.ApplyOptimization(blocks);
+CFG cfg = constPropOptimizer.ApplyOptimization(blocks);
 ```
 Функция _ApplyOptimization_ строит по базовым блокам исходной программы граф потока управления и запускает для него обобщённый итерационный алгоритм, используя передаточную функцию для задачи распространения констант. На выходе этой функции — новый граф потока управления.
 
