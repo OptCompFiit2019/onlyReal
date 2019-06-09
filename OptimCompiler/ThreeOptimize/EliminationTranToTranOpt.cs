@@ -98,11 +98,13 @@ namespace SimpleLang.ThreeCodeOptimisations
                 if (line.operation is ThreeOperator.Goto && (temp = FindLabel(code, line.arg1.ToString())).Value.operation is ThreeOperator.Goto)
                 {
                     line.arg1 = temp.Value.arg1;
+                    _apply = true;
                 }
 
                 if (line.operation is ThreeOperator.IfGoto && (temp = FindLabel(code, line.arg2.ToString())).Value.operation is ThreeOperator.Goto)
                 {
                     line.arg1 = temp.Value.arg1;
+                    _apply = true;
                 }
 
                 currentNode = currentNode.Next;
@@ -126,6 +128,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                 var label = new ThreeAddressStringValue(nextNode.Value.label);
                 code.AddAfter(gotoNode2, new ThreeCode("", ThreeOperator.Goto, label));
                 code.Remove(targetNode);
+                _apply = true;
             }
 
             return code;
