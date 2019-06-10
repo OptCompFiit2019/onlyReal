@@ -65,9 +65,9 @@ namespace SimpleLang.Visitors
                                  .Select(l => l.result));
         }
 
-        public (List<StringExprSet>, List<KillerSet>) GetGenAndKillerSets(List<LinkedList<ThreeCode>> bblocks)
+        public Tuple<List<StringExprSet>, List<KillerSet>> GetGenAndKillerSets(List<LinkedList<ThreeCode>> bblocks)
         {
-            return (bblocks.Select(b => new StringExprSet(GetGenExprSet(b)
+            return new Tuple<List<StringExprSet>, List<KillerSet>>(bblocks.Select(b => new StringExprSet(GetGenExprSet(b)
                         .Select(e => new StringExpr(e.Item1.ToString(), e.Item2.ToString(), e.Item3.ToString()))))
                         .ToList(),
                     bblocks.Select(b => GetKillerSet(b)).ToList());
