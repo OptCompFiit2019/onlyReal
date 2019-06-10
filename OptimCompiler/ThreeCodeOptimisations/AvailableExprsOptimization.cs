@@ -10,7 +10,7 @@ using SimpleLang.ThreeCodeOptimisations;
 
 namespace SimpleLang.ExprOptimisations
 {
-    using Expr = ValueTuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>;
+    using Expr = Tuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>;
 
     class AvailableExprsOptimizer : ThreeCodeOptimiser
 	{
@@ -51,7 +51,7 @@ namespace SimpleLang.ExprOptimisations
 
             var U = new HashSet<Expr>(blocks.Select(b => b.Where(c =>
                     AvaliableExprs.IsDefinition(c.operation))
-                .Select(c => (c.arg1, c.operation, c.arg2)))
+                .Select(c => new Expr(c.arg1, c.operation, c.arg2)))
                 .Aggregate((s1, s2) => s1.Union(s2)));
 
             // создание объекта итерационного алгоритма
@@ -127,7 +127,7 @@ namespace SimpleLang.ExprOptimisations
                 for (var it = bs[i].First; true; it = it.Next)
                 {
                     var command = it.Value;
-                    var expr = (command.arg1, command.operation, command.arg2);
+                    var expr = new Expr(command.arg1, command.operation, command.arg2);
                     if (Ins[i].Contains(expr))
                     {
                         string t = GenTempVariable();
@@ -161,7 +161,7 @@ namespace SimpleLang.ExprOptimisations
                 while (notFirst = ancestor_it.Value.result != expr.Item1.ToString()
                         && ancestor_it.Value.result != expr.Item3.ToString())
                 {
-                    if (!ExprEq((ancestor_it.Value.arg1,
+                    if (!ExprEq(new Expr(ancestor_it.Value.arg1,
                                 ancestor_it.Value.operation,
                                 ancestor_it.Value.arg2), expr))
                         if (ancestor_it == bs[ii].First)
@@ -200,7 +200,7 @@ namespace SimpleLang.ExprOptimisations
                 while (ancestor_it.Value.result != expr.Item1.ToString()
                         && ancestor_it.Value.result != expr.Item3.ToString())
                 {
-                    if (ExprEq((ancestor_it.Value.arg1,
+                    if (ExprEq(new Expr(ancestor_it.Value.arg1,
                                 ancestor_it.Value.operation,
                                 ancestor_it.Value.arg2), expr))
                         ancestor_it.Value = new ThreeCode(ancestor_it.Value.result,
