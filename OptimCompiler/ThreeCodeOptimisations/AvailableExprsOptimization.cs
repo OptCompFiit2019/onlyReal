@@ -6,13 +6,14 @@ using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 using SimpleLang.Visitors;
 using SimpleLang.GenericIterativeAlgorithm;
 using SimpleLang;
+using SimpleLang.ThreeCodeOptimisations;
 
 namespace SimpleLang.ExprOptimisations
 {
     using Expr = ValueTuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>;
 
-    class AvailableExprsOptimizer
-    {
+    class AvailableExprsOptimizer : ThreeCodeOptimiser
+	{
         private CFG controlFlowGraph;
 
         private int currentTempVarIndex = 0;
@@ -83,7 +84,40 @@ namespace SimpleLang.ExprOptimisations
             //Outs = mopAlg.GetOUTs();
         }
 
-        public CFG ApplyOptimization(List<LinkedList<ThreeCode>> blocks)
+		public void Apply(ref LinkedList<ThreeCode> program)
+		{
+			// заглушка
+		}
+
+		public bool NeedFullCode() => true;
+
+		public void Apply(ref List<LinkedList<ThreeCode>> res)
+		{
+			var old = res;
+			var availableExprsOptimizer = new AvailableExprsOptimizer();
+			CFG cfg = availableExprsOptimizer.ApplyOptimization(old);
+			res = cfg.blocks;
+			for (int i = 0; i < old.Count; ++i)
+			{
+				var it1 = old[i].First;
+				var it2 = res[i].First;
+				for (int j = 0; j < old[i].Count; ++j)
+				{
+					if (it1.Value.ToString() != it2.Value.ToString())
+					{
+						Applied = true;
+						return;
+					}
+					it1 = it1.Next;
+					it2 = it2.Next;
+				}
+			}
+		}
+
+		private bool Applied = false;
+		public bool Applyed() => Applied;
+
+		public CFG ApplyOptimization(List<LinkedList<ThreeCode>> blocks)
         {
             IterativeAlgorithm(blocks);
             var bs = controlFlowGraph.blocks;
