@@ -84,7 +84,8 @@ namespace SimpleLang.ThreeCodeOptimisations
             {
                 if (it.Value.operation != ThreeOperator.Goto &&
                     it.Value.operation != ThreeOperator.IfGoto &&
-                    it.Value.operation != ThreeOperator.None)
+                    it.Value.operation != ThreeOperator.None &&
+                    it.Value.operation!= ThreeOperator.Println)
                 {
                     if (it.Value.arg2 == null)
                         blocksDefs.Add(new VarDef(it));

@@ -42,8 +42,11 @@
     <Compile Include="AstOptimisations\DeleteNullVisitor.cs" />
     <Compile Include="AstOptimisations\FalseExprMoreAndNonEqualVisitor.cs" />
     <Compile Include="AstOptimisations\Opt_8_13.cs" />
+
     <Compile Include="AstOptimisations\LinearizeBlocks.cs" />
+
     <Compile Include="ThreeOptimize\DAGOpt.cs" />
+    <Compile Include="IterationAlgorithm\ConstantPropagationItA.cs" />
     <Compile Include="ThreeOptimize\DeadOrAliveOnGraphAdapter.cs" />
     <Compile Include="ThreeOptimize\CommonExprOpt.cs" />
     <Compile Include="ThreeOptimize\EliminationTranToTranOpt.cs" />

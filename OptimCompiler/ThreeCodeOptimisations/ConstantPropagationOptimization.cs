@@ -87,7 +87,8 @@ namespace SimpleLang.ThreeCodeOptimisations
 
 		public void Apply(ref List<LinkedList<ThreeCode>> res)
 		{
-			var old = res;
+            Applied = false;
+            var old = res;
 			var constPropOptimizer = new ConstantPropagationOptimizer();
 			CFG cfg = constPropOptimizer.ApplyOptimization(old);
 			res = cfg.blocks;
@@ -97,7 +98,7 @@ namespace SimpleLang.ThreeCodeOptimisations
 				var it2 = res[i].First;
 				for (int j = 0; j < old[i].Count; ++j)
 				{
-					if (it1.Value.ToString() != it2.Value.ToString())
+					if (! it1.Value.ToString().Equals(it2.Value.ToString()))
 					{
 						Applied = true;
 						return;
