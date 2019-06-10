@@ -26,16 +26,12 @@ namespace SimpleLang.ThreeCodeOptimisations
             var strCode = block.First;
             while (strCode != null)
             {
-                if (strCode.Value.operation != ThreeOperator.None
-                    && strCode.Value.operation != ThreeOperator.Goto
-                    && strCode.Value.operation != ThreeOperator.IfGoto
-                    && strCode.Value.operation != ThreeOperator.Println)
-                {
                     n++;
                     // условие для проверки строки 3-х адр. кода на соответствие виду бин. операции
                     if (strCode.Value.operation == Visitors.ThreeOperator.None
                         || strCode.Value.operation == Visitors.ThreeOperator.IfGoto
-                        || strCode.Value.operation == Visitors.ThreeOperator.Goto)
+                        || strCode.Value.operation == Visitors.ThreeOperator.Goto
+                        || strCode.Value.operation != ThreeOperator.Println)
                     {
                         strCode = strCode.Next;
                         continue;
@@ -77,8 +73,6 @@ namespace SimpleLang.ThreeCodeOptimisations
 
 
                 }
-               
-            }
 
             return block;
         }

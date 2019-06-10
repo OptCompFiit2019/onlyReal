@@ -4,7 +4,7 @@
   a = a * 0 + 434 * 0;
   a = a + 0 + 5*3;
   a= 0 + a;
-
+println(a);
 
   if ( true ) {
     println(true);

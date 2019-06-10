@@ -1,5 +1,7 @@
 {
+
 int a,b,c,d,x,y;
+println(a);
 a = x + y;
 b = x + y;
 a = 17;
