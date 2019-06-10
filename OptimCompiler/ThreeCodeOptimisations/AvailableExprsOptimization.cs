@@ -93,9 +93,9 @@ namespace SimpleLang.ExprOptimisations
 
 		public void Apply(ref List<LinkedList<ThreeCode>> res)
 		{
-			var old = res;
+			var old = res.Select(b => new LinkedList<string>(b.Select(c => c.ToString()))).ToList();
 			var availableExprsOptimizer = new AvailableExprsOptimizer();
-			CFG cfg = availableExprsOptimizer.ApplyOptimization(old);
+			CFG cfg = availableExprsOptimizer.ApplyOptimization(res);
 			res = cfg.blocks;
 			for (int i = 0; i < old.Count; ++i)
 			{
