@@ -47,15 +47,15 @@
 * [Удаление мертвых переменных на основе итерационного алгоритма](#удаление-мертвых-переменных-на-основе-итерационного-алгоритма)
 * [Оптимизация Распространение констант](#оптимизация-распространение-констант)
 * [Вычисление множеств DEFb и USEb для активных переменных](#вычисление-множеств-defb-и-useb-для-активных-переменных)
+* [Передаточная функция в задаче о распространении констант](#передаточная-функция-в-задаче-о-распространении-констант)
 * [Итерационный алгоритм для активных переменных](#итерационный-алгоритм-для-активных-переменных)
 * [Итерационный алгоритм для доступных выражений](#итерационный-алгоритм-для-доступных-выражений)
+* [Итерационный алгоритм в задаче растпространения констант](#итерационный-алгоритм-в-задаче-растпространения-констант)
 * [Класс передаточной функции](#класс-передаточной-функции)
 * [Доступные выражения-множества e_genB и e_killB Передаточная функция базового блока В](#доступные-выражения-множества-e_genb-и-e_killb-передаточная-функция-базового-блока-в)
 * [Оптимизация Доступные выражения](#оптимизация-доступные-выражения)
 * [Генерация CIL-кода по трехадресному программному коду](#генерация-cil-кода-по-трехадресному-программному-коду)
-* [Итерационный алгоритм в задаче растпространения констант](#итерационный-алгоритм-в-задаче-растпространения-констант)
 * [Класс обобщенного итерационного  алгоритма](#класс-обобщенного-итерационного--алгоритма)
-* [Передаточная функция в задаче о распространении констант](#передаточная-функция-в-задаче-о-распространении-констант)
 * [Поиск доминаторов для каждой вершины графа потока управления](#поиск-доминаторов-для-каждой-вершины-графа-потока-управления)
 * [Получение трехадресного кода из графа потока управления](#получение-трехадресного-кода-из-графа-потока-управления)
 * [Определение того, является ли ребро обратным и являеется ли CFG приводимым](#определение-того,-является-ли-ребро-обратным-и-являеется-ли-cfg-приводимым)
@@ -328,7 +328,7 @@
         <td>Intel</td>
     </tr>
     <tr>
-        <td>31 - нет</td>
+        <td>31</td>
         <td>Передаточная функция в задаче о распространении констант</td>
         <td>Roslyn</td>
     </tr>
@@ -3787,7 +3787,7 @@ killB – множество остальных определений пере�
 
 #### Теория
 Базовый блок - это максимальная последовательность команд трехадресного кода, удовлетворяющая следующим условиям:
-- поток управления может входить в ББл только через первую команду 
+- поток управления может входить в ББл только через первую команду
 - управление покидает ББл без останова или ветвления, за исключением, возможно, последней команды
 Для находления базовых блоков необходимо найти все команды-лидеры, которыми явзяются:
 - первая команда
@@ -3798,64 +3798,147 @@ killB – множество остальных определений пере�
 
 #### Особенности реализации
 ```
-	public class Block
+public class AttainableVariables
+{
+	public ControlFlowGraph cfg;
+	public List<BlockVariables> blocks_variables;
+
+	public AttainableVariables(ControlFlowGraph _cfg)
 	{
-        public LinkedList<ThreeCode> code;
-        public Block(ThreeAddressCodeVisitor _code)
+		this.cfg = _cfg;
+		blocks_variables = new List<BlockVariables>();
+		for (var i = 0; i < cfg.cfg.n; ++i)
+			blocks_variables.Add(new BlockVariables());
+	}
+
+	public bool CheckToUsefulOperation(ThreeOperator op)
+	{
+		return !(op == ThreeOperator.Goto || op == ThreeOperator.None || op == ThreeOperator.IfGoto);
+	}
+
+	public bool IsInnerInOperation(string name, ThreeCode a)
+	{
+		bool y1 = false, y2 = false;
+
+		if (a.arg1 != null & a.arg1.ToString().Length > 0)
+			y1 = a.arg1.ToString().IndexOf(name, 0) != -1;
+
+		if (a.arg2 != null && a.arg2.ToString().Length > 0)
+			y2 = a.arg2.ToString().IndexOf(name, 0) != -1;
+
+		return y1 || y2;
+	}
+
+	public AttainableGraph GenerateAttainableVariables()
+	{
+		// Finding all initialized variables
+		int var_count = 0;
+		for (var i = 0; i < cfg.cfg.n; ++i)
+		{
+			LinkedList<ThreeCode> check_block = cfg.blocks[i];
+			// First analise this block
+			// Find first assign or variable initialisation
+			foreach (var operation in check_block)
+				if (this.CheckToUsefulOperation(operation.operation))
+					if (operation.result.ToString().Length > 0)
+						blocks_variables[i].Add(operation.result.ToString(), var_count++);
+		}
+
+		GenKillList genkilllist = new GenKillList(cfg.cfg.n, var_count).Generate(blocks_variables);
+
+		var att_graph = new AttainableGraph(cfg.cfg.n, var_count);
+
+		var steps_list = new Queue<int>();
+		var used_nodes = new List<bool>();
+		for (var i = 0; i < cfg.cfg.n; ++i)
+			used_nodes.Add(false);
+		used_nodes[0] = true;
+		steps_list.Enqueue(0);
+
+		while (steps_list.Count > 0)
+		{
+			var node_ind = steps_list.Dequeue();
+
+			foreach (var out_node_id in cfg.cfg.GetOutputNodes(node_ind))
+				if (!used_nodes[out_node_id])
+					steps_list.Enqueue(out_node_id);
+
+			// att_graph.OUT_byte[node_ind] = new ByteVector(var_count);
+
+			foreach (var out_node_id in cfg.cfg.GetOutputNodes(node_ind))
+				if (out_node_id != node_ind)
+					att_graph.OUT_byte[out_node_id] = new ByteVector(var_count);
+
+			bool changes = true;
+			while (changes && cfg.cfg.GetOutputNodes(node_ind).Count > 0)
+				foreach (var out_node_id in cfg.cfg.GetOutputNodes(node_ind))
+				{
+					ByteVector previous_out = new ByteVector(att_graph.OUT_byte[out_node_id]);
+
+					if (out_node_id != node_ind)
+					{
+						foreach (var in_out_node_id in cfg.cfg.GetInputNodes(out_node_id))
+							att_graph.IN_byte[out_node_id] =
+								att_graph.IN_byte[out_node_id] + att_graph.OUT_byte[in_out_node_id];
+						var transferFunction = new TransferFunction();
+						att_graph.OUT_byte[out_node_id] = transferFunction.Apply(genkilllist.GEN[out_node_id], genkilllist.KILL[out_node_id], att_graph.IN_byte[out_node_id]);
+					}
+
+					changes = changes && previous_out != att_graph.OUT_byte[out_node_id];
+				}
+		}
+
+		return att_graph;
+	}
+
+	public override string ToString()
+	{
+		var result = "";
+		foreach (var varnl in this.blocks_variables)
+			foreach (var varn in varnl.variables_names)
+				result += varn + "\n";
+		return result;
+	}
+}
+```
+Для более удобного дальнейшгего использования результат хранится в виде класса 'AttainableGraph', где хранятся списки IN, OUT.
+
+```
+public class AttainableGraph
+    {
+        public List<ByteVector> IN_byte;
+        public List<ByteVector> OUT_byte;
+
+        public List<List<int>> IN;
+        public List<List<int>> OUT;
+
+        public AttainableGraph(int blocks_count, int assigns_count)
         {
-            this.code = _code.GetCode();
+            IN = new List<List<int>>();
+            OUT = new List<List<int>>();
+
+            IN_byte = new List<ByteVector>();
+            OUT_byte = new List<ByteVector>();
+
+            for (var i = 0; i < blocks_count; ++i)
+            {
+                IN.Add(new List<int>());
+                OUT.Add(new List<int>());
+                IN_byte.Add(new ByteVector(assigns_count));
+                OUT_byte.Add(new ByteVector(assigns_count));
+            }
         }
 
-        public List<int> FindLeaders()
+        public override string ToString()
         {
-            var Leaders = new List<int>();
-            int i = 1;
-
-            bool PreviousIsGoto = false;
-
-            foreach (var line in this.code)
-            {
-                if (i == 1)
-                    Leaders.Add(i);
-                else
-                    if (!String.IsNullOrEmpty(line.label))
-                        Leaders.Add(i);
-                    else
-                        if (PreviousIsGoto)
-                            Leaders.Add(i);
-
-                PreviousIsGoto = line.operation == ThreeOperator.Goto || line.operation == ThreeOperator.IfGoto;
-                
-                i += 1;
-            }
-
-            return Leaders;
-        }
-
-        public List<LinkedList<ThreeCode>> GenerateBlocks()
-        {
-            var Leaders = FindLeaders();
-            int i = 1;
-            int LiderInd = 0;
-            
-            var Blocks = new List<LinkedList<ThreeCode>>();
-
-            foreach (var line in this.code)
-            {
-                if (LiderInd < Leaders.Count && i == Leaders[LiderInd])
-                {
-                    Blocks.Add(new LinkedList<ThreeCode>());
-                    LiderInd += 1;
-                }
-                Blocks.Last().AddLast(line);
-                i += 1;
-            }
-
-            return Blocks;
+            var result = "";
+            for (var i = 0; i < this.IN_byte.Count; ++i)
+                result += "BLOCK: " + i.ToString() + ", IN: " + this.IN_byte[i].ToString() +
+                          ", OUT: " + this.OUT_byte[i].ToString() + "\n";
+            return result;
         }
     }
 ```
-Был определен класс `Block`, инициализирующийся трехадресным кодом, с методом `GenerateBlocks`, который возращает `List<LinkedList<ThreeCode>>`, то есть, список блоков.
 
 [Вверх](#содержание)
 # Удаление мертвых переменных на основе итерационного алгоритма
@@ -3993,6 +4076,109 @@ label_1:   println a
 ```
 
 #### Особенности реализации
+
+```
+using ConstPropBlockInfo = BlockInfo<KeyValuePair<string, ConstPropSemilatticeEl>>;
+using ConstPropKeyValue = KeyValuePair<string, ConstPropSemilatticeEl>;
+
+public partial class ConstantPropagationOptimizer : ThreeCodeOptimiser
+{
+	private CFG controlFlowGraph;
+	private List<HashSet<ConstPropKeyValue>> Ins;
+
+	public void IterativeAlgorithm(List<LinkedList<ThreeCode>> blocks)
+	{
+		// построение CFG по блокам
+		controlFlowGraph = new CFG(blocks.ToList());
+		// создание информации о блоках
+		var blocksInfo = new List<ConstPropBlockInfo>();
+		var m = new Dictionary<string, ConstPropSemilatticeEl>();
+		for (int i = 0; i < blocks.Count; i++)
+		{
+			foreach (var c in blocks[i].Where(com =>
+				com.operation != ThreeOperator.Goto && com.operation != ThreeOperator.IfGoto))
+			{
+				string[] vars = new string[]
+					{ c.result
+					, (c.arg1 as ThreeAddressStringValue)?.Value
+					, (c.arg2 as ThreeAddressStringValue)?.Value };
+
+				foreach (var v in vars)
+					if (v != null && v != "" && !m.ContainsKey(v))
+						m[v] = new ConstPropSemilatticeEl(ValConstType.Undef);
+			}
+		}
+		for (int i = 0; i < blocks.Count; i++)
+			blocksInfo.Add(new ConstPropBlockInfo(blocks[i]));
+
+		// оператор сбора в задаче о распространении констант
+		Func<List<ConstPropBlockInfo>, CFG, int, ConstPropBlockInfo> meetOperator =
+			(blocksInfos, graph, index) =>
+			{
+				var inputIndexes = graph.cfg.GetInputNodes(index);
+				var resInfo = new ConstPropBlockInfo(blocksInfos[index]);
+				foreach (var i in inputIndexes)
+				{
+					var resIn = resInfo.IN.ToDictionary(e => e.Key);
+					foreach (var Out in blocksInfos[i].OUT)
+						if (resIn[Out.Key].Value.Constantness == ValConstType.Undef)
+							resIn[Out.Key] = new ConstPropKeyValue(Out.Key, Out.Value);
+						else if (resIn[Out.Key].Value.Constantness == ValConstType.NAC
+									|| Out.Value.Constantness == ValConstType.NAC
+									|| (resIn[Out.Key].Value.Constantness == ValConstType.Const
+											&& Out.Value.Constantness == ValConstType.Const
+											&& resIn[Out.Key].Value.Value != Out.Value.Value))
+							resIn[Out.Key] = new ConstPropKeyValue(Out.Key,
+								new ConstPropSemilatticeEl(ValConstType.NAC));
+
+					resInfo.IN = new HashSet<ConstPropKeyValue>(resIn.Values);
+				}
+				return resInfo;
+			};
+
+		var transferFunction = TransferFunction();
+
+		// создание объекта итерационного алгоритма
+		var iterativeAlgorithm = new IterativeAlgorithm<ConstPropKeyValue>(blocksInfo,
+			controlFlowGraph, meetOperator, true, new HashSet<ConstPropKeyValue>(m),
+			new HashSet<ConstPropKeyValue>(m), transferFunction);
+
+		// выполнение алгоритма
+		iterativeAlgorithm.Perform();
+		Ins = iterativeAlgorithm.GetINs();
+	}
+
+	...
+	
+	public CFG ApplyOptimization(List<LinkedList<ThreeCode>> blocks)
+	{
+		IterativeAlgorithm(blocks);
+		var bs = controlFlowGraph.blocks;
+
+		for (int i = 0; i < bs.Count; ++i)
+		{
+			var m = Ins[i].ToDictionary(e => e.Key);
+			for (var it = bs[i].First; true; it = it.Next)
+			{
+				var command = it.Value;
+				if (command.arg1 is ThreeAddressStringValue v1 && m.ContainsKey(v1.Value)
+						&& m[v1.Value].Value.Constantness == ValConstType.Const)
+					command.arg1 = new ThreeAddressIntValue(m[v1.Value].Value.Value);
+
+				if (command.arg2 is ThreeAddressStringValue v2 && m.ContainsKey(v2.Value)
+						&& m[v2.Value].Value.Constantness == ValConstType.Const)
+					command.arg2 = new ThreeAddressIntValue(m[v2.Value].Value.Value);
+				m.Remove(command.result);
+
+				if (it == bs[i].Last)
+					break;
+			}
+		}
+		return controlFlowGraph;
+	}
+```
+
+Класс _ConstantPropagationOptimizer_ предоставляет функции _IterativeAlgorithm_ и _ApplyOptimization_. Функция _IterativeAlgorithm_ принимает на вход базовые блоки исходной программы и запускает для них (обобщённый) итерационный алгоритм. Данная функция используется в функции _ApplyOptimization_, которая запускает оптимизацию на основе информации, полученной в результате работы алгоритма. В функции _IterativeAlgorithm_ определяется оператор сбора для задачи распространения констант и используется функция _TransferFunction_, определённая в классе _ConstantPropagationOptimizer_, предоставляющая передаточную функцию для данной задачи.
 
 Для использования данной оптимизации необходимо выполнить следующий код:
 ```csharp
@@ -4139,6 +4325,133 @@ l = j
 ```
 DEFb: i j k l
 USEb: k l
+```
+
+[Вверх](#содержание)
+# Передаточная функция в задаче о распространении констант
+
+### Команда Roslyn
+
+#### Постановка задачи
+
+Задача состояла в разработке структуры для хранения передаточной функции для задачи о распространении констант.
+
+#### Зависимости задач в графе задач
+Данная задача зависит от задачи генерации базовых блоков.
+
+От задачи зависит:
+* Реализация итерационного алгоритма для распространения констант
+
+#### Теория
+
+fS — передаточная функция одной команды S.
+1. Если S — не присваивание, то fS — тождественная: `fS(m) = m`
+2. Если S: x = ..., то ∀v ≠ x m′(v) = m(v), а m′(x) определяется так:
+a) если x := c, то m′ x = c
+b) если x = y + z, то
+m′(x) = m(y) + m(z), если m(y) − const и m(z) − const, иначе
+m′(x) = NAC, если m(y) = NAC или m(z) = NAC, иначе
+m′(x) = UNDEF
+c) если x = g(...), то m′(x) = NAC (консервативно)
+
+#### Особенности реализации
+
+```csharp
+using ConstPropBlockInfo = BlockInfo<KeyValuePair<string, ConstPropSemilatticeEl>>;
+using ConstPropKeyValue = KeyValuePair<string, ConstPropSemilatticeEl>;
+public partial class ConstantPropagationOptimizer
+{
+	public static TransferFunction<ConstPropBlockInfo> TransferFunction()
+		=> new TransferFunction<ConstPropBlockInfo>(bi =>
+		{
+			var m = bi.IN.ToDictionary(e => e.Key);
+			foreach (var command in bi.Commands)
+			{
+				if (command.arg1 is ThreeAddressLogicValue
+						|| command.arg1 is ThreeAddressDoubleValue
+						|| command.arg2 is ThreeAddressLogicValue
+						|| command.arg2 is ThreeAddressDoubleValue)
+					continue;
+				if (command.operation == ThreeOperator.Assign)
+					m[command.result] = new ConstPropKeyValue(command.result,
+						GetSemilatticeEl(command.arg1, m));
+				else if (command.operation == ThreeOperator.Plus
+						|| command.operation == ThreeOperator.Minus
+						|| command.operation == ThreeOperator.Mult
+						|| command.operation == ThreeOperator.Div)
+				{
+					var el1 = GetSemilatticeEl(command.arg1, m);
+					var el2 = GetSemilatticeEl(command.arg2, m);
+					if (el1.Constantness == ValConstType.Const
+							&& el2.Constantness == ValConstType.Const)
+						m[command.result] = new ConstPropKeyValue(command.result,
+							new ConstPropSemilatticeEl(ValConstType.Const,
+								EvalConst(el1.Value, el2.Value, command.operation)));
+					else if (el1.Constantness == ValConstType.NAC
+							|| el2.Constantness == ValConstType.NAC)
+						m[command.result] = new ConstPropKeyValue(command.result,
+							new ConstPropSemilatticeEl(ValConstType.NAC));
+					else
+						m[command.result] = new ConstPropKeyValue(command.result,
+							new ConstPropSemilatticeEl(ValConstType.Undef));
+				}
+			}
+			var Out = new ConstPropBlockInfo(bi);
+			Out.OUT = new HashSet<ConstPropKeyValue>(m.Values);
+			return Out;
+		});
+	private static int EvalConst(int c1, int c2, ThreeOperator op)
+	{
+		switch (op)
+		{
+			case ThreeOperator.Plus:  return c1 + c2;
+			case ThreeOperator.Minus: return c1 - c2;
+			case ThreeOperator.Mult:  return c1 * c2;
+			case ThreeOperator.Div:   return c1 / c2;
+			default: throw new Exception("Logic error");
+		}
+	}
+	private static ConstPropSemilatticeEl GetSemilatticeEl
+		(ThreeAddressValueType val,
+		 Dictionary<string, ConstPropKeyValue> m)
+	{
+		ConstPropSemilatticeEl semilatticeEl = null;
+		if (val is ThreeAddressStringValue v)
+			semilatticeEl = m[v.Value].Value;
+		else if (val is ThreeAddressIntValue c)
+			semilatticeEl = new ConstPropSemilatticeEl(ValConstType.Const, c.Value);
+		return semilatticeEl;
+	}
+}
+```
+Класс _ConstantPropagationOptimizer_ предоставляет функцию _TransferFunction_ в формате, совместимом с обобщённым итерационным алгоритмом. _ConstPropSemilatticeEl_ — это тип элементов полурешётки. Значения этого типа имеют два поля: _Constantness_ и _Value_. Поле _Constantness_ допускает значения _Const_, _NAC_ и _Undef_. Поле _Value_ используется, если _Constantness_ имеет значение _Const_, и хранит значение константы типа _int_.
+
+#### Тесты
+Пример исходной программы:
+```
+{
+	int t1, t2, i, x, u1;
+	i = 2;
+	t1 = 4 * i;
+	x = 3 + 17;
+	u1 = 5 * t1;
+	t2 = i;
+}
+```
+Пример работы передаточной функции:
+```
+Before
+i: (Undef, 0)
+t1: (Undef, 0)
+x: (Undef, 0)
+u1: (Undef, 0)
+t2: (Undef, 0)
+After
+i: (Const, 2)
+t1: (Const, 8)
+x: (Const, 20)
+u1: (Const, 40)
+t2: (Const, 2)
 ```
 
 [Вверх](#содержание)
@@ -4427,6 +4740,56 @@ A set of expressions available at the exit:
 4 Mult i
 5 Mult i
 6 Mult i
+```
+
+[Вверх](#содержание)
+# Итерационный алгоритм в задаче растпространения констант
+
+### Команда Nvidia
+
+#### Постановка задачи
+Реализовать итерационный алгоритм выполняющий распространение констант.
+
+#### Зависимости задач в графе задач
+
+Задача зависит от:
+* Класс обобщенного итерационного  алгоритма.
+
+#### Теория
+Основными этапами данного итерационного алгоритма являются:
+1. Инициализация множеств IN, OUT
+2. Основной цикл алгоритма, на каждой итерации которого производится обновление IN и OUT для всего графа. Для информации о каждом из блоков применяется оператор сбора и передаточная функция.
+3. Проверка условия остановки. Обычно анализ заканчивается когда множества IN, OUT более не претерпевают изменений.
+
+#### Особенности реализации
+Для использования данного класса необходимо:
+1. Подключить пространство имен using SimpleLang.GenericTransferFunction;
+2. Написать делегат или множество делегатов, реализующих конкретную передаточную функцию.
+3. Создать объект передаточной функции, передав в конструктор делегат или список делегатов.
+4. Применить передаточную функцию к объекту путем вызова у передаточной функции метода Apply.
+
+Ниже представлен код использования данного класса. Пример показывает анализ активных переменных и удаления мертвых переменных на его основе:
+```csharp
+using SimpleLang.GenericIterativeAlgorithm;
+
+
+var ucfg = new CFG(treeCode);
+
+var cp = new ConstantPropagationItA(ucfg);
+cp.PerformAlgorithm();
+
+Console.WriteLine("IN\n");
+foreach (var dict in cp.IN)
+{
+	var asString = string.Join(";", dict);
+	Console.WriteLine(asString);
+}
+Console.WriteLine("OUT\n");
+foreach (var dict in cp.OUT)
+{
+	var asString = string.Join(";", dict);
+	Console.WriteLine(asString);
+}
 ```
 
 [Вверх](#содержание)
@@ -4774,6 +5137,96 @@ Block 8:
 
 #### Особенности реализации
 
+```
+using Expr = Tuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>;
+
+class AvailableExprsOptimizer : ThreeCodeOptimiser
+{
+	private CFG controlFlowGraph;
+
+	private int currentTempVarIndex = 0;
+
+	public List<HashSet<Expr>> Ins { get; private set; }
+	public List<HashSet<Expr>> Outs { get; private set; }
+
+	public void IterativeAlgorithm(List<LinkedList<ThreeCode>> blocks)
+	{
+		var bb = new LinkedList<ThreeCode>();
+		bb.AddLast(new ThreeCode("entry", "", ThreeOperator.None, null, null));
+		var bs = blocks.ToList();
+		// добавление пустого входного блока - необходимо для корректной работы ит. алгоритма
+		bs.Insert(0, bb);
+		// построение CFG по блокам
+		controlFlowGraph = new CFG(bs);
+		// создание информации о блоках
+		var blocksInfo = new List<BlockInfo<Expr>>();
+		for (int i = 0; i < bs.Count; i++)
+			blocksInfo.Add(new BlockInfo<Expr>(bs[i]));
+
+		// оператор сбора для доступных выражений
+		Func<List<BlockInfo<Expr>>, CFG, int, BlockInfo<Expr>> meetOperator =
+			(blocksInfos, graph, index) =>
+			{
+				var inputIndexes = graph.cfg.GetInputNodes(index);
+				var resInfo = new BlockInfo<Expr>(blocksInfos[index]);
+				resInfo.IN = resInfo.OUT; // универсальное множество
+				foreach (var i in inputIndexes)
+					resInfo.IN.IntersectWith(blocksInfos[i].OUT);
+				return resInfo;
+			};
+
+		var transferFunction = AvaliableExprsAdaptor.TransferFunction();
+
+		var U = new HashSet<Expr>(blocks.Select(b => b.Where(c =>
+				AvaliableExprs.IsDefinition(c.operation))
+			.Select(c => new Expr(c.arg1, c.operation, c.arg2)))
+			.Aggregate((s1, s2) => s1.Union(s2)));
+
+		// создание объекта итерационного алгоритма
+		var iterativeAlgorithm = new IterativeAlgorithm<Expr>(blocksInfo,
+			controlFlowGraph, meetOperator, true, new HashSet<Expr>(), U, transferFunction);
+
+		// выполнение алгоритма
+		iterativeAlgorithm.Perform();
+		Ins = iterativeAlgorithm.GetINs();
+		Outs = iterativeAlgorithm.GetOUTs();
+	}
+
+	public CFG ApplyOptimization(List<LinkedList<ThreeCode>> blocks)
+	{
+		IterativeAlgorithm(blocks);
+		var bs = controlFlowGraph.blocks;
+
+		for (int i = 1; i < bs.Count; ++i)
+		{
+			for (var it = bs[i].First; true; it = it.Next)
+			{
+				var command = it.Value;
+				var expr = new Expr(command.arg1, command.operation, command.arg2);
+				if (Ins[i].Contains(expr))
+				{
+					string t = GenTempVariable();
+					it.Value = new ThreeCode(command.result, new ThreeAddressStringValue(t));
+					ApplyOptToAncestors(i, expr, t);
+					if (Outs[i].Contains(expr))
+						ApplyOptToDescendents(i, expr, t);
+				}
+
+				Ins[i].ExceptWith(Ins[i].Where(e => e.Item1.ToString() == command.result
+					|| e.Item3?.ToString() == command.result).ToList());
+				if (it == bs[i].Last)
+					break;
+			}
+		}
+		return controlFlowGraph;
+	}
+	
+	...
+}
+```
+
+Класс _AvailableExprsOptimizer_ предоставляет функции _IterativeAlgorithm_ и _ApplyOptimization_. Функция _IterativeAlgorithm_ принимает на вход базовые блоки исходной программы и запускает для них (обобщённый) итерационный алгоритм. Данная функция используется в функции _ApplyOptimization_, которая запускает оптимизацию на основе информации, полученной в результате работы алгоритма. В функции _IterativeAlgorithm_ определяется оператор сбора для доступных выражений и используется функция _TransferFunction_, определённая в классе _AvaliableExprsAdaptor_, предоставляющая передаточную функцию для данной задачи.
+
 Для использования данной оптимизации необходимо выполнить следующий код:
 ```csharp
 // Построение базовых блоков по трёхадресному коду исходной программы
@@ -5029,56 +5482,6 @@ MarkLabel Label2
 ```
 
 [Вверх](#содержание)
-# Итерационный алгоритм в задаче растпространения констант
-
-### Команда Nvidia
-
-#### Постановка задачи
-Реализовать итерационный алгоритм выполняющий распространение констант.
-
-#### Зависимости задач в графе задач
-
-Задача зависит от:
-* Класс обобщенного итерационного  алгоритма.
-
-#### Теория
-Основными этапами данного итерационного алгоритма являются:
-1. Инициализация множеств IN, OUT
-2. Основной цикл алгоритма, на каждой итерации которого производится обновление IN и OUT для всего графа. Для информации о каждом из блоков применяется оператор сбора и передаточная функция.
-3. Проверка условия остановки. Обычно анализ заканчивается когда множества IN, OUT более не претерпевают изменений.
-
-#### Особенности реализации
-Для использования данного класса необходимо:
-1. Подключить пространство имен using SimpleLang.GenericTransferFunction;
-2. Написать делегат или множество делегатов, реализующих конкретную передаточную функцию.
-3. Создать объект передаточной функции, передав в конструктор делегат или список делегатов.
-4. Применить передаточную функцию к объекту путем вызова у передаточной функции метода Apply.
-
-Ниже представлен код использования данного класса. Пример показывает анализ активных переменных и удаления мертвых переменных на его основе:
-```csharp
-using SimpleLang.GenericIterativeAlgorithm;
-
-
-var ucfg = new CFG(treeCode);
-
-var cp = new ConstantPropagationItA(ucfg);
-cp.PerformAlgorithm();
-
-Console.WriteLine("IN\n");
-foreach (var dict in cp.IN)
-{
-	var asString = string.Join(";", dict);
-	Console.WriteLine(asString);
-}
-Console.WriteLine("OUT\n");
-foreach (var dict in cp.OUT)
-{
-	var asString = string.Join(";", dict);
-	Console.WriteLine(asString);
-}
-```
-
-[Вверх](#содержание)
 # Класс обобщенного итерационного  алгоритма
 
 ### Команда Roll
@@ -5210,133 +5613,6 @@ label_2:   println a
 [Вверх](#содержание)
 include "tac/29-tac.md"
 include "tac/30-tac.md"
-# Передаточная функция в задаче о распространении констант
-
-### Команда Roslyn
-
-#### Постановка задачи
-
-Задача состояла в разработке структуры для хранения передаточной функции для задачи о распространении констант.
-
-#### Зависимости задач в графе задач
-Данная задача зависит от задачи генерации базовых блоков.
-
-От задачи зависит:
-* Реализация итерационного алгоритма для распространения констант
-
-#### Теория
-
-fS — передаточная функция одной команды S.
-1. Если S — не присваивание, то fS — тождественная: `fS(m) = m`
-2. Если S: x = ..., то ∀v ≠ x m′(v) = m(v), а m′(x) определяется так:
-a) если x := c, то m′ x = c
-b) если x = y + z, то
-m′(x) = m(y) + m(z), если m(y) − const и m(z) − const, иначе
-m′(x) = NAC, если m(y) = NAC или m(z) = NAC, иначе
-m′(x) = UNDEF
-c) если x = g(...), то m′(x) = NAC (консервативно)
-
-#### Особенности реализации
-
-```csharp
-using ConstPropBlockInfo = BlockInfo<KeyValuePair<string, ConstPropSemilatticeEl>>;
-using ConstPropKeyValue = KeyValuePair<string, ConstPropSemilatticeEl>;
-public partial class ConstantPropagationOptimizer
-{
-	public static TransferFunction<ConstPropBlockInfo> TransferFunction()
-		=> new TransferFunction<ConstPropBlockInfo>(bi =>
-		{
-			var m = bi.IN.ToDictionary(e => e.Key);
-			foreach (var command in bi.Commands)
-			{
-				if (command.arg1 is ThreeAddressLogicValue
-						|| command.arg1 is ThreeAddressDoubleValue
-						|| command.arg2 is ThreeAddressLogicValue
-						|| command.arg2 is ThreeAddressDoubleValue)
-					continue;
-				if (command.operation == ThreeOperator.Assign)
-					m[command.result] = new ConstPropKeyValue(command.result,
-						GetSemilatticeEl(command.arg1, m));
-				else if (command.operation == ThreeOperator.Plus
-						|| command.operation == ThreeOperator.Minus
-						|| command.operation == ThreeOperator.Mult
-						|| command.operation == ThreeOperator.Div)
-				{
-					var el1 = GetSemilatticeEl(command.arg1, m);
-					var el2 = GetSemilatticeEl(command.arg2, m);
-					if (el1.Constantness == ValConstType.Const
-							&& el2.Constantness == ValConstType.Const)
-						m[command.result] = new ConstPropKeyValue(command.result,
-							new ConstPropSemilatticeEl(ValConstType.Const,
-								EvalConst(el1.Value, el2.Value, command.operation)));
-					else if (el1.Constantness == ValConstType.NAC
-							|| el2.Constantness == ValConstType.NAC)
-						m[command.result] = new ConstPropKeyValue(command.result,
-							new ConstPropSemilatticeEl(ValConstType.NAC));
-					else
-						m[command.result] = new ConstPropKeyValue(command.result,
-							new ConstPropSemilatticeEl(ValConstType.Undef));
-				}
-			}
-			var Out = new ConstPropBlockInfo(bi);
-			Out.OUT = new HashSet<ConstPropKeyValue>(m.Values);
-			return Out;
-		});
-	private static int EvalConst(int c1, int c2, ThreeOperator op)
-	{
-		switch (op)
-		{
-			case ThreeOperator.Plus:  return c1 + c2;
-			case ThreeOperator.Minus: return c1 - c2;
-			case ThreeOperator.Mult:  return c1 * c2;
-			case ThreeOperator.Div:   return c1 / c2;
-			default: throw new Exception("Logic error");
-		}
-	}
-	private static ConstPropSemilatticeEl GetSemilatticeEl
-		(ThreeAddressValueType val,
-		 Dictionary<string, ConstPropKeyValue> m)
-	{
-		ConstPropSemilatticeEl semilatticeEl = null;
-		if (val is ThreeAddressStringValue v)
-			semilatticeEl = m[v.Value].Value;
-		else if (val is ThreeAddressIntValue c)
-			semilatticeEl = new ConstPropSemilatticeEl(ValConstType.Const, c.Value);
-		return semilatticeEl;
-	}
-}
-```
-Класс _ConstantPropagationOptimizer_ предоставляет функцию _TransferFunction_ в формате, совместимом с обобщённым итерационным алгоритмом. _ConstPropSemilatticeEl_ — это тип элементов полурешётки. Значения этого типа имеют два поля: _Constantness_ и _Value_. Поле _Constantness_ допускает значения _Const_, _NAC_ и _Undef_. Поле _Value_ используется, если _Constantness_ имеет значение _Const_, и хранит значение константы типа _int_.
-
-#### Тесты
-Пример исходной программы:
-```
-{
-	int t1, t2, i, x, u1;
-	i = 2;
-	t1 = 4 * i;
-	x = 3 + 17;
-	u1 = 5 * t1;
-	t2 = i;
-}
-```
-Пример работы передаточной функции:
-```
-Before
-i: (Undef, 0)
-t1: (Undef, 0)
-x: (Undef, 0)
-u1: (Undef, 0)
-t2: (Undef, 0)
-After
-i: (Const, 2)
-t1: (Const, 8)
-x: (Const, 20)
-u1: (Const, 40)
-t2: (Const, 2)
-```
-
-[Вверх](#содержание)
 # Поиск доминаторов для каждой вершины графа потока управления
 
 ### Команда Komanda
@@ -5782,6 +6058,36 @@ CFG is reducibile
 
 
 #### Особенности реализации
+
+Для определения глубины графа необходимо найти самый длинный путь, состоящий лишь из обратных дуг. В данной реализации для графа с правильной нумерацией дуга является обратной, если она ведет из узла с большим индексом в узел с меньшим индексом.
+Алгоритм находит все обратные дуги, а затем для каждой из них ищет путь наибольшей длины.
+
+``` csharp
+public static int GetGraphDepth(ControlFlowGraph graph)
+{
+    int maxDepth = 0;
+    var backwardArcs = new Dictionary<int, int>();
+    for(int nodeId = 0; nodeId < graph.blocks.Count; nodeId++)
+    {
+        var successors = graph.cfg.GetOutputNodes(nodeId);
+        foreach (var s in successors)
+            if(s <= nodeId)                    
+                backwardArcs.Add(nodeId, s);                
+    }
+    foreach(var arc in backwardArcs)
+    {
+        int currentDepth = 0;
+        var currentNode = arc.Key;
+        while(backwardArcs.ContainsKey(currentNode))
+        {
+            currentNode = backwardArcs[currentNode];
+            currentDepth++;
+        }
+        maxDepth = currentDepth > maxDepth ? currentDepth : maxDepth; 
+    }
+    return maxDepth;
+}
+```
 Для использования данной оптимизации необходимо:
 1. Подключить пространство имен using SimpleLang.ControlFlowGraph;
 2. Построить граф с правильной нумерацией вершин
