@@ -11,7 +11,7 @@ namespace SimpleLang.ThreeCodeOptimisations
     using ConstPropBlockInfo = BlockInfo<KeyValuePair<string, ConstPropSemilatticeEl>>;
     using ConstPropKeyValue = KeyValuePair<string, ConstPropSemilatticeEl>;
 
-    public partial class ConstantPropagationOptimizer
+    public partial class ConstantPropagationOptimizer : ThreeCodeOptimiser
     {
         private CFG controlFlowGraph;
         private List<HashSet<ConstPropKeyValue>> Ins;
@@ -78,7 +78,39 @@ namespace SimpleLang.ThreeCodeOptimisations
             Ins = iterativeAlgorithm.GetINs();
         }
 
-        public CFG ApplyOptimization(List<LinkedList<ThreeCode>> blocks)
+		public void Apply(ref LinkedList<ThreeCode> program)
+		{
+			// заглушка
+		}
+
+		public bool NeedFullCode() => true;
+
+		public void Apply(ref List<LinkedList<ThreeCode>> res)
+		{
+            _Applied = false;
+			var old = res.Select(b => new LinkedList<string>(b.Select(c => c.ToString()))).ToList();
+			var constPropOptimizer = new ConstantPropagationOptimizer();
+			CFG cfg = constPropOptimizer.ApplyOptimization(res);
+			res = cfg.blocks;
+			for (int i = 0; i < old.Count; ++i)
+			{
+				for (int j = 0; j < old[i].Count; ++j)
+				{
+                    var it1 = old[i].ElementAt(j);
+                    var it2 = res[i].ElementAt(j);
+                    if (!it1.ToString().Equals(it2.ToString()))
+					{
+                        _Applied = true;
+						return;
+					}
+				}
+			}
+		}
+
+		private bool _Applied = false;
+		public bool Applyed() => _Applied;
+
+		public CFG ApplyOptimization(List<LinkedList<ThreeCode>> blocks)
         {
             IterativeAlgorithm(blocks);
             var bs = controlFlowGraph.blocks;

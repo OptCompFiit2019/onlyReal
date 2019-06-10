@@ -10,14 +10,15 @@ using GenericTransferFunction;
 namespace SimpleLang.Visitors
 {
     // arg1 op arg2
-    using Expr = ValueTuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>;
-    using ExprSet = HashSet<(ThreeAddressValueType, ThreeOperator, ThreeAddressValueType)>;
+    using Expr = Tuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>;
+    using ExprSet = HashSet<Tuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>>;
     using KillerSet = HashSet<string>;
 
     // Для обратной совместимости с тестирующей системой
-    using StringExprSet = HashSet<(string, string, string)>;
+    using StringExprSet = HashSet<Tuple<string, string, string>>;
+	using StringExpr = Tuple<string, string, string>;
 
-    public class AvaliableExprsAdaptor
+	public class AvaliableExprsAdaptor
     {
         public static TransferFunction<BlockInfo<Expr>> TransferFunction()
             => new TransferFunction<BlockInfo<Expr>>(bi =>
@@ -51,7 +52,7 @@ namespace SimpleLang.Visitors
 
                 if (line.operation == ThreeOperator.Plus || line.operation == ThreeOperator.Mult || line.operation == ThreeOperator.Minus || line.operation == ThreeOperator.Logic_or || line.operation == ThreeOperator.Logic_not || line.operation == ThreeOperator.Logic_neq || line.operation == ThreeOperator.Logic_less || line.operation == ThreeOperator.Logic_leq || line.operation == ThreeOperator.Logic_greater || line.operation == ThreeOperator.Logic_geq || line.operation == ThreeOperator.Logic_equal || line.operation == ThreeOperator.Logic_and || line.operation == ThreeOperator.Div)
                 {
-                    ret.Add((line.arg1, line.operation, line.arg2));
+                    ret.Add(new Expr(line.arg1, line.operation, line.arg2));
                 }
             }
             return ret;
@@ -67,7 +68,7 @@ namespace SimpleLang.Visitors
         public (List<StringExprSet>, List<KillerSet>) GetGenAndKillerSets(List<LinkedList<ThreeCode>> bblocks)
         {
             return (bblocks.Select(b => new StringExprSet(GetGenExprSet(b)
-                        .Select(e => (e.Item1.ToString(), e.Item2.ToString(), e.Item3.ToString()))))
+                        .Select(e => new StringExpr(e.Item1.ToString(), e.Item2.ToString(), e.Item3.ToString()))))
                         .ToList(),
                     bblocks.Select(b => GetKillerSet(b)).ToList());
         }

@@ -7,7 +7,7 @@ using SimpleLang.ControlFlowGraph;
 
 namespace SimpleCompiler
 {
-    using ExprSet = HashSet<(ThreeAddressValueType, ThreeOperator, ThreeAddressValueType)>;
+    using ExprSet = HashSet<Tuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>>;
 
     public class IterativeAlgAvailableExprs
     {

@@ -105,6 +105,8 @@ namespace OptGui
                 res.Add(new SimpleLang.ThreeCodeOptimisations.PullCopiesOpt());
             if (checkBox17.Checked)
                 res.Add(new SimpleLang.ThreeOptimize.DeadOrAliveOnGraphAdapter());
+            if (checkBox18.Checked)
+                res.Add(new SimpleLang.ThreeCodeOptimisations.ConstantPropagationOptimizer());
             return res;
         }
         void UpdateForms() {
