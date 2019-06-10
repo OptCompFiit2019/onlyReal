@@ -108,16 +108,40 @@ namespace SimpleLang.ThreeCodeOptimisations
             {
                 var line = currentNode.Value;
 
-                if (line.operation is ThreeOperator.Goto && (temp = FindLabel(code, line.arg1.ToString())).Value.operation is ThreeOperator.Goto)
+                if (line.operation is ThreeOperator.Goto)
                 {
-                    line.arg1 = temp.Value.arg1;
-                    _apply = true;
+                    if (line.arg1 != null)
+                        temp = FindLabel(code, line.arg1.ToString());
+                    else
+                        continue;
+                    if (temp.Value.operation is ThreeOperator.Goto)
+                    {
+                        line.arg1 = temp.Value.arg1;
+                        _apply = true;
+                    }
+                    else if (temp.Value.operation is ThreeOperator.None && temp.Next != null && temp.Next.Value.operation is ThreeOperator.Goto)
+                    {
+                        line.arg1 = temp.Next.Value.arg1;
+                        _apply = true;
+                    }
                 }
 
-                if (line.operation is ThreeOperator.IfGoto && (temp = FindLabel(code, line.arg2.ToString())).Value.operation is ThreeOperator.Goto)
+                if (line.operation is ThreeOperator.IfGoto)
                 {
-                    line.arg1 = temp.Value.arg1;
-                    _apply = true;
+                    if (line.arg2 != null)
+                        temp = FindLabel(code, line.arg2.ToString());
+                    else
+                        continue;
+                    if (temp.Value.operation is ThreeOperator.Goto)
+                    {
+                        line.arg1 = temp.Value.arg1;
+                        _apply = true;
+                    }
+                    else if (temp.Value.operation is ThreeOperator.None && temp.Next != null && temp.Next.Value.operation is ThreeOperator.Goto)
+                    {
+                        line.arg1 = temp.Next.Value.arg1;
+                        _apply = true;
+                    }
                 }
 
                 currentNode = currentNode.Next;
