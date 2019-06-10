@@ -1,7 +1,7 @@
 # Проект onlyReal
 Пишем новый язык программирования
 --
-[Анкета 2019](https://docs.google.com/forms/d/1yioyLEPFn9mvj03pGYWrf6ptZ2aw-Llnmrj_J_tLgo8/edit?usp=sharing)
+[Анкета 2019](https://forms.gle/jz5ptyAkqru4trdU8)
 --
 [Ссылка на первичное описание разрабатываемого языка](https://drive.google.com/file/d/1qE3rKjgdjBNN9UxvYN8zgQVhy-1x9RLk/view?usp=sharing)
 --
