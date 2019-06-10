@@ -240,7 +240,7 @@
         <td>qwerty</td>
     </tr>
     <tr>
-        <td>14</td>
+        <td>14 - нет</td>
         <td>Для достигающих определений вычислить genB, killB для любого B и разработать структуру для хранения передаточной функции.
             fB = fSn*fSn-1*...*fS1 - вычислить fSi для каждой инструкции ББл и потом найти композицию</td>
         <td>Roslyn</td>
@@ -324,9 +324,11 @@
     </tr>
     <tr>
         <td>30 - нет</td>
+        <td>Поиск решения методом MOP</td>
+        <td>Intel</td>
     </tr>
     <tr>
-        <td>31</td>
+        <td>31 - нет</td>
         <td>Передаточная функция в задаче о распространении констант</td>
         <td>Roslyn</td>
     </tr>
@@ -3011,7 +3013,7 @@ public class ControlFlowGraph
     {
         public List<LinkedList<ThreeCode>> blocks;
         public Graph cfg;
-        
+
         public ControlFlowGraph(List<LinkedList<ThreeCode>> b)
         {
             this.blocks = b;
@@ -3053,6 +3055,93 @@ public class ControlFlowGraph
                 }
 ```
 Был определен класс `ControlFlowGraph`, инициализирующийся списком базовых блоков, по которому, посредством метода `GenerateCFG`, строится граф потока управления. Для удобства использования были определены методы `GetAsAdjacencyMatrix` и `GetAsAdjacencyList`, возвращающие соответственно матрицу смежности и список смежности.
+
+Для удобства дальнейшего использования был введён класс 'Graph'.
+```
+public class Graph
+{
+public int[] g;
+public int n;
+
+public Graph(int _n)
+{
+    this.n = _n;
+    this.g = new int[this.n*this.n];
+
+    for (var i = 0; i < this.n * this.n; ++i)
+    this.g[i] = 0;
+}
+
+public void AddArc(int i, int j)
+{
+    this.g[i * this.n + j] = 1;
+}
+
+public void ResetArc(int i, int j)
+{
+    this.g[i * this.n + j] = 0;
+}
+
+public int[,] GetAdjacencyMatrix()
+{
+    var result = new int[this.n, this.n];
+
+    for (var i = 0; i < this.n; ++i)
+        for (var j = 0; j < this.n; ++j)
+            result[i, j] = this.g[i * this.n + j];
+
+return result;
+}
+
+public List<List<int>> GetAdjacencyList()
+{
+    var result = new List<List<int>>();
+
+    for (var i = 0; i < this.n; ++i)
+    {
+        result.Add(new List<int>());
+        for (var j = 0; j < this.n; ++j)
+            if (this.g[i*this.n + j] == 1)
+                result.Last().Add(j);
+    }
+
+    return result;
+}
+
+public override string ToString()
+{
+var result = "";
+    for (var i = 0; i < this.n; ++i)
+    {
+        result += i.ToString() + ": ";
+        for (var j = 0; j < this.n; ++j)
+            if (this.g[i * this.n + j] == 1)
+            result += j.ToString() + " ";
+        result += '\n'.ToString();
+    }
+
+return result;
+}
+
+public List<int> GetInputNodes(int node_id)
+{
+    var res = new List<int>();
+    for (var i = 0; i < this.n; ++i)
+        if (this.g[i * this.n + node_id] == 1)
+            res.Add(i);
+    return res;
+}
+
+public List<int> GetOutputNodes(int node_id)
+{
+    var res = new List<int>();
+    for (var j = 0; j < this.n; ++j)
+        if (this.g[node_id * this.n + j] == 1)
+            res.Add(j);
+        return res;
+    }
+}
+```
 
 [Вверх](#содержание)
 # Алгоритм LVN
