@@ -5,6 +5,7 @@ using System.Text;
 using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
 using SimpleLang.Visitors;
 using SimpleLang.GenericIterativeAlgorithm;
+using SimpleLang;
 
 namespace SimpleLang.ExprOptimisations
 {
@@ -60,6 +61,26 @@ namespace SimpleLang.ExprOptimisations
             iterativeAlgorithm.Perform();
             Ins = iterativeAlgorithm.GetINs();
             Outs = iterativeAlgorithm.GetOUTs();
+
+            //var itAlg = new SimpleCompiler.IterationAlgorithm.IterativeAlgAvailableExprs();
+            //(Ins, Outs) = itAlg.GenerateInputOutputAvaliableExpr(bs);
+
+            //Func<IEnumerable<BlockInfo<Expr>>, BlockInfo<Expr>, BlockInfo<Expr>> meetOp =
+            //    (blocksInfos, bInfo) =>
+            //    {
+            //        var resInfo = new BlockInfo<Expr>(bInfo);
+            //        resInfo.IN = resInfo.OUT; // универсальное множество
+            //        foreach (var bi in blocksInfos)
+            //            resInfo.IN.IntersectWith(bi.OUT);
+            //        return resInfo;
+            //    };
+
+            //var mopAlg = new MOPAlgorithm<Expr>(blocksInfo,
+            //    controlFlowGraph, meetOp, true, new HashSet<Expr>(), U, transferFunction);
+
+            //mopAlg.Perform();
+            //Ins = mopAlg.GetINs();
+            //Outs = mopAlg.GetOUTs();
         }
 
         public CFG ApplyOptimization(List<LinkedList<ThreeCode>> blocks)
