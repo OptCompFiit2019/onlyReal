@@ -1,26 +1,19 @@
 entry:
-
            #t1 = 4 * i
            #t0 = 5 * i
            t1 = #t1
            x = #t1
            u1 = #t0
            if True goto label_0
-
            goto label_1
-
 label_0:
            u3 = #t0
-
            t2 = #t1
            u2 = #t0
            u4 = 6 * i
            u5 = #t0
            if False goto label_2
-
            goto label_3
-
 label_2:
            t4 = #t1
-
 label_3:

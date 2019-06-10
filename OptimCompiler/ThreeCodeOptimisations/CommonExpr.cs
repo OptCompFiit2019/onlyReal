@@ -80,13 +80,14 @@ namespace SimpleLang.Visitors
 
             for (int i = 0; i < program.Count - 1; i++)
             {
-                if (program[i].arg1 == null && program[i].arg2 == null)
+                if ((program[i].arg1 == null && program[i].arg2 == null) || program[i].operation == ThreeOperator.Assign || program[i].operation == ThreeOperator.Goto
+                    || program[i].operation == ThreeOperator.Println || program[i].operation == ThreeOperator.None)
                     continue;
                 else
                 {
                     for (int j = i + 1; j < program.Count; j++)
                     {
-                        if (program[j].arg1.ToString() == program[i].arg1.ToString() && program[j].arg2 != null && program[i].arg2 != null && program[j].arg2.ToString() == program[i].arg2.ToString() && program[j].operation == program[i].operation)
+                        if (program[j].arg1 != null && program[j].arg2 != null && program[i].arg2 != null && program[j].arg1.ToString() == program[i].arg1.ToString() && program[j].arg2.ToString() == program[i].arg2.ToString() && program[j].operation == program[i].operation)
                         {
                             program[j].operation = ThreeOperator.Assign;
                             program[j].arg1 = new ThreeAddressStringValue(program[i].result);
