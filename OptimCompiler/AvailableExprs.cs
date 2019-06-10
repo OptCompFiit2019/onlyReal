@@ -10,8 +10,8 @@ using GenericTransferFunction;
 namespace SimpleLang.Visitors
 {
     // arg1 op arg2
-    using Expr = ValueTuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>;
-    using ExprSet = HashSet<(ThreeAddressValueType, ThreeOperator, ThreeAddressValueType)>;
+    using Expr = Tuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>;
+    using ExprSet = HashSet<Tuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>>;
     using KillerSet = HashSet<string>;
 
     // Для обратной совместимости с тестирующей системой
@@ -51,7 +51,7 @@ namespace SimpleLang.Visitors
 
                 if (line.operation == ThreeOperator.Plus || line.operation == ThreeOperator.Mult || line.operation == ThreeOperator.Minus || line.operation == ThreeOperator.Logic_or || line.operation == ThreeOperator.Logic_not || line.operation == ThreeOperator.Logic_neq || line.operation == ThreeOperator.Logic_less || line.operation == ThreeOperator.Logic_leq || line.operation == ThreeOperator.Logic_greater || line.operation == ThreeOperator.Logic_geq || line.operation == ThreeOperator.Logic_equal || line.operation == ThreeOperator.Logic_and || line.operation == ThreeOperator.Div)
                 {
-                    ret.Add((line.arg1, line.operation, line.arg2));
+                    ret.Add(new Expr(line.arg1, line.operation, line.arg2));
                 }
             }
             return ret;
