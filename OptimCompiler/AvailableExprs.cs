@@ -15,9 +15,10 @@ namespace SimpleLang.Visitors
     using KillerSet = HashSet<string>;
 
     // Для обратной совместимости с тестирующей системой
-    using StringExprSet = HashSet<(string, string, string)>;
+    using StringExprSet = HashSet<Tuple<string, string, string>>;
+	using StringExpr = Tuple<string, string, string>;
 
-    public class AvaliableExprsAdaptor
+	public class AvaliableExprsAdaptor
     {
         public static TransferFunction<BlockInfo<Expr>> TransferFunction()
             => new TransferFunction<BlockInfo<Expr>>(bi =>
@@ -67,7 +68,7 @@ namespace SimpleLang.Visitors
         public (List<StringExprSet>, List<KillerSet>) GetGenAndKillerSets(List<LinkedList<ThreeCode>> bblocks)
         {
             return (bblocks.Select(b => new StringExprSet(GetGenExprSet(b)
-                        .Select(e => (e.Item1.ToString(), e.Item2.ToString(), e.Item3.ToString()))))
+                        .Select(e => new StringExpr(e.Item1.ToString(), e.Item2.ToString(), e.Item3.ToString()))))
                         .ToList(),
                     bblocks.Select(b => GetKillerSet(b)).ToList());
         }
