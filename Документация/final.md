@@ -41,11 +41,12 @@
 * [Алгоритм LVN](#алгоритм-lvn)
 * [Устранение локальных общих подвыражений построением ациклического графа](#устранение-локальных-общих-подвыражений-построением-ациклического-графа)
 * [Хранение IN B и OUT B для ряда задач](#хранение-in-b-и-out-b-для-ряда-задач)
-* [Достигающие определения множества genB killB Передаточная функция базового блока В](#достигающие-определения-множества-genb-killb-передаточная-функция-базового-блока-в)
-* [Для достигающих определений вычислить genB killB для любого B](#для-достигающих-определений-вычислить-genb-killb-для-любого-b)
 * [Итерационный алгоритм для достигающих определений](#итерационный-алгоритм-для-достигающих-определений)
-* [Оптимизация Распространение констант](#оптимизация-распространение-констант)
+* [Для достигающих определений вычислить genB killB для любого B](#для-достигающих-определений-вычислить-genb-killb-для-любого-b)
+* [Достигающие определения множества genB killB Передаточная функция базового блока В](#достигающие-определения-множества-genb-killb-передаточная-функция-базового-блока-в)
+* [Класс обобщенного итерационного  алгоритма](#класс-обобщенного-итерационного--алгоритма)
 * [Итерационный алгоритм для активных переменных](#итерационный-алгоритм-для-активных-переменных)
+* [Оптимизация Распространение констант](#оптимизация-распространение-констант)
 * [Вычисление множеств DEFb и USEb для активных переменных](#вычисление-множеств-defb-и-useb-для-активных-переменных)
 * [Итерационный алгоритм для доступных выражений](#итерационный-алгоритм-для-доступных-выражений)
 * [Удаление мертвых переменных на основе итерационного алгоритма](#удаление-мертвых-переменных-на-основе-итерационного-алгоритма)
@@ -54,7 +55,6 @@
 * [Доступные выражения-множества e_genB и e_killB Передаточная функция базового блока В](#доступные-выражения-множества-e_genb-и-e_killb-передаточная-функция-базового-блока-в)
 * [Оптимизация Доступные выражения](#оптимизация-доступные-выражения)
 * [Генерация CIL-кода по трехадресному программному коду](#генерация-cil-кода-по-трехадресному-программному-коду)
-* [Класс обобщенного итерационного  алгоритма](#класс-обобщенного-итерационного--алгоритма)
 * [Поиск доминаторов для каждой вершины графа потока управления](#поиск-доминаторов-для-каждой-вершины-графа-потока-управления)
 * [Получение трехадресного кода из графа потока управления](#получение-трехадресного-кода-из-графа-потока-управления)
 * [Определение того, является ли ребро обратным и являеется ли CFG приводимым](#определение-того,-является-ли-ребро-обратным-и-являеется-ли-cfg-приводимым)
@@ -3516,264 +3516,6 @@ IN и OUT всей программы возвращает ```List<List<string>>
 
 [Вверх](#содержание)
 
-# Достигающие определения множества genB killB Передаточная функция базового блока В
-
-### Команда Roslyn
-
-#### Постановка задачи
-
-Задача состояла в реализации вычисления множеств genB и killB для анализа достигающих определений, а также в разработке структуры для хранения передаточной функции.
-
-#### Зависимости задач в графе задач
-Данная задача зависит от задачи генерации базовых блоков.
-
-От задачи зависит:
-* Реализация итерационного алгоритма для достигающих определений
-
-#### Теория
-
-genB — множество определений, генерируемых и не переопределённых базовым блоком B.
-killB — множество остальных определений переменных, определяемых в определениях genB, в других базовых блоках.
-Передаточная функция вычислятся по формуле `fB(X) = genB ∪ (X − killB)`. 
-
-#### Особенности реализации
-
-```csharp
-using BasicBlock = LinkedList<ThreeCode>;
-// Адаптор для совместимости с обобщённым итерационным алгоритмом
-public class ReachingDefsAdaptor
-{
-	private ReachingDefsTransferFunction tf;
-	public ReachingDefsAdaptor(CFG cfg)
-		=> tf = new ReachingDefsTransferFunction(cfg);
-	public TransferFunction<BlockInfo<ThreeCode>> TransferFunction()
-		=> new TransferFunction<BlockInfo<ThreeCode>>(bi =>
-		{
-			var Out = new BlockInfo<ThreeCode>(bi);
-			Out.OUT = tf.BlockTransferFunction(bi.Commands)
-				(new HashSet<ThreeCode>(bi.IN));
-			return Out;
-		});
-}
-public class ReachingDefsTransferFunction
-{
-	private CFG cfg;
-	public ReachingDefsTransferFunction(CFG cfg) => this.cfg = cfg;
-	private IEnumerable<ThreeCode> Definitions(BasicBlock bb)
-		=> bb.Where(tc => tc.operation != ThreeOperator.Goto
-			&& tc.operation != ThreeOperator.IfGoto
-			&& tc.operation != ThreeOperator.None);
-	private List<HashSet<ThreeCode>> InstructionGens(BasicBlock bb)
-		=> Definitions(bb).Select(tc =>
-			new HashSet<ThreeCode>(new ThreeCode[] { tc })
-		).ToList();
-	private List<HashSet<ThreeCode>> InstructionKills(BasicBlock bb)
-		=> Definitions(bb).Select(tc =>
-			new HashSet<ThreeCode>(cfg.blocks.Where(b => b != bb)
-				.Select(b => Definitions(b))
-				.SelectMany(e => e).Where(tc_cur => tc_cur.result == tc.result))
-		).ToList();
-	public HashSet<ThreeCode> Kill(BasicBlock bb)
-	{
-		var kills = InstructionKills(bb);
-		if (kills.Count == 0)
-			return new HashSet<ThreeCode>();
-		else
-			return kills.Aggregate((s1, s2) =>
-				new HashSet<ThreeCode>(s1.Union(s2))
-		);
-	}
-	public HashSet<ThreeCode> Gen(BasicBlock bb)
-	{
-		var gens = InstructionGens(new LinkedList<ThreeCode>
-			(bb.GroupBy(tc => tc.result, (tc, e) => e.Last())));
-		var kills = InstructionKills(bb);
-		int n = gens.Count;
-		if (n <= 0)
-			return new HashSet<ThreeCode>();
-		HashSet<ThreeCode> gen = gens[n - 1];
-		for (int i = n - 2; i >= 0; --i)
-		{
-			var gen_cur = gens[i];
-			for (int j = i + 1; j < n; ++j)
-				gen_cur.ExceptWith(kills[j]);
-			gen.UnionWith(gen_cur);
-		}
-		return gen;
-	}
-	private IEnumerable<InstructionTransferFunction> InstructionTransferFunctions(BasicBlock bb)
-	{
-		var tf = InstructionGens(bb).Zip(InstructionKills(bb), (g, k) =>
-			new InstructionTransferFunction(g, k));
-		if (tf.Count() == 0)
-			tf = new InstructionTransferFunction[] { new InstructionTransferFunction() };
-		return tf;
-	}
-	public Func<HashSet<ThreeCode>, HashSet<ThreeCode>> BlockTransferFunction(BasicBlock bb)
-		=> InstructionTransferFunctions(bb).Aggregate((f, g) => f * g).Func;
-}
-public class InstructionTransferFunction
-{
-	public Func<HashSet<ThreeCode>, HashSet<ThreeCode>> Func;
-	public InstructionTransferFunction()
-		=> Func = defs => defs;
-	public InstructionTransferFunction(HashSet<ThreeCode> gen, HashSet<ThreeCode> kill)
-		=> Func = defs => new HashSet<ThreeCode>(gen.Union(defs.Except(kill)));
-	public InstructionTransferFunction(Func<HashSet<ThreeCode>, HashSet<ThreeCode>> Func)
-		=> this.Func = Func;
-	public static InstructionTransferFunction operator *
-			(InstructionTransferFunction f, InstructionTransferFunction g)
-		=> new InstructionTransferFunction(defs => f.Func(g.Func(defs)));
-}
-```
-Функция _Gen_ вычисляет множество определений (команд трёхадресного кода), генерируемых блоком. Функция _Kill_ вычисляет множество всех определений, уничтожаемых блоком. Функция _BlockTransferFunction_ возвращает делегат передаточной функции, вычисленной по формуле. Класс _ReachingDefsAdaptor_ предоставляет функцию _TransferFunction_ в формате, совместимом с обобщённым итерационным алгоритмом.
-
-#### Тесты
-Пример исходной программы:
-```
-{
-		int i, j, m, n, a, u1, u2, u3, t, x;
-/*d1*/	i = m - 1;
-/*d3*/	j = n;
-/*d4*/	a = u1;
-		while (true)
-		{
-/*d5*/		i = i + 1;
-/*d6*/		j = j - 1;
-			if (false)
-			{
-/*d7*/			a = u2;
-			}
-/*d8*/		i = u3;
-		}
-}
-```
-Пример формирования множеств genB и killB:
-```
-GenB
-Block 1: { d1, d2, d3 }
-Block 2: { d4, d5 }
-Block 3: { d6 }
-Block 4: { d7 }
-KillB
-Block 1: { d4, d5, d6, d7 }
-Block 2: { d1, d2, d7 }
-Block 3: { d3 }
-Block 4: { d1, d4 }
-```
-
-[Вверх](#содержание)
-# Для достигающих определений вычислить genB killB для любого B
-
-### Команда Intel
-
-### Постановка задачи
-
-Задача состояла вычислении genB, killB и передаточной функции для реализации итерационного алгоритма для достигающих определений.
-
-#### Зависимости задач в графе задач
-
-Оптимизация протяжка const на основе инф., полученной в результате применения ИтА для достиг. Определений
-
-#### Теория
-Будем говорить, что определение d достигает точки p, если существует путь от точки, непосредственно следующей за d, к точке p, такой, что d не уничтожается вдоль этого пути.
-genB – множество определений, генерируемых и не переопределённых базовым блоком B.
-killB – множество остальных определений переменных, определяемых в определениях genB.
-
-#### Особенности реализации
-
-```
-    public class GenKillList
-
-    {
-
-        public List<ByteVector> GEN;
-
-        public List<ByteVector> KILL;
-
-
-
-
-        public GenKillList(int blocks_count, int assigns_count)
-
-        {
-
-            GEN = new List<ByteVector>();
-
-            KILL = new List<ByteVector>();
-
-
-
-
-            for (var i = 0; i < blocks_count; ++i)
-
-            {
-
-                GEN.Add(new ByteVector(assigns_count));
-
-                KILL.Add(new ByteVector(assigns_count));
-
-            }
-
-        }
-
-
-
-
-        public GenKillList Generate(List<BlockVariables> blocks)
-
-        {
-
-            for (var i = 0; i < blocks.Count; ++i)
-
-                for (var k = 0; k < blocks[i].Count(); ++k)
-
-                {
-
-                    GEN[i].v[blocks[i].variable_nums[k]] = 1;
-
-
-
-
-                    for (var j = 0; j < blocks.Count; ++j)
-
-                        if (i != j)
-
-                            foreach (var in_var_num in blocks[j].In(blocks[i].variables_names[k]))
-
-                                KILL[i].v[in_var_num] = 1;
-
-                }
-
-            return this;
-
-        }
-
-    }
-
-
-
-
-    public class TransferFunction
-
-    {
-
-        public ByteVector Apply(ByteVector GEN, ByteVector KILL, ByteVector IN)
-
-        {
-
-            return GEN + (IN - KILL);
-
-        }
-
-
-
-
-    }
-
-```
-
-[Вверх](#содержание)
 # Итерационный алгоритм для достигающих определений
 
 ### Команда Nvidia
@@ -3938,6 +3680,520 @@ public class AttainableGraph
             return result;
         }
     }
+```
+
+[Вверх](#содержание)
+# Для достигающих определений вычислить genB killB для любого B
+
+### Команда Intel
+
+### Постановка задачи
+
+Задача состояла вычислении genB, killB и передаточной функции для реализации итерационного алгоритма для достигающих определений.
+
+#### Зависимости задач в графе задач
+
+Оптимизация протяжка const на основе инф., полученной в результате применения ИтА для достиг. Определений
+
+#### Теория
+Будем говорить, что определение d достигает точки p, если существует путь от точки, непосредственно следующей за d, к точке p, такой, что d не уничтожается вдоль этого пути.
+genB – множество определений, генерируемых и не переопределённых базовым блоком B.
+killB – множество остальных определений переменных, определяемых в определениях genB.
+
+#### Особенности реализации
+
+```
+    public class GenKillList
+
+    {
+
+        public List<ByteVector> GEN;
+
+        public List<ByteVector> KILL;
+
+
+
+
+        public GenKillList(int blocks_count, int assigns_count)
+
+        {
+
+            GEN = new List<ByteVector>();
+
+            KILL = new List<ByteVector>();
+
+
+
+
+            for (var i = 0; i < blocks_count; ++i)
+
+            {
+
+                GEN.Add(new ByteVector(assigns_count));
+
+                KILL.Add(new ByteVector(assigns_count));
+
+            }
+
+        }
+
+
+
+
+        public GenKillList Generate(List<BlockVariables> blocks)
+
+        {
+
+            for (var i = 0; i < blocks.Count; ++i)
+
+                for (var k = 0; k < blocks[i].Count(); ++k)
+
+                {
+
+                    GEN[i].v[blocks[i].variable_nums[k]] = 1;
+
+
+
+
+                    for (var j = 0; j < blocks.Count; ++j)
+
+                        if (i != j)
+
+                            foreach (var in_var_num in blocks[j].In(blocks[i].variables_names[k]))
+
+                                KILL[i].v[in_var_num] = 1;
+
+                }
+
+            return this;
+
+        }
+
+    }
+
+
+
+
+    public class TransferFunction
+
+    {
+
+        public ByteVector Apply(ByteVector GEN, ByteVector KILL, ByteVector IN)
+
+        {
+
+            return GEN + (IN - KILL);
+
+        }
+
+
+
+
+    }
+
+```
+
+[Вверх](#содержание)
+# Достигающие определения множества genB killB Передаточная функция базового блока В
+
+### Команда Roslyn
+
+#### Постановка задачи
+
+Задача состояла в реализации вычисления множеств genB и killB для анализа достигающих определений, а также в разработке структуры для хранения передаточной функции.
+
+#### Зависимости задач в графе задач
+Данная задача зависит от задачи генерации базовых блоков.
+
+От задачи зависит:
+* Реализация итерационного алгоритма для достигающих определений
+
+#### Теория
+
+genB — множество определений, генерируемых и не переопределённых базовым блоком B.
+killB — множество остальных определений переменных, определяемых в определениях genB, в других базовых блоках.
+Передаточная функция вычислятся по формуле `fB(X) = genB ∪ (X − killB)`. 
+
+#### Особенности реализации
+
+```csharp
+using BasicBlock = LinkedList<ThreeCode>;
+// Адаптор для совместимости с обобщённым итерационным алгоритмом
+public class ReachingDefsAdaptor
+{
+	private ReachingDefsTransferFunction tf;
+	public ReachingDefsAdaptor(CFG cfg)
+		=> tf = new ReachingDefsTransferFunction(cfg);
+	public TransferFunction<BlockInfo<ThreeCode>> TransferFunction()
+		=> new TransferFunction<BlockInfo<ThreeCode>>(bi =>
+		{
+			var Out = new BlockInfo<ThreeCode>(bi);
+			Out.OUT = tf.BlockTransferFunction(bi.Commands)
+				(new HashSet<ThreeCode>(bi.IN));
+			return Out;
+		});
+}
+public class ReachingDefsTransferFunction
+{
+	private CFG cfg;
+	public ReachingDefsTransferFunction(CFG cfg) => this.cfg = cfg;
+	private IEnumerable<ThreeCode> Definitions(BasicBlock bb)
+		=> bb.Where(tc => tc.operation != ThreeOperator.Goto
+			&& tc.operation != ThreeOperator.IfGoto
+			&& tc.operation != ThreeOperator.None);
+	private List<HashSet<ThreeCode>> InstructionGens(BasicBlock bb)
+		=> Definitions(bb).Select(tc =>
+			new HashSet<ThreeCode>(new ThreeCode[] { tc })
+		).ToList();
+	private List<HashSet<ThreeCode>> InstructionKills(BasicBlock bb)
+		=> Definitions(bb).Select(tc =>
+			new HashSet<ThreeCode>(cfg.blocks.Where(b => b != bb)
+				.Select(b => Definitions(b))
+				.SelectMany(e => e).Where(tc_cur => tc_cur.result == tc.result))
+		).ToList();
+	public HashSet<ThreeCode> Kill(BasicBlock bb)
+	{
+		var kills = InstructionKills(bb);
+		if (kills.Count == 0)
+			return new HashSet<ThreeCode>();
+		else
+			return kills.Aggregate((s1, s2) =>
+				new HashSet<ThreeCode>(s1.Union(s2))
+		);
+	}
+	public HashSet<ThreeCode> Gen(BasicBlock bb)
+	{
+		var gens = InstructionGens(new LinkedList<ThreeCode>
+			(bb.GroupBy(tc => tc.result, (tc, e) => e.Last())));
+		var kills = InstructionKills(bb);
+		int n = gens.Count;
+		if (n <= 0)
+			return new HashSet<ThreeCode>();
+		HashSet<ThreeCode> gen = gens[n - 1];
+		for (int i = n - 2; i >= 0; --i)
+		{
+			var gen_cur = gens[i];
+			for (int j = i + 1; j < n; ++j)
+				gen_cur.ExceptWith(kills[j]);
+			gen.UnionWith(gen_cur);
+		}
+		return gen;
+	}
+	private IEnumerable<InstructionTransferFunction> InstructionTransferFunctions(BasicBlock bb)
+	{
+		var tf = InstructionGens(bb).Zip(InstructionKills(bb), (g, k) =>
+			new InstructionTransferFunction(g, k));
+		if (tf.Count() == 0)
+			tf = new InstructionTransferFunction[] { new InstructionTransferFunction() };
+		return tf;
+	}
+	public Func<HashSet<ThreeCode>, HashSet<ThreeCode>> BlockTransferFunction(BasicBlock bb)
+		=> InstructionTransferFunctions(bb).Aggregate((f, g) => f * g).Func;
+}
+public class InstructionTransferFunction
+{
+	public Func<HashSet<ThreeCode>, HashSet<ThreeCode>> Func;
+	public InstructionTransferFunction()
+		=> Func = defs => defs;
+	public InstructionTransferFunction(HashSet<ThreeCode> gen, HashSet<ThreeCode> kill)
+		=> Func = defs => new HashSet<ThreeCode>(gen.Union(defs.Except(kill)));
+	public InstructionTransferFunction(Func<HashSet<ThreeCode>, HashSet<ThreeCode>> Func)
+		=> this.Func = Func;
+	public static InstructionTransferFunction operator *
+			(InstructionTransferFunction f, InstructionTransferFunction g)
+		=> new InstructionTransferFunction(defs => f.Func(g.Func(defs)));
+}
+```
+Функция _Gen_ вычисляет множество определений (команд трёхадресного кода), генерируемых блоком. Функция _Kill_ вычисляет множество всех определений, уничтожаемых блоком. Функция _BlockTransferFunction_ возвращает делегат передаточной функции, вычисленной по формуле. Класс _ReachingDefsAdaptor_ предоставляет функцию _TransferFunction_ в формате, совместимом с обобщённым итерационным алгоритмом.
+
+#### Тесты
+Пример исходной программы:
+```
+{
+		int i, j, m, n, a, u1, u2, u3, t, x;
+/*d1*/	i = m - 1;
+/*d3*/	j = n;
+/*d4*/	a = u1;
+		while (true)
+		{
+/*d5*/		i = i + 1;
+/*d6*/		j = j - 1;
+			if (false)
+			{
+/*d7*/			a = u2;
+			}
+/*d8*/		i = u3;
+		}
+}
+```
+Пример формирования множеств genB и killB:
+```
+GenB
+Block 1: { d1, d2, d3 }
+Block 2: { d4, d5 }
+Block 3: { d6 }
+Block 4: { d7 }
+KillB
+Block 1: { d4, d5, d6, d7 }
+Block 2: { d1, d2, d7 }
+Block 3: { d3 }
+Block 4: { d1, d4 }
+```
+
+[Вверх](#содержание)
+# Класс обобщенного итерационного  алгоритма
+
+### Команда Roll
+
+#### Постановка задачи
+Написать класс обобщенного итерационного  алгоритма. Обеспечить прямой и обратный ход анализа, задание передаточной функции, оператора сбора. Полученный класс должен позволить выполнять итерационный алгоритм для доступных выражений, активных переменных, достигающих определений и распространения констант.
+
+#### Зависимости задач в графе задач
+
+Задача зависит от:
+* Класс передаточной функции
+
+#### Теория
+Обобщенный итерационный алгоритм является основой для реализации конкретных итерационных алгоритмов. Для заданного графа потоков управления он производит анализ потоков данных. Основными этапами итерационного алгоритма являются:
+1. Инициализация множеств, как анализируемых, так и вспомогательных (IN, OUT, Def, Use, Gen, Kill и т.п.)
+2. Основной цикл алгоритма, на каждой итерации которого производится обновление множеств IN и OUT для всего графа. Для информации о каждом из блоков применяется оператор сбора и передаточная функция.
+3. Проверка условия остановки. Обычно анализ заканчивается когда множества IN, OUT более не претерпевают изменений.
+
+#### Особенности реализации
+Для использования данного класса необходимо:
+1. Подключить пространство имен using SimpleLang.GenericTransferFunction;
+2. Написать делегат или множество делегатов, реализующих конкретную передаточную функцию.
+3. Создать объект передаточной функции, передав в конструктор делегат или список делегатов.
+4. Применить передаточную функцию к объекту путем вызова у передаточной функции метода Apply.
+
+Ниже представлен код использования данного класса. Пример показывает анализ активных переменных и удаления мертвых переменных на его основе:
+```csharp
+using SimpleLang.GenericIterativeAlgorithm;
+using GenericTransferFunction;
+
+CFG controlFlowGraph = new CFG(blocks);
+
+                    // создание информации о блоках
+                    var blocksInfo = new List<BlockInfo<string>>();
+
+                    // вычисление множеств Def и Use для всего графа потоков данных
+                    var DefUse = new DefUseBlocks(controlFlowGraph);
+                    // создание информации о блоках
+
+                    for (int i = 0; i < DefUse.DefBs.Count; i++)
+                        blocksInfo.Add(new BlockInfo<string>(DefUse.DefBs[i], DefUse.UseBs[i]));
+
+                    // оператор сбора для анализа активных переменных
+                    Func<List<BlockInfo<string>>, CFG, int, BlockInfo<string>> meetOperator = (blocksInfos, graph, index) =>
+                    {
+                        var successorIndexes = graph.cfg.GetOutputNodes(index);
+                        var resInfo = new BlockInfo<string>(blocksInfos[index]);
+                        foreach (var i in successorIndexes)
+                            resInfo.OUT.UnionWith(blocksInfos[i].IN);
+                        return resInfo;
+                    };
+
+                    // делегат передаточной функции для анализа активных переменных
+                    Func<BlockInfo<string>, BlockInfo<string>> tFunc = (blockInfo) =>
+                    {
+                        blockInfo.IN = new HashSet<string>();
+                        blockInfo.IN.UnionWith(blockInfo.OUT);
+                        blockInfo.IN.ExceptWith(blockInfo.HelpFirst);
+                        blockInfo.IN.UnionWith(blockInfo.HelpSecond);
+                        return blockInfo;
+                    };
+
+                    var transferFunction = new TransferFunction<BlockInfo<string>>(tFunc);
+
+                    // создание объекта итерационного алгоритма
+                    var iterativeAlgorithm = new IterativeAlgorithm<string>(blocksInfo, controlFlowGraph, meetOperator,
+                    false, new HashSet<string>(), new HashSet<string>(), transferFunction);
+
+                    // выполнение алгоритма - вычисление IN и OUT
+                    iterativeAlgorithm.Perform();
+
+                    controlFlowGraph = ControlFlowOptimisations.DeadOrAliveOnGraph(iterativeAlgorithm.GetOUTs(), controlFlowGraph); // выполнение оптимизации
+
+```
+
+#### Тесты
+``` csharp
+Исходный код
+{
+    int a,b,c;
+    b = a;
+    a = 1;
+    a = 2;
+    a = 3;
+    while ((c > (a - b)))
+    {
+        c = (c + 1);
+        a = b;
+        b = 100;
+        b = (c + 4);
+        a = 30;
+    }
+    println(a);
+}
+Блоки трехадресного кода до каскадного удаления мертвых переменных
+           b = a
+           a = 1
+           a = 2
+           a = 3
+label_0:   temp_2 = a - b
+           temp_1 = c > temp_2
+           temp_0 = temp_1
+           if temp_0 goto label_1
+           goto label_2
+label_1:   c = c + 1
+           a = b
+           b = 100
+           b = c + 4
+           a = 30
+           goto label_0
+label_2:   println a
+
+
+После каскадного удаления мертвых переменных для графа
+           b = a
+           a = 3
+label_0:   temp_2 = a - b
+           temp_1 = c > temp_2
+           temp_0 = temp_1
+           if temp_0 goto label_1
+           goto label_2
+label_1:   c = c + 1
+           b = c + 4
+           a = 30
+           goto label_0
+label_2:   println a
+```
+
+[Вверх](#содержание)
+# Итерационный алгоритм для активных переменных
+
+### Команда BOOM
+
+#### Постановка задачи
+
+Задача состояла в вычислении множеств IN и OUT для каждого из блоков графа потоков управления.
+
+
+#### Зависимости задач в графе задач
+
+Данная задача зависит от задачи получения множеств DefB и UseB. Также от задачи Хранение IN[B] и OUT[B] для ряда задач.
+
+### Теория
+
+Данная задача состоит в том, чтобы получить множества In[B] и OUT[B] для каждого из блоков графа потоков управления. Задачи относится к категории анализа потока данных и не является оптимизацией.
+
+#### Особенности реализации
+
+```
+public class InOutActiveVariables
+{
+    public List<HashSet<string>> InBlocks { get; } // множества IN для блоков
+    public List<HashSet<string>> OutBlocks { get; } // множества OUT для блоков
+
+    /// <summary>
+    /// Итерационный алгоритм для активных переменных. Находит для графа <paramref name="graph"/> множества
+    /// IN (<paramref name="InBlocks"/>) и OUT (<paramref name="OutBlocks"/>) на основе ранее вычисленных
+    /// Def и Use (<paramref name="defUseBlocks"/>). IN и OUT сохраняются в объекте IterAlgoActiveVariables
+    /// Граф должен содержать фиктивный узел ВЫХОД.
+    /// </summary>
+    /// <param name="defUseBlocks"></param>
+    /// <param name="graph"></param>
+    public InOutActiveVariables(DefUseBlocks defUseBlocks, ControlFlowGraph.ControlFlowGraph graph)
+    {
+        InBlocks = new List<HashSet<string>>();
+        OutBlocks = new List<HashSet<string>>();
+        for(int i = 0; i < defUseBlocks.DefBs.Count; i++)
+        {
+            InBlocks.Add(new HashSet<string>());
+            OutBlocks.Add(new HashSet<string>());
+        }
+        bool isInChanged = true;
+
+        while(isInChanged)
+        {
+            isInChanged = false;
+            for(int i = 0; i < defUseBlocks.DefBs.Count - 1; i++)
+            {
+                var previousIn = new string[InBlocks[i].Count];
+                InBlocks[i].CopyTo(previousIn);
+                OutBlocks[i] = MeetOperator(graph, i);
+                var Except = new HashSet<string>(OutBlocks[i]);
+                Except.ExceptWith(defUseBlocks.DefBs[i]);
+                InBlocks[i].UnionWith(Except);
+                InBlocks[i].UnionWith(defUseBlocks.UseBs[i]);
+                isInChanged = isInChanged || !InBlocks[i].SetEquals(previousIn);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Оператор сбора для задачи анализа активных переменных
+    /// </summary>
+    /// <param name="graph">Граф потоков управления</param>
+    /// <param name="index">Индекс анализируемого блока B</param>
+    /// <returns></returns>
+    private HashSet<string> MeetOperator(ControlFlowGraph.ControlFlowGraph graph, int index)
+    {
+        var successors = graph.GetAsGraph().GetOutputNodes(index);
+        var OutBlock = new HashSet<string>();
+        foreach (var i in successors)
+            OutBlock.UnionWith(InBlocks[i]);
+        return OutBlock;
+    }
+}
+```
+
+#### Тесты
+
+Программа до применения алгоритма:
+```
+{
+    int a,b,c,d;
+    a = 5;
+    b = 3;
+    if (true){
+	       c = 2;
+    }
+    int i;
+    for (i=1 to 10)
+    {
+        c = c + 1;
+    }
+    d = 7;
+}
+```
+
+После применения алгоритма будут получены множества IN[B] и OUT[B]:
+```
+Block1
+InB: c
+OutB: c
+Block2
+InB: c
+OutB: c
+Block3
+InB:
+OutB: c
+Block4
+InB: c
+OutB: i c
+Block5
+InB: i c
+OutB: c i
+Block6
+InB:
+OutB:
+Block7
+InB: c i
+OutB: i c
+Block8
+InB:
+OutB:
 ```
 
 [Вверх](#содержание)
@@ -4152,133 +4408,6 @@ label_1:
 ```
 
 [Вверх](#содержание )
-# Итерационный алгоритм для активных переменных
-
-### Команда BOOM
-
-#### Постановка задачи
-
-Задача состояла в вычислении множеств IN и OUT для каждого из блоков графа потоков управления.
-
-
-#### Зависимости задач в графе задач
-
-Данная задача зависит от задачи получения множеств DefB и UseB. Также от задачи Хранение IN[B] и OUT[B] для ряда задач.
-
-### Теория
-
-Данная задача состоит в том, чтобы получить множества In[B] и OUT[B] для каждого из блоков графа потоков управления. Задачи относится к категории анализа потока данных и не является оптимизацией.
-
-#### Особенности реализации
-
-```
-public class InOutActiveVariables
-{
-    public List<HashSet<string>> InBlocks { get; } // множества IN для блоков
-    public List<HashSet<string>> OutBlocks { get; } // множества OUT для блоков
-
-    /// <summary>
-    /// Итерационный алгоритм для активных переменных. Находит для графа <paramref name="graph"/> множества
-    /// IN (<paramref name="InBlocks"/>) и OUT (<paramref name="OutBlocks"/>) на основе ранее вычисленных
-    /// Def и Use (<paramref name="defUseBlocks"/>). IN и OUT сохраняются в объекте IterAlgoActiveVariables
-    /// Граф должен содержать фиктивный узел ВЫХОД.
-    /// </summary>
-    /// <param name="defUseBlocks"></param>
-    /// <param name="graph"></param>
-    public InOutActiveVariables(DefUseBlocks defUseBlocks, ControlFlowGraph.ControlFlowGraph graph)
-    {
-        InBlocks = new List<HashSet<string>>();
-        OutBlocks = new List<HashSet<string>>();
-        for(int i = 0; i < defUseBlocks.DefBs.Count; i++)
-        {
-            InBlocks.Add(new HashSet<string>());
-            OutBlocks.Add(new HashSet<string>());
-        }
-        bool isInChanged = true;
-
-        while(isInChanged)
-        {
-            isInChanged = false;
-            for(int i = 0; i < defUseBlocks.DefBs.Count - 1; i++)
-            {
-                var previousIn = new string[InBlocks[i].Count];
-                InBlocks[i].CopyTo(previousIn);
-                OutBlocks[i] = MeetOperator(graph, i);
-                var Except = new HashSet<string>(OutBlocks[i]);
-                Except.ExceptWith(defUseBlocks.DefBs[i]);
-                InBlocks[i].UnionWith(Except);
-                InBlocks[i].UnionWith(defUseBlocks.UseBs[i]);
-                isInChanged = isInChanged || !InBlocks[i].SetEquals(previousIn);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Оператор сбора для задачи анализа активных переменных
-    /// </summary>
-    /// <param name="graph">Граф потоков управления</param>
-    /// <param name="index">Индекс анализируемого блока B</param>
-    /// <returns></returns>
-    private HashSet<string> MeetOperator(ControlFlowGraph.ControlFlowGraph graph, int index)
-    {
-        var successors = graph.GetAsGraph().GetOutputNodes(index);
-        var OutBlock = new HashSet<string>();
-        foreach (var i in successors)
-            OutBlock.UnionWith(InBlocks[i]);
-        return OutBlock;
-    }
-}
-```
-
-#### Тесты
-
-Программа до применения алгоритма:
-```
-{
-    int a,b,c,d;
-    a = 5;
-    b = 3;
-    if (true){
-	       c = 2;
-    }
-    int i;
-    for (i=1 to 10)
-    {
-        c = c + 1;
-    }
-    d = 7;
-}
-```
-
-После применения алгоритма будут получены множества IN[B] и OUT[B]:
-```
-Block1
-InB: c
-OutB: c
-Block2
-InB: c
-OutB: c
-Block3
-InB:
-OutB: c
-Block4
-InB: c
-OutB: i c
-Block5
-InB: i c
-OutB: c i
-Block6
-InB:
-OutB:
-Block7
-InB: c i
-OutB: i c
-Block8
-InB:
-OutB:
-```
-
-[Вверх](#содержание)
 # Вычисление множеств DEFb и USEb для активных переменных
 
 (Граф потока управления (CFG): Вычисление множеств DEFb и USEb для активных переменных)
@@ -5429,135 +5558,6 @@ MarkLabel Label2
 514229
 832040
 1346269
-```
-
-[Вверх](#содержание)
-# Класс обобщенного итерационного  алгоритма
-
-### Команда Roll
-
-#### Постановка задачи
-Написать класс обобщенного итерационного  алгоритма. Обеспечить прямой и обратный ход анализа, задание передаточной функции, оператора сбора. Полученный класс должен позволить выполнять итерационный алгоритм для доступных выражений, активных переменных, достигающих определений и распространения констант.
-
-#### Зависимости задач в графе задач
-
-Задача зависит от:
-* Класс передаточной функции
-
-#### Теория
-Обобщенный итерационный алгоритм является основой для реализации конкретных итерационных алгоритмов. Для заданного графа потоков управления он производит анализ потоков данных. Основными этапами итерационного алгоритма являются:
-1. Инициализация множеств, как анализируемых, так и вспомогательных (IN, OUT, Def, Use, Gen, Kill и т.п.)
-2. Основной цикл алгоритма, на каждой итерации которого производится обновление множеств IN и OUT для всего графа. Для информации о каждом из блоков применяется оператор сбора и передаточная функция.
-3. Проверка условия остановки. Обычно анализ заканчивается когда множества IN, OUT более не претерпевают изменений.
-
-#### Особенности реализации
-Для использования данного класса необходимо:
-1. Подключить пространство имен using SimpleLang.GenericTransferFunction;
-2. Написать делегат или множество делегатов, реализующих конкретную передаточную функцию.
-3. Создать объект передаточной функции, передав в конструктор делегат или список делегатов.
-4. Применить передаточную функцию к объекту путем вызова у передаточной функции метода Apply.
-
-Ниже представлен код использования данного класса. Пример показывает анализ активных переменных и удаления мертвых переменных на его основе:
-```csharp
-using SimpleLang.GenericIterativeAlgorithm;
-using GenericTransferFunction;
-
-CFG controlFlowGraph = new CFG(blocks);
-
-                    // создание информации о блоках
-                    var blocksInfo = new List<BlockInfo<string>>();
-
-                    // вычисление множеств Def и Use для всего графа потоков данных
-                    var DefUse = new DefUseBlocks(controlFlowGraph);
-                    // создание информации о блоках
-
-                    for (int i = 0; i < DefUse.DefBs.Count; i++)
-                        blocksInfo.Add(new BlockInfo<string>(DefUse.DefBs[i], DefUse.UseBs[i]));
-
-                    // оператор сбора для анализа активных переменных
-                    Func<List<BlockInfo<string>>, CFG, int, BlockInfo<string>> meetOperator = (blocksInfos, graph, index) =>
-                    {
-                        var successorIndexes = graph.cfg.GetOutputNodes(index);
-                        var resInfo = new BlockInfo<string>(blocksInfos[index]);
-                        foreach (var i in successorIndexes)
-                            resInfo.OUT.UnionWith(blocksInfos[i].IN);
-                        return resInfo;
-                    };
-
-                    // делегат передаточной функции для анализа активных переменных
-                    Func<BlockInfo<string>, BlockInfo<string>> tFunc = (blockInfo) =>
-                    {
-                        blockInfo.IN = new HashSet<string>();
-                        blockInfo.IN.UnionWith(blockInfo.OUT);
-                        blockInfo.IN.ExceptWith(blockInfo.HelpFirst);
-                        blockInfo.IN.UnionWith(blockInfo.HelpSecond);
-                        return blockInfo;
-                    };
-
-                    var transferFunction = new TransferFunction<BlockInfo<string>>(tFunc);
-
-                    // создание объекта итерационного алгоритма
-                    var iterativeAlgorithm = new IterativeAlgorithm<string>(blocksInfo, controlFlowGraph, meetOperator,
-                    false, new HashSet<string>(), new HashSet<string>(), transferFunction);
-
-                    // выполнение алгоритма - вычисление IN и OUT
-                    iterativeAlgorithm.Perform();
-
-                    controlFlowGraph = ControlFlowOptimisations.DeadOrAliveOnGraph(iterativeAlgorithm.GetOUTs(), controlFlowGraph); // выполнение оптимизации
-
-```
-
-#### Тесты
-``` csharp
-Исходный код
-{
-    int a,b,c;
-    b = a;
-    a = 1;
-    a = 2;
-    a = 3;
-    while ((c > (a - b)))
-    {
-        c = (c + 1);
-        a = b;
-        b = 100;
-        b = (c + 4);
-        a = 30;
-    }
-    println(a);
-}
-Блоки трехадресного кода до каскадного удаления мертвых переменных
-           b = a
-           a = 1
-           a = 2
-           a = 3
-label_0:   temp_2 = a - b
-           temp_1 = c > temp_2
-           temp_0 = temp_1
-           if temp_0 goto label_1
-           goto label_2
-label_1:   c = c + 1
-           a = b
-           b = 100
-           b = c + 4
-           a = 30
-           goto label_0
-label_2:   println a
-
-
-После каскадного удаления мертвых переменных для графа
-           b = a
-           a = 3
-label_0:   temp_2 = a - b
-           temp_1 = c > temp_2
-           temp_0 = temp_1
-           if temp_0 goto label_1
-           goto label_2
-label_1:   c = c + 1
-           b = c + 4
-           a = 30
-           goto label_0
-label_2:   println a
 ```
 
 [Вверх](#содержание)
