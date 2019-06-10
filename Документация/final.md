@@ -45,12 +45,11 @@
 * [Для достигающих определений вычислить genB killB для любого B](#для-достигающих-определений-вычислить-genb-killb-для-любого-b)
 * [Итерационный алгоритм для достигающих определений](#итерационный-алгоритм-для-достигающих-определений)
 * [Оптимизация Распространение констант](#оптимизация-распространение-констант)
-* [Вычисление множеств DEFb и USEb для активных переменных](#вычисление-множеств-defb-и-useb-для-активных-переменных)
 * [Итерационный алгоритм для активных переменных](#итерационный-алгоритм-для-активных-переменных)
+* [Вычисление множеств DEFb и USEb для активных переменных](#вычисление-множеств-defb-и-useb-для-активных-переменных)
+* [Итерационный алгоритм для доступных выражений](#итерационный-алгоритм-для-доступных-выражений)
 * [Удаление мертвых переменных на основе итерационного алгоритма](#удаление-мертвых-переменных-на-основе-итерационного-алгоритма)
 * [Передаточная функция в задаче о распространении констант](#передаточная-функция-в-задаче-о-распространении-констант)
-* [Итерационный алгоритм для доступных выражений](#итерационный-алгоритм-для-доступных-выражений)
-* [Итерационный алгоритм в задаче растпространения констант](#итерационный-алгоритм-в-задаче-растпространения-констант)
 * [Класс передаточной функции](#класс-передаточной-функции)
 * [Доступные выражения-множества e_genB и e_killB Передаточная функция базового блока В](#доступные-выражения-множества-e_genb-и-e_killb-передаточная-функция-базового-блока-в)
 * [Оптимизация Доступные выражения](#оптимизация-доступные-выражения)
@@ -4152,95 +4151,7 @@ label_0:
 label_1:
 ```
 
-[Вверх](#содержание)
-# Вычисление множеств DEFb и USEb для активных переменных
-
-(Граф потока управления (CFG): Вычисление множеств DEFb и USEb для активных переменных)
-
- ## qwerty
-
- ### Постановка задачи
-
-Задача состояла в вычислении множеств DEFb и USEb для активных переменных. 
-
- ### Зависимости задач в графе задач
-
-Данная задача зависит от CFG. 
-От нее зависит задача оптимизация на основе ИтА для активных переменных - удаление мертвого кода.
-
-### Теория
-
-Множества вычисляются локально в каждом базовом блоке ```B``` в графе потока управления.
-
-Переменная x активна в точке ```p``` если значение ```x``` из точки ```p``` может использоваться вдоль некоторого пути, начинающегося в ```p```.
-
-```DEFb``` - множество переменных, определенных в ```B```.
-```USEb``` - множество переменных, значения которых могут использоваться в ```B``` до любого их определения. 
-
-### Особенности реализации
-
-```csharp
-using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
-...
-class DefUseBlocks
-{
-	public List<HashSet<string>> DefBs { get; }
-	public List<HashSet<string>> UseBs { get; }
-	readonly CFG Graph;
-
-	public DefUseBlocks(CFG graph)
-	{
-		DefBs = new List<HashSet<string>>();
-		UseBs = new List<HashSet<string>>();
-		Graph = graph;
-		MakeSets();
-	}
-
-	private void MakeSets()
-	{
-		foreach (var block in Graph.blocks)
-		{
-			var DefB = new HashSet<string>();
-			var UseB = new HashSet<string>();
-			foreach (var cmd in block)
-			{
-				if (cmd.arg1 != null && cmd.arg1.ToString() != "" && cmd.arg1 is ThreeAddressStringValue 
-					&& !cmd.arg1.ToString().StartsWith("temp_") && !cmd.arg1.ToString().StartsWith("label") 
-					&& !DefB.Contains(cmd.arg1.ToString()))
-					UseB.Add(cmd.arg1.ToString());
-				if (cmd.arg2 != null && cmd.arg2.ToString() != "" &&  cmd.arg2 is ThreeAddressStringValue 
-					&& !cmd.arg2.ToString().StartsWith("temp_") && !cmd.arg2.ToString().StartsWith("label") 
-					&& !DefB.Contains(cmd.arg2.ToString()))
-					UseB.Add(cmd.arg2.ToString());
-				if (cmd.result != null && cmd.result.ToString() != "" && !cmd.result.ToString().StartsWith("temp_") )
-					DefB.Add(cmd.result);
-			}
-			DefBs.Add(DefB);
-			UseBs.Add(UseB);
-		}
-	}
-}
-```
-Для каждого базового блока в CFG осуществляется проход по каждой команде и проверяется сначала возможность добавить переменную в множество ```USEb```, затем во множество ```DEFb```.
-
-
-### Тесты
-
-Исходный код:
-```
-i = k + 1
-j = l + 1
-k = i
-l = j
-```
-
-Получившиеся множества:
-```
-DEFb: i j k l
-USEb: k l
-```
-
-[Вверх](#содержание)
+[Вверх](#содержание )
 # Итерационный алгоритм для активных переменных
 
 ### Команда BOOM
@@ -4365,6 +4276,255 @@ OutB: i c
 Block8
 InB:
 OutB:
+```
+
+[Вверх](#содержание)
+# Вычисление множеств DEFb и USEb для активных переменных
+
+(Граф потока управления (CFG): Вычисление множеств DEFb и USEb для активных переменных)
+
+ ## qwerty
+
+ ### Постановка задачи
+
+Задача состояла в вычислении множеств DEFb и USEb для активных переменных. 
+
+ ### Зависимости задач в графе задач
+
+Данная задача зависит от CFG. 
+От нее зависит задача оптимизация на основе ИтА для активных переменных - удаление мертвого кода.
+
+### Теория
+
+Множества вычисляются локально в каждом базовом блоке ```B``` в графе потока управления.
+
+Переменная x активна в точке ```p``` если значение ```x``` из точки ```p``` может использоваться вдоль некоторого пути, начинающегося в ```p```.
+
+```DEFb``` - множество переменных, определенных в ```B```.
+```USEb``` - множество переменных, значения которых могут использоваться в ```B``` до любого их определения. 
+
+### Особенности реализации
+
+```csharp
+using CFG = SimpleLang.ControlFlowGraph.ControlFlowGraph;
+...
+class DefUseBlocks
+{
+	public List<HashSet<string>> DefBs { get; }
+	public List<HashSet<string>> UseBs { get; }
+	readonly CFG Graph;
+
+	public DefUseBlocks(CFG graph)
+	{
+		DefBs = new List<HashSet<string>>();
+		UseBs = new List<HashSet<string>>();
+		Graph = graph;
+		MakeSets();
+	}
+
+	private void MakeSets()
+	{
+		foreach (var block in Graph.blocks)
+		{
+			var DefB = new HashSet<string>();
+			var UseB = new HashSet<string>();
+			foreach (var cmd in block)
+			{
+				if (cmd.arg1 != null && cmd.arg1.ToString() != "" && cmd.arg1 is ThreeAddressStringValue 
+					&& !cmd.arg1.ToString().StartsWith("temp_") && !cmd.arg1.ToString().StartsWith("label") 
+					&& !DefB.Contains(cmd.arg1.ToString()))
+					UseB.Add(cmd.arg1.ToString());
+				if (cmd.arg2 != null && cmd.arg2.ToString() != "" &&  cmd.arg2 is ThreeAddressStringValue 
+					&& !cmd.arg2.ToString().StartsWith("temp_") && !cmd.arg2.ToString().StartsWith("label") 
+					&& !DefB.Contains(cmd.arg2.ToString()))
+					UseB.Add(cmd.arg2.ToString());
+				if (cmd.result != null && cmd.result.ToString() != "" && !cmd.result.ToString().StartsWith("temp_") )
+					DefB.Add(cmd.result);
+			}
+			DefBs.Add(DefB);
+			UseBs.Add(UseB);
+		}
+	}
+}
+```
+Для каждого базового блока в CFG осуществляется проход по каждой команде и проверяется сначала возможность добавить переменную в множество ```USEb```, затем во множество ```DEFb```.
+
+
+### Тесты
+
+Исходный код:
+```
+i = k + 1
+j = l + 1
+k = i
+l = j
+```
+
+Получившиеся множества:
+```
+DEFb: i j k l
+USEb: k l
+```
+
+[Вверх](#содержание)
+# Итерационный алгоритм для доступных выражений
+
+### Команда GreatBean
+
+#### Постановка задачи
+Необходимо реализовать итерационный алгоритм для нахождения доступных выражений.
+
+#### Зависимости задач в графе задач
+Задача зависит от:
+* Построение CFG
+* Выделение ББл
+
+#### Теория
+Определение. x+y доступно в точке p если любой путь от входа к p вычисляет x+y и после последнего вычисления до достижения p нет присваиваний x и y.
+Опр. Блок уничтожает выражение x+y если он присваивает x или y и потом не перевычисляет x+y. e_killB − множество всех выражений, уничтожаемых блоком B
+Опр. Блок генерирует выражение x+y если он вычисляет x+y и потом не переопределяет x и y. e_genB − множество всех выражений, генерируемых блоком B
+
+#### Особенности реализации
+Вход алгоритма: граф потока управления, в котором для каждого ББл вычислены e_genB и e_killB
+Выход алгоритма: Множества выражений, доступных на входе IN[B] и на выходе OUT[B] для всех ББл B
+
+Для решения этой задачи был реализован класс IterativeAlgAvailableExprs. Процедура PrintInputOutputAvaliableExpr выводит в консоль множества выражений, достпуных на входе и на выходе. Фукнция GenerateInputOutputAvaliableExpr возвращает множества выражений, достпуных на входе и на выходе.
+
+```csharp
+public class IterativeAlgAvailableExprs
+{
+    private IEnumerable<ThreeCode> Definitions(LinkedList<ThreeCode> bb)
+        => bb.Where(tc => tc.operation != ThreeOperator.Goto
+            && tc.operation != ThreeOperator.IfGoto
+            && tc.operation != ThreeOperator.None);
+
+    private List<HashSet<ThreeCode>> InstructionGens(LinkedList<ThreeCode> bb)
+        => Definitions(bb).Select(tc =>
+            new HashSet<ThreeCode>(new ThreeCode[] { tc })
+        ).ToList();
+
+    //Процедура вывода в консоль множества выражений, достпуных на входе и на выходе
+    public void PrintInputOutputAvaliableExpr(List<LinkedList<ThreeCode>> _bblocks)
+    {
+        var ioAE = this.GenerateInputOutputAvaliableExpr(_bblocks);
+
+        Console.WriteLine("A set of expressions available at the entrance:");
+        if (ioAE.Item1 != null)
+            foreach (var hashS in ioAE.Item1)
+            {
+                if (hashS != null)
+                    foreach (var hashlem in hashS)
+                        Console.WriteLine("{0} {1} {2}", hashlem.Item1, hashlem.Item2, hashlem.Item3);
+                Console.WriteLine();
+            }
+
+        Console.WriteLine("\nA set of expressions available at the exit:");
+        if (ioAE.Item2 != null)
+            foreach (var hashS in ioAE.Item2)
+            {
+                if (hashS != null)
+                    foreach (var hashlem in hashS)
+                        Console.WriteLine("{0} {1} {2}", hashlem.Item1, hashlem.Item2, hashlem.Item3);
+                Console.WriteLine();
+            }
+    }
+
+    //Фукнция, возвращающая множества выражений, достпуных на входе и на выходе
+    public (List<ExprSet>, List<ExprSet>) GenerateInputOutputAvaliableExpr(List<LinkedList<ThreeCode>> _bblocks)
+    {
+        //Множество выражений, доступных на входе IN[B] для всех ББл B
+        var In = new List<ExprSet>();
+        //Множество выражений, доступных на выходе OUT[B] для всех ББл B
+        var Out = new List<ExprSet>();
+
+        //Экземпляр класса AvaliableExprs для некоторых методов
+        var ae = new AvaliableExprs();
+
+        //e_genB
+        Dictionary<int, ExprSet> _genExprByStart = new Dictionary<int, ExprSet>();
+
+        Dictionary<int, List<HashSet<ThreeCode>>> _defByStart = new Dictionary<int, List<HashSet<ThreeCode>>>();
+
+        for (int i = 0; i < _bblocks.Count; i++)
+            _genExprByStart[i] = AvaliableExprs.GetGenExprSet(_bblocks[i]);
+
+        for (int i = 0; i < _bblocks.Count; i++)
+            _defByStart[i] = InstructionGens(_bblocks[i]);
+
+        for (int i = 0; i < _bblocks.Count(); ++i)
+        {
+            In.Add(null);
+            Out.Add(new ExprSet());
+
+            if (i > 0)
+                Out[i] = new ExprSet(_genExprByStart.SelectMany(kv => kv.Value.ToList()));
+        }
+
+        //Внесены ли изменения в Out
+        bool change = true;
+        while (change)
+        {
+            change = false;
+
+            //Каждый ББ отличный от входного
+            for (int B = 1; B < _bblocks.Count(); ++B)
+            {
+                In[B] = null;
+                var cfg = new ControlFlowGraph(_bblocks);
+                var inputIndexes = cfg.cfg.GetInputNodes(B);
+                foreach (var P in inputIndexes)
+                    //Проверяем, что коллекция еще не создана
+                    if (In[B] == null)
+                        In[B] = new ExprSet(Out[P]);
+                    else
+                        In[B].IntersectWith(Out[P]);
+
+                int sz = Out[B].Count;
+
+                Out[B] = AvaliableExprs.TransferByGenAndKiller(In[B],
+                    AvaliableExprs.GetGenExprSet(_bblocks[B]), AvaliableExprs.GetKillerSet(_bblocks[B]));
+
+                change |= sz != Out[B].Count;
+            }
+
+        }
+        return (In, Out);
+    }
+}
+```
+
+
+#### Тесты
+Из исходной программы вида
+```csharp
+{
+  int t1, t2, t3, i, a;
+  int u1, u2, u3, u4;
+  t1 = 4 * i;
+  u1 = 5 * i;
+  if (true)
+  {
+    t3 = 4 * i;
+    u3 = 5 * i;
+  }
+  t2 = 4 * i;
+  u2 = 5 * i;
+  u4 = 6 * i;
+}
+```
+
+Мы получаем
+```
+A set of expressions available at the entrance:
+A set of expressions available at the exit:
+
+
+4 Mult i
+5 Mult i
+
+4 Mult i
+5 Mult i
+6 Mult i
 ```
 
 [Вверх](#содержание)
@@ -4580,217 +4740,6 @@ t1: (Const, 8)
 x: (Const, 20)
 u1: (Const, 40)
 t2: (Const, 2)
-```
-
-[Вверх](#содержание)
-# Итерационный алгоритм для доступных выражений
-
-### Команда GreatBean
-
-#### Постановка задачи
-Необходимо реализовать итерационный алгоритм для нахождения доступных выражений.
-
-#### Зависимости задач в графе задач
-Задача зависит от:
-* Построение CFG
-* Выделение ББл
-
-#### Теория
-Определение. x+y доступно в точке p если любой путь от входа к p вычисляет x+y и после последнего вычисления до достижения p нет присваиваний x и y.
-Опр. Блок уничтожает выражение x+y если он присваивает x или y и потом не перевычисляет x+y. e_killB − множество всех выражений, уничтожаемых блоком B
-Опр. Блок генерирует выражение x+y если он вычисляет x+y и потом не переопределяет x и y. e_genB − множество всех выражений, генерируемых блоком B
-
-#### Особенности реализации
-Вход алгоритма: граф потока управления, в котором для каждого ББл вычислены e_genB и e_killB
-Выход алгоритма: Множества выражений, доступных на входе IN[B] и на выходе OUT[B] для всех ББл B
-
-Для решения этой задачи был реализован класс IterativeAlgAvailableExprs. Процедура PrintInputOutputAvaliableExpr выводит в консоль множества выражений, достпуных на входе и на выходе. Фукнция GenerateInputOutputAvaliableExpr возвращает множества выражений, достпуных на входе и на выходе.
-
-```csharp
-public class IterativeAlgAvailableExprs
-{
-    private IEnumerable<ThreeCode> Definitions(LinkedList<ThreeCode> bb)
-        => bb.Where(tc => tc.operation != ThreeOperator.Goto
-            && tc.operation != ThreeOperator.IfGoto
-            && tc.operation != ThreeOperator.None);
-
-    private List<HashSet<ThreeCode>> InstructionGens(LinkedList<ThreeCode> bb)
-        => Definitions(bb).Select(tc =>
-            new HashSet<ThreeCode>(new ThreeCode[] { tc })
-        ).ToList();
-
-    //Процедура вывода в консоль множества выражений, достпуных на входе и на выходе
-    public void PrintInputOutputAvaliableExpr(List<LinkedList<ThreeCode>> _bblocks)
-    {
-        var ioAE = this.GenerateInputOutputAvaliableExpr(_bblocks);
-
-        Console.WriteLine("A set of expressions available at the entrance:");
-        if (ioAE.Item1 != null)
-            foreach (var hashS in ioAE.Item1)
-            {
-                if (hashS != null)
-                    foreach (var hashlem in hashS)
-                        Console.WriteLine("{0} {1} {2}", hashlem.Item1, hashlem.Item2, hashlem.Item3);
-                Console.WriteLine();
-            }
-
-        Console.WriteLine("\nA set of expressions available at the exit:");
-        if (ioAE.Item2 != null)
-            foreach (var hashS in ioAE.Item2)
-            {
-                if (hashS != null)
-                    foreach (var hashlem in hashS)
-                        Console.WriteLine("{0} {1} {2}", hashlem.Item1, hashlem.Item2, hashlem.Item3);
-                Console.WriteLine();
-            }
-    }
-
-    //Фукнция, возвращающая множества выражений, достпуных на входе и на выходе
-    public (List<ExprSet>, List<ExprSet>) GenerateInputOutputAvaliableExpr(List<LinkedList<ThreeCode>> _bblocks)
-    {
-        //Множество выражений, доступных на входе IN[B] для всех ББл B
-        var In = new List<ExprSet>();
-        //Множество выражений, доступных на выходе OUT[B] для всех ББл B
-        var Out = new List<ExprSet>();
-
-        //Экземпляр класса AvaliableExprs для некоторых методов
-        var ae = new AvaliableExprs();
-
-        //e_genB
-        Dictionary<int, ExprSet> _genExprByStart = new Dictionary<int, ExprSet>();
-
-        Dictionary<int, List<HashSet<ThreeCode>>> _defByStart = new Dictionary<int, List<HashSet<ThreeCode>>>();
-
-        for (int i = 0; i < _bblocks.Count; i++)
-            _genExprByStart[i] = AvaliableExprs.GetGenExprSet(_bblocks[i]);
-
-        for (int i = 0; i < _bblocks.Count; i++)
-            _defByStart[i] = InstructionGens(_bblocks[i]);
-
-        for (int i = 0; i < _bblocks.Count(); ++i)
-        {
-            In.Add(null);
-            Out.Add(new ExprSet());
-
-            if (i > 0)
-                Out[i] = new ExprSet(_genExprByStart.SelectMany(kv => kv.Value.ToList()));
-        }
-
-        //Внесены ли изменения в Out
-        bool change = true;
-        while (change)
-        {
-            change = false;
-
-            //Каждый ББ отличный от входного
-            for (int B = 1; B < _bblocks.Count(); ++B)
-            {
-                In[B] = null;
-                var cfg = new ControlFlowGraph(_bblocks);
-                var inputIndexes = cfg.cfg.GetInputNodes(B);
-                foreach (var P in inputIndexes)
-                    //Проверяем, что коллекция еще не создана
-                    if (In[B] == null)
-                        In[B] = new ExprSet(Out[P]);
-                    else
-                        In[B].IntersectWith(Out[P]);
-
-                int sz = Out[B].Count;
-
-                Out[B] = AvaliableExprs.TransferByGenAndKiller(In[B],
-                    AvaliableExprs.GetGenExprSet(_bblocks[B]), AvaliableExprs.GetKillerSet(_bblocks[B]));
-
-                change |= sz != Out[B].Count;
-            }
-
-        }
-        return (In, Out);
-    }
-}
-```
-
-
-#### Тесты
-Из исходной программы вида
-```csharp
-{
-  int t1, t2, t3, i, a;
-  int u1, u2, u3, u4;
-  t1 = 4 * i;
-  u1 = 5 * i;
-  if (true)
-  {
-    t3 = 4 * i;
-    u3 = 5 * i;
-  }
-  t2 = 4 * i;
-  u2 = 5 * i;
-  u4 = 6 * i;
-}
-```
-
-Мы получаем
-```
-A set of expressions available at the entrance:
-A set of expressions available at the exit:
-
-
-4 Mult i
-5 Mult i
-
-4 Mult i
-5 Mult i
-6 Mult i
-```
-
-[Вверх](#содержание)
-# Итерационный алгоритм в задаче растпространения констант
-
-### Команда Nvidia
-
-#### Постановка задачи
-Реализовать итерационный алгоритм выполняющий распространение констант.
-
-#### Зависимости задач в графе задач
-
-Задача зависит от:
-* Класс обобщенного итерационного  алгоритма.
-
-#### Теория
-Основными этапами данного итерационного алгоритма являются:
-1. Инициализация множеств IN, OUT
-2. Основной цикл алгоритма, на каждой итерации которого производится обновление IN и OUT для всего графа. Для информации о каждом из блоков применяется оператор сбора и передаточная функция.
-3. Проверка условия остановки. Обычно анализ заканчивается когда множества IN, OUT более не претерпевают изменений.
-
-#### Особенности реализации
-Для использования данного класса необходимо:
-1. Подключить пространство имен using SimpleLang.GenericTransferFunction;
-2. Написать делегат или множество делегатов, реализующих конкретную передаточную функцию.
-3. Создать объект передаточной функции, передав в конструктор делегат или список делегатов.
-4. Применить передаточную функцию к объекту путем вызова у передаточной функции метода Apply.
-
-Ниже представлен код использования данного класса. Пример показывает анализ активных переменных и удаления мертвых переменных на его основе:
-```csharp
-using SimpleLang.GenericIterativeAlgorithm;
-
-
-var ucfg = new CFG(treeCode);
-
-var cp = new ConstantPropagationItA(ucfg);
-cp.PerformAlgorithm();
-
-Console.WriteLine("IN\n");
-foreach (var dict in cp.IN)
-{
-	var asString = string.Join(";", dict);
-	Console.WriteLine(asString);
-}
-Console.WriteLine("OUT\n");
-foreach (var dict in cp.OUT)
-{
-	var asString = string.Join(";", dict);
-	Console.WriteLine(asString);
-}
 ```
 
 [Вверх](#содержание)
