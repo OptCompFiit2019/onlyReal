@@ -16,6 +16,8 @@ using SimpleLang.GenericIterativeAlgorithm;
 using GenericTransferFunction;
 using ProgramTree;
 using SimpleLang.Optimisations;
+using SimpleLang.ExprOptimisations;
+using SimpleCompiler.IterationAlgorithm;
 
 namespace SimpleLang
 {
@@ -213,12 +215,14 @@ namespace SimpleLang
         {
             var text = File.ReadAllLines(path);
             List<ThreeCode> program = new List<ThreeCode>();
-            var label_rx = new Regex(@"\s*(label_\d+):.*");
+            var label_rx = new Regex(@"\s*([label_\dentry]+):.*");
             var if_rx = new Regex(@"\s*if (\S+) goto (label_\d+).*");
             var goto_rx = new Regex(@"\s*goto\s+(label_\d)");
-            var binop_rx = new Regex(@"\s*(\w[\w\d]*)\s*=\s*(\w[\w\d.,]*)\s*([+\-*\/<>=!]{1,2})\s*(\w[\w\d.,]*)]?");
-            var assign_rx = new Regex(@"\s*(\w[\w\d]*)\s*=\s*([\w\d.,]+)\s*");
-            var println_rx = new Regex(@"\s*println\s+([\w\d.]+).*");
+            //var binop_rx = new Regex(@"\s*(\w[\w\d]*)\s*=\s*(\w[\w\d.,]*)\s*([+\-*\/<>=!]{1,2})\s*(\w[\w\d.,]*)]?");
+            var binop_rx = new Regex(@"\s*([#\w\d]*)\s*=\s*([#\w\d.,]*)\s*([+\-*\/<>=!]{1,2})\s*([#\w\d.,]*)]?");
+            //var assign_rx = new Regex(@"\s*(\w[\w\d]*)\s*=\s*([\w\d.,]+)\s*");
+            var assign_rx = new Regex(@"\s*([#\w\d]*)\s*=\s*([#\w\d.,]+)\s*");
+            var println_rx = new Regex(@"\s*println\s+([#\w\d.]+).*");
 
             foreach (var line in text)
             {
@@ -322,7 +326,15 @@ namespace SimpleLang
                     arg1 = arg1.Replace('.', ',');
                 if (arg2 != null)
                     arg2 = arg2.Replace('.', ',');
-                program.Add(new ThreeCode(label, result, operation, new ThreeAddressStringValue(arg1), new ThreeAddressStringValue(arg2)));
+                if (arg1 != null)
+                {
+                    if (arg2 != null)
+                        program.Add(new ThreeCode(label, result, operation, new ThreeAddressStringValue(arg1), new ThreeAddressStringValue(arg2)));
+                    else
+                        program.Add(new ThreeCode(label, result, operation, new ThreeAddressStringValue(arg1), null));
+                }
+                else
+                    program.Add(new ThreeCode(label, result, operation, null, null));
             }
             return program;
         }
@@ -1138,12 +1150,12 @@ namespace SimpleLang
                                 flag = false;
                                 break;
                             }
-                            for(int j = 0; j < cfg.Count; j++)
+                            for (int j = 0; j < cfg.Count; j++)
                             {
                                 var edges0 = expectationSets[j + 1].Split(' ');
                                 for (int k = 0; k < cfg[j].Count; k++)
                                 {
-                                    if (cfg.ElementAt(j).ElementAt(k).ToString() != edges0[k+1])
+                                    if (cfg.ElementAt(j).ElementAt(k).ToString() != edges0[k + 1])
                                     {
                                         Console.WriteLine("Тест {0} не пройден: в строке {1} ожидалось {2}, получилось {3}", source, j, edges0[k + 1], cfg.ElementAt(j).ElementAt(k));
                                         flag = false;
@@ -1223,6 +1235,307 @@ namespace SimpleLang
                             CheckResults(opt_program.ToList(), target, ref flag, ref testFault, source);
 
 
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "DetectReversibleEdges": //GreatBean
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            expectationSets = File.ReadAllLines(pathToFolder + expectation);
+                            flag = true;
+                            var cfg = new CFG(sourceCode);
+                            var isR = new DetectReversibleEdges(cfg);
+                            var dic = isR.isRevers();
+                            if (expectationSets.Length != dic.Count)
+                            {
+                                Console.WriteLine("Тест {0} не пройден: кол-во ребер не совпадает с ожидаемым", source);
+                                flag = false;
+                                break;
+                            }
+                            int k = 0;
+                            foreach (var x in dic)
+                            {
+                                var ans = "";
+                                if (x.Value)
+                                    ans = "Edge " + x.Key.v1.num.ToString() + " -> " + x.Key.v2.num.ToString() + " is reverse";
+                                else ans = "Edge " + x.Key.v1.num.ToString() + " -> " + x.Key.v2.num.ToString() + " is not reverse";
+                                if (expectationSets[k] != ans)
+                                {
+                                    Console.WriteLine("Тест {0} не пройден! Ошибка в строке {1}!", source, k);
+                                    Console.WriteLine("Получилось:\n" + ans + '\n' + "-----------\nОжидалось:\n" + expectationSets[k]);
+                                    flag = false;
+                                    break;
+                                }
+                                k++;
+                            }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "Reducibility_CFG": //GreatBean
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            expectationSets = File.ReadAllLines(pathToFolder + expectation);
+                            flag = true;
+                            var cfg = new CFG(sourceCode);
+                            var isR = new DetectReversibleEdges(cfg);
+                            var ans = "";
+                            if (isR.isReducible())
+                                ans = "CFG is reducibile";
+                            else ans = "CFG is not reducibile";
+                            if (expectationSets[0] != ans)
+                            {
+                                Console.WriteLine("Тест {0} не пройден! ", source);
+                                Console.WriteLine("Получилось:\n" + ans + '\n' + "-----------\nОжидалось:\n" + expectationSets[0]);
+                                flag = false;
+                                break;
+                            }
+
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "NaturalCycles": //Intel
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                            expectationSets = File.ReadAllLines(pathToFolder + expectation);
+                            flag = true;
+
+                            var cfg = new CFG(sourceCode);
+                            var cycles = NaturalCycles.SearchNaturalCycles(cfg);
+
+                            if (cycles.Count == 0 && expectationSets.Length == 1 && expectationSets[0] == "0:")
+                            {
+                                Console.WriteLine("Тест {0} успешно пройден!", source);
+                                break;
+                            }
+                            if (expectationSets.Length != cycles.Count)
+                            {
+                                Console.WriteLine("Получилось:\n" + cycles.Count + '\n' + "-----------\nОжидалось:\n" + expectationSets.Length);
+                                Console.WriteLine("Тест {0} не пройден: кол-во вершин не совпадает с ожидаемым", source);
+                                flag = false;
+                                break;
+                            }
+                            for (int j = 0; j < cycles.Count; j++)
+                            {
+                                var edges0 = expectationSets[j].Split(' ');
+                                for (int k = 0; k < cycles[j].Count; k++)
+                                {
+                                    if (cycles[j].ElementAt(k).ToString() != edges0[k + 1])
+                                    {
+                                        Console.WriteLine("Тест {0} не пройден: в строке {1} ожидалось {2}, получилось {3}", source, j, edges0[k + 1], cycles[j].ElementAt(k));
+                                        flag = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "GenerateAttainableVariables": //Nvidia
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                            expectationSets = File.ReadAllLines(pathToFolder + expectation);
+                            flag = true;
+
+                            var cfg = new CFG(sourceCode);
+
+                            var av = new AttainableVariables(cfg);
+                            var att_vars = av.GenerateAttainableVariables();
+                            var INB = att_vars.IN_byte;
+                            var OUTB = att_vars.OUT_byte;
+
+                            if (expectationSets.Length != INB.Count || expectationSets.Length != OUTB.Count)
+                            {
+                                Console.WriteLine("Тест {0} не пройден: кол-во ББл не совпадает с ожидаемым", source);
+                                flag = false;
+                                break;
+                            }
+                            for (int j = 0; j < expectationSets.Length; j++)
+                            {
+                                var sets = expectationSets[j].Split(' ');
+                                var block_num = int.Parse(sets[1]);
+                                if (sets[3] != INB[block_num].ToString())
+                                {
+                                    Console.WriteLine("Тест {0} не пройден: в строке {1} во множестве IN ожидалось {2}, получилось {3}", source, j, sets[3], INB[block_num]);
+                                    flag = false;
+                                    break;
+                                }
+                                if (sets[5] != OUTB[block_num].ToString())
+                                {
+                                    Console.WriteLine("Тест {0} не пройден: в строке {1} во множестве OUT ожидалось {2}, получилось {3}", source, j, sets[3], OUTB[block_num]);
+                                    flag = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "AvailableExprsOptimization": //Roslyn
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+
+                            var availableExprsOptimizer = new AvailableExprsOptimizer();
+                            CFG cfg1 = availableExprsOptimizer.ApplyOptimization(sourceBlocks);
+
+                            flag = true;
+                            var opt_program = cfg1.blocks.SelectMany(x => x).ToList();
+                            var target = ParseThreeCode(pathToFolder + expectation);
+
+                            if (opt_program.Count != target.Count)
+                            {
+                                Console.WriteLine("Тест {0} не пройден! Ошибка в блоке {1}!", source, 0);
+                                flag = false;
+                                break;
+                            }
+                            else
+                            {
+                                for (int k = 0; k < opt_program.Count; k++)
+                                    if (opt_program[k].ToString() != target[k].ToString())
+                                    {
+                                        Console.WriteLine("Тест {0} не пройден! Ошибка в строке {1}!", source, k);
+                                        flag = false;
+                                        break;
+                                    }
+                            }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "IterAlgoActiveVariables": //Boom
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+                            var expectationLines = File.ReadAllText(pathToFolder + expectation).Split('\n');
+                            var in_list_exp = new List<HashSet<string>>();
+                            var out_list_exp = new List<HashSet<string>>();
+                            flag = true;
+
+                            for (int m = 0; m < expectationLines.Length; m += 3)
+                            {
+                                var temp = expectationLines[m + 1].Replace("InB:", "");
+                                in_list_exp.Add(new HashSet<string>(temp.Split(' ').Select(x => x.Replace("\r", "")).Where(x => x.Length > 0).ToList()));
+                                temp = expectationLines[m + 2].Replace("OutB:", "");
+                                out_list_exp.Add(new HashSet<string>(temp.Split(' ').Select(x => x.Replace("\r", "")).Where(x => x.Length > 0).ToList()));
+                            }
+
+                            controlFlowGraph = new CFG(sourceBlocks);
+                            DefUse = new DefUseBlocks(controlFlowGraph);
+                            var InOut = new InOutActiveVariables(DefUse, controlFlowGraph);
+                            var in_list = InOut.InBlocks;
+                            var out_list = InOut.OutBlocks;
+
+                            bool testFault = false;
+                            for (int k = 0; k < in_list.Count; k++)
+                            {
+                                if (testFault)
+                                {
+                                    flag = false;
+                                    break;
+                                }
+                                if (in_list[k].Count != in_list_exp[k].Count || out_list[k].Count != out_list_exp[k].Count)
+                                {
+                                    Console.WriteLine("Тест {0} не пройден! Ошибка в блоке {1}!", source, k + 1);
+                                    testFault = true;
+                                }
+                                else
+                                {
+                                    for (int l = 0; l < in_list[k].Count; l++)
+                                    {
+                                        if (!in_list[k].ElementAt(l).Equals(in_list_exp[k].ElementAt(l)))
+                                        {
+                                            Console.WriteLine("Тест {0} не пройден! Ошибка в блоке {1}!", source, k + 1);
+                                            testFault = true;
+                                            break;
+                                        }
+                                    }
+                                    for (int l = 0; l < out_list[k].Count; l++)
+                                    {
+                                        if (!out_list[k].ElementAt(l).Equals(out_list_exp[k].ElementAt(l)))
+                                        {
+                                            Console.WriteLine("Тест {0} не пройден! Ошибка в блоке {1}!", source, k + 1);
+                                            testFault = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "CFGToThreeAdressCode": //Roslyn
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+
+                            controlFlowGraph = new CFG(sourceBlocks);
+
+                            flag = true;
+                            var opt_program = controlFlowGraph.ToThreeAddressCode().ToList();
+                            var target = ParseThreeCode(pathToFolder + expectation);
+
+                            if (opt_program.Count != target.Count)
+                            {
+                                Console.WriteLine("Тест {0} не пройден! Ошибка в блоке {1}!", source, 0);
+                                flag = false;
+                                break;
+                            }
+                            else
+                            {
+                                for (int k = 0; k < opt_program.Count; k++)
+                                    if (opt_program[k].ToString() != target[k].ToString())
+                                    {
+                                        Console.WriteLine("Тест {0} не пройден! Ошибка в строке {1}!", source, k);
+                                        flag = false;
+                                        break;
+                                    }
+                            }
+                        }
+                        if (flag)
+                            Console.WriteLine("Тест {0} успешно пройден!", source);
+                        break;
+
+                    case "CFGGetThreeAdressCode": //Boom
+                        {
+                            sourceCode = GetThreeAddressCodeVisitor(pathToFolder, source);
+                            sourceBlocks = new Block.Block(sourceCode).GenerateBlocks();
+
+                            controlFlowGraph = new CFG(sourceBlocks);
+
+                            flag = true;
+                            var opt_program = controlFlowGraph.GetThreeAddressCode().ToList();
+                            var target = ParseThreeCode(pathToFolder + expectation);
+
+                            if (opt_program.Count != target.Count)
+                            {
+                                Console.WriteLine("Тест {0} не пройден! Ошибка в блоке {1}!", source, 0);
+                                flag = false;
+                                break;
+                            }
+                            else
+                            {
+                                for (int k = 0; k < opt_program.Count; k++)
+                                    if (opt_program[k].ToString() != target[k].ToString())
+                                    {
+                                        Console.WriteLine("Тест {0} не пройден! Ошибка в строке {1}!", source, k);
+                                        flag = false;
+                                        break;
+                                    }
+                            }
                         }
                         if (flag)
                             Console.WriteLine("Тест {0} успешно пройден!", source);
@@ -1342,10 +1655,8 @@ namespace SimpleLang
                         }
                         break;
 
+
                     //здесь будет
-                    //DetectReversibleEdges         GreatBean
-                    //Reducibility_CFG              GreatBean
-                    //GenerateAttainableVariables   Nvidia
 
                     default:
                         break;

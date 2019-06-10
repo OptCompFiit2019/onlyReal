@@ -1,10 +1,10 @@
-DominatorsFinder
+п»їDominatorsFinder
 
-Поиск доминаторов для каждой вершины графа потока управления
+РџРѕРёСЃРє РґРѕРјРёРЅР°С‚РѕСЂРѕРІ РґР»СЏ РєР°Р¶РґРѕР№ РІРµСЂС€РёРЅС‹ РіСЂР°С„Р° РїРѕС‚РѕРєР° СѓРїСЂР°РІР»РµРЅРёСЏ
 
-Для запуска выполнить следующий код:
+Р”Р»СЏ Р·Р°РїСѓСЃРєР° РІС‹РїРѕР»РЅРёС‚СЊ СЃР»РµРґСѓСЋС‰РёР№ РєРѕРґ:
 
 var finder = new SimpleLang.Dominators.DominatorsFinder(controlFlowGraph);
 var dominators = finder.Find();
 
-Где controlFlowGraph - экземпляр класса ControlFlowGraph.
+Р“РґРµ controlFlowGraph - СЌРєР·РµРјРїР»СЏСЂ РєР»Р°СЃСЃР° ControlFlowGraph.

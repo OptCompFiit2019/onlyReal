@@ -3,10 +3,10 @@ label_0:   temp_0 = False
            goto label_2
 label_1:   temp_1 = True
            if temp_1 goto label_3
-           goto label_4
+           goto label_0
 label_3:   temp_2 = False
            if temp_2 goto label_5
-           goto label_6
+           goto label_1
 label_5:   println 1
            goto label_3
 label_6:   

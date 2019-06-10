@@ -136,6 +136,12 @@ namespace SimpleLang.ControlFlowGraph
         {
             var list = cfg.GetAsAdjacencyList();
             var cycles = NaturalCycles.GetListCycles(list);
+           
+            return cycles;
+        }
+
+        public static void WriteNestedCycles(List<List<int>> cycles)
+        {
             for (int i = 0; i < cycles.Count; i++)
             {
                 for (int j = 0; j < cycles.Count; j++)
@@ -145,7 +151,6 @@ namespace SimpleLang.ControlFlowGraph
                         Console.WriteLine(NaturalCycles.ListToString(cycles[j]) + "contains in " + NaturalCycles.ListToString(cycles[i]));
                 }
             }
-            return cycles;
         }
     }
 }

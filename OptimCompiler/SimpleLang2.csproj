@@ -54,6 +54,7 @@
     <Compile Include="AstOptimisations\LinearizeBlocks.cs" />
     <Compile Include="AvailableExprs.cs" />
     <Compile Include="MOPAlgorithm.cs" />
+    <Compile Include="ControlFlowGraph\NaturalCycles.cs" />
     <Compile Include="ThreeCodeOptimisations\AvailableExprsOptimization.cs" />
     <Compile Include="ThreeOptimize\DAGOpt.cs" />
     <Compile Include="ThreeOptimize\CommonExprOpt.cs" />

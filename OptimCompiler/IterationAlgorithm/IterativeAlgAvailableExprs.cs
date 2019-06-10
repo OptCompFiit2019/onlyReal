@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SimpleLang.ControlFlowGraph;
-using SimpleLang.Visitors;
 
-namespace SimpleCompiler.IterationAlgorithm
+namespace SimpleCompiler
 {
     using ExprSet = HashSet<(ThreeAddressValueType, ThreeOperator, ThreeAddressValueType)>;
 
-    //using KillerSet = HashSet<String>;
     public class IterativeAlgAvailableExprs
     {
         private IEnumerable<ThreeCode> Definitions(LinkedList<ThreeCode> bb)
@@ -29,18 +27,27 @@ namespace SimpleCompiler.IterationAlgorithm
             var ioAE = this.GenerateInputOutputAvaliableExpr(_bblocks);
 
             Console.WriteLine("A set of expressions available at the entrance:");
-            foreach (var hashS in ioAE.Item1)
-                foreach (var hashlem in hashS)
-                    Console.WriteLine("{0} {1} {2}", hashlem.Item1, hashlem.Item2, hashlem.Item3);
+            if (ioAE.Item1 != null)
+                foreach (var hashS in ioAE.Item1)
+                {
+                    if (hashS != null)
+                        foreach (var hashlem in hashS)
+                            Console.WriteLine("{0} {1} {2}", hashlem.Item1, hashlem.Item2, hashlem.Item3);
+                    Console.WriteLine();
+                }
 
             Console.WriteLine("\nA set of expressions available at the exit:");
-            foreach (var hashS in ioAE.Item2)
-                foreach (var hashlem in hashS)
-                    Console.WriteLine("{0} {1} {2}", hashlem.Item1, hashlem.Item2, hashlem.Item3);
-
+            if (ioAE.Item2 != null)
+                foreach (var hashS in ioAE.Item2)
+                {
+                    if (hashS != null)
+                        foreach (var hashlem in hashS)
+                            Console.WriteLine("{0} {1} {2}", hashlem.Item1, hashlem.Item2, hashlem.Item3);
+                    Console.WriteLine();
+                }
         }
 
-        //Фукнция, возвращая множества выражений, достпуных на входе и на выходе
+        //Фукнция, возвращающая множества выражений, достпуных на входе и на выходе
         public (List<ExprSet>, List<ExprSet>) GenerateInputOutputAvaliableExpr(List<LinkedList<ThreeCode>> _bblocks)
         {
             //Множество выражений, доступных на входе IN[B] для всех ББл B
@@ -78,12 +85,12 @@ namespace SimpleCompiler.IterationAlgorithm
                 change = false;
 
                 //Каждый ББ отличный от входного
-                for (int B = 0; B < _bblocks.Count(); ++B)
+                for (int B = 1; B < _bblocks.Count(); ++B)
                 {
                     In[B] = null;
                     var cfg = new ControlFlowGraph(_bblocks);
-                    //cfg.cfg.GetInputNodes()
-                    for (int P = 0; P <= B; ++P)
+                    var inputIndexes = cfg.cfg.GetInputNodes(B);
+                    foreach (var P in inputIndexes)
                         //Проверяем, что коллекция еще не создана
                         if (In[B] == null)
                             In[B] = new ExprSet(Out[P]);

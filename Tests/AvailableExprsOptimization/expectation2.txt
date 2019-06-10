@@ -1,12 +1,8 @@
 entry:
-
            #t0 = 4 * i
            t1 = #t0
            if True goto label_0
-
            goto label_1
-
 label_0:
            t3 = #t0
-
            t2 = #t0
