@@ -26,50 +26,53 @@ namespace SimpleLang.ThreeCodeOptimisations
             var strCode = block.First;
             while (strCode != null)
             {
-                n++;
-                // условие для проверки строки 3-х адр. кода на соответствие виду бин. операции
-                if (strCode.Value.operation == Visitors.ThreeOperator.None
-                    || strCode.Value.operation == Visitors.ThreeOperator.IfGoto
-                    || strCode.Value.operation == Visitors.ThreeOperator.Goto)
-                {
-                    strCode = strCode.Next;
-                    continue;
-                }
-
-                if (!dict.Keys.Contains(strCode.Value.arg1.ToString()))
-                    dict[strCode.Value.arg1.ToString()] = i++;
-
-                Key = dict[strCode.Value.arg1.ToString()].ToString();
-                if (strCode.Value.arg2 != null && !dict.Keys.Contains(strCode.Value.arg2.ToString()))
-                    dict[strCode.Value.arg2.ToString()] = i++;
-
-                Key = strCode.Value.arg2 == null ? strCode.Value.arg1.ToString() :
-                    dict[strCode.Value.arg1.ToString()].ToString() + strCode.Value.operation + dict[strCode.Value.arg2.ToString()];
-
-                if (!dict.Keys.Contains(Key))
-                    dict[Key] = i++;
-
-                if (ValueDict.Keys.Contains(dict[Key]))
-                {
-                    if (dict[ValueDict[dict[Key]].Value.result] != dict[Key])
+                    n++;
+                    // условие для проверки строки 3-х адр. кода на соответствие виду бин. операции
+                    if (strCode.Value.operation == Visitors.ThreeOperator.None
+                        || strCode.Value.operation == Visitors.ThreeOperator.IfGoto
+                        || strCode.Value.operation == Visitors.ThreeOperator.Goto
+                        || strCode.Value.operation == ThreeOperator.Println)
                     {
-                        block.AddAfter(ValueDict[dict[Key]],
-                            new ThreeCode("t" + tmpNum++, ValueDict[dict[Key]].Value.arg1));
-                        ValueDict[dict[Key]] = ValueDict[dict[Key]].Next;
+                        strCode = strCode.Next;
+                        continue;
                     }
-                    var prevStr = strCode.Value.ToString();
-                    strCode.Value.operation = ThreeOperator.Assign;
-                    strCode.Value.arg2 = null;
-                    strCode.Value.arg1 = new ThreeAddressStringValue(ValueDict[dict[Key]].Value.result);
-                    var newStr = strCode.Value.ToString();
-                    if(prevStr != newStr)
-                        IsApplyed = true;
-                }
 
-                dict[strCode.Value.result] = dict[Key];
-                ValueDict[dict[Key]] = strCode;
-                strCode = strCode.Next;
-            }
+                    if (!dict.Keys.Contains(strCode.Value.arg1.ToString()))
+                        dict[strCode.Value.arg1.ToString()] = i++;
+
+                    Key = dict[strCode.Value.arg1.ToString()].ToString();
+                    if (strCode.Value.arg2 != null && !dict.Keys.Contains(strCode.Value.arg2.ToString()))
+                        dict[strCode.Value.arg2.ToString()] = i++;
+
+                    Key = strCode.Value.arg2 == null ? strCode.Value.arg1.ToString() :
+                        dict[strCode.Value.arg1.ToString()].ToString() + strCode.Value.operation + dict[strCode.Value.arg2.ToString()];
+
+                    if (!dict.Keys.Contains(Key))
+                        dict[Key] = i++;
+
+                    if (ValueDict.Keys.Contains(dict[Key]))
+                    {
+                        if (dict[ValueDict[dict[Key]].Value.result] != dict[Key])
+                        {
+                            block.AddAfter(ValueDict[dict[Key]],
+                                new ThreeCode("t" + tmpNum++, ValueDict[dict[Key]].Value.arg1));
+                            ValueDict[dict[Key]] = ValueDict[dict[Key]].Next;
+                        }
+                        var prevStr = strCode.Value.ToString();
+                        strCode.Value.operation = ThreeOperator.Assign;
+                        strCode.Value.arg2 = null;
+                        strCode.Value.arg1 = new ThreeAddressStringValue(ValueDict[dict[Key]].Value.result);
+                        var newStr = strCode.Value.ToString();
+                        if (prevStr != newStr)
+                            IsApplyed = true;
+                    }
+
+                    dict[strCode.Value.result] = dict[Key];
+                    ValueDict[dict[Key]] = strCode;
+                    strCode = strCode.Next;
+
+
+                }
 
             return block;
         }
