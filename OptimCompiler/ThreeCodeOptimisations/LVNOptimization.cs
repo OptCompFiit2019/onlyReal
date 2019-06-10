@@ -31,7 +31,7 @@ namespace SimpleLang.ThreeCodeOptimisations
                     if (strCode.Value.operation == Visitors.ThreeOperator.None
                         || strCode.Value.operation == Visitors.ThreeOperator.IfGoto
                         || strCode.Value.operation == Visitors.ThreeOperator.Goto
-                        || strCode.Value.operation != ThreeOperator.Println)
+                        || strCode.Value.operation == ThreeOperator.Println)
                     {
                         strCode = strCode.Next;
                         continue;
