@@ -46,11 +46,11 @@
 * [Достигающие определения множества genB killB Передаточная функция базового блока В](#достигающие-определения-множества-genb-killb-передаточная-функция-базового-блока-в)
 * [Класс обобщенного итерационного  алгоритма](#класс-обобщенного-итерационного--алгоритма)
 * [Итерационный алгоритм для активных переменных](#итерационный-алгоритм-для-активных-переменных)
+* [Класс передаточной функции](#класс-передаточной-функции)
+* [Передаточная функция в задаче о распространении констант](#передаточная-функция-в-задаче-о-распространении-констант)
 * [Вычисление множеств DEFb и USEb для активных переменных](#вычисление-множеств-defb-и-useb-для-активных-переменных)
 * [Итерационный алгоритм для доступных выражений](#итерационный-алгоритм-для-доступных-выражений)
 * [Удаление мертвых переменных на основе итерационного алгоритма](#удаление-мертвых-переменных-на-основе-итерационного-алгоритма)
-* [Класс передаточной функции](#класс-передаточной-функции)
-* [Передаточная функция в задаче о распространении констант](#передаточная-функция-в-задаче-о-распространении-констант)
 * [Оптимизация Распространение констант](#оптимизация-распространение-констант)
 * [Доступные выражения-множества e_genB и e_killB Передаточная функция базового блока В](#доступные-выражения-множества-e_genb-и-e_killb-передаточная-функция-базового-блока-в)
 * [Оптимизация Доступные выражения](#оптимизация-доступные-выражения)
@@ -4197,6 +4197,297 @@ OutB:
 ```
 
 [Вверх](#содержание)
+# Класс передаточной функции
+
+### Команда Roll
+
+#### Постановка задачи
+Написать класс передаточной функции. Функция может задаваться формулой, алгоритмом. Реализовать суперпозицию функций.
+
+#### Зависимости задач в графе задач
+
+От задачи зависит:
+* Обобщенный итерационный алгоритм
+
+#### Теория
+Передаточная функция преобразует множество IN на входе в блок во множество на выходе из блока OUT.
+
+#### Особенности реализации
+Для использования данной оптимизации необходимо:
+1. Подключить пространство имен using SimpleLang.GenericTransferFunction;
+2. Написать делегат или множество делегатов, реализующих конкретную передаточную функцию.
+3. Создать объект передаточной функции, передав в конструктор делегат или список делегатов.
+4. Применить передаточную функцию к объекту путем вызова у передаточной функции метода Apply.
+
+Ниже представлен код использования данной функции:
+```csharp
+                    using SimpleLang.GenericIterativeAlgorithm;
+using GenericTransferFunction;
+
+
+CFG controlFlowGraph = new CFG(blocks);
+
+using SimpleLang.GenericIterativeAlgorithm;
+using GenericTransferFunction;
+
+
+CFG controlFlowGraph = new CFG(blocks);
+
+                    // создание информации о блоках
+                    var blocksInfo = new List<BlockInfo<string>>();
+
+                    // вычисление множеств Def и Use для всего графа потоков данных
+                    var DefUse = new DefUseBlocks(controlFlowGraph);
+                    // создание информации о блоках
+
+                    for (int i = 0; i < DefUse.DefBs.Count; i++)
+                        blocksInfo.Add(new BlockInfo<string>(DefUse.DefBs[i], DefUse.UseBs[i]));
+
+                    // оператор сбора для анализа активных переменных
+                    Func<List<BlockInfo<string>>, CFG, int, BlockInfo<string>> meetOperator = (blocksInfos, graph, index) =>
+                    {
+                        var successorIndexes = graph.cfg.GetOutputNodes(index);
+                        var resInfo = new BlockInfo<string>(blocksInfos[index]);
+                        foreach (var i in successorIndexes)
+                            resInfo.OUT.UnionWith(blocksInfos[i].IN);
+                        return resInfo;
+                    };
+
+                    // делегат передаточной функции для анализа активных переменных
+                    Func<BlockInfo<string>, BlockInfo<string>> tFunc = (blockInfo) =>
+                    {
+                        blockInfo.IN = new HashSet<string>();
+                        blockInfo.IN.UnionWith(blockInfo.OUT);
+                        blockInfo.IN.ExceptWith(blockInfo.HelpFirst);
+                        blockInfo.IN.UnionWith(blockInfo.HelpSecond);
+                        return blockInfo;
+                    };
+
+                    var transferFunction = new TransferFunction<BlockInfo<string>>(tFunc);
+
+                    // создание объекта итерационного алгоритма
+                    var iterativeAlgorithm = new IterativeAlgorithm<string>(blocksInfo, controlFlowGraph, meetOperator,
+                    false, new HashSet<string>(), new HashSet<string>(), transferFunction);
+
+                    // выполнение алгоритма - вычисление IN и OUT
+                    iterativeAlgorithm.Perform();
+
+                    controlFlowGraph = ControlFlowOptimisations.DeadOrAliveOnGraph(iterativeAlgorithm.GetOUTs(), controlFlowGraph); // выполнение оптимизации
+
+```
+В строках 46-62 создаются делегаты и объекты передаточных функций. Для наглядности они представлены в виде двух функций, суперпозиция которых передается в конструктор итерационного алгоритма. Суперпозиция передаточных функций синтаксически оформлена через оператор \*. При этом результатом суперпозиции будет новый объект передаточной функции, в списке делегатов которого содержатся все делегаты исходных функций.
+Еще примеры использования данного класса:
+```csharp
+using GenericTransferFunction;
+using SimpleLang.Visitors;
+
+// сначала описать передаточную функцию как делегат
+// например эквивалентная передаточная функция для строк
+Func<string, string> EquivalentFunction = (In) => In;
+
+//создать объект передаточной функции одним из методов:
+
+var ts = new TransferFunction<string>(EquivalentFunction);
+
+// применение передаточной функции к аргументу выполняется через метод Apply
+string s = "d";
+string res = ts.Apply(s);
+
+// суперпозиция передаточных функций - новая передаточная функция
+var tsSuperpostion = (ts * ts * ts);
+
+// получение результата применения суперпозиции без создания нового объекта функции
+var resSuperpostion = (ts * ts * ts).Apply(s);
+
+// чтобы изначально создать объект передаточной функции, которая является суперпозицией, нужно вызвать конструктор, принимающий List<Func<T, T>> algorithms
+var listFs = new List<Func<string, string>>() 
+{
+	EquivalentFunction, EquivalentFunction, EquivalentFunction
+};
+var tfAlgorithms = new TransferFunction<string>(listFs);
+```
+
+#### Тесты
+``` csharp
+Исходный код
+{
+    int a,b,c;
+    b = a;
+    a = 1;
+    a = 2;
+    a = 3;
+    while ((c > (a - b)))
+    {
+        c = (c + 1);
+        a = b;
+        b = 100;
+        b = (c + 4);
+        a = 30;
+    }
+    println(a);
+}
+Блоки трехадресного кода до каскадного удаления мертвых переменных
+           b = a
+           a = 1
+           a = 2
+           a = 3
+label_0:   temp_2 = a - b
+           temp_1 = c > temp_2
+           temp_0 = temp_1
+           if temp_0 goto label_1
+           goto label_2
+label_1:   c = c + 1
+           a = b
+           b = 100
+           b = c + 4
+           a = 30
+           goto label_0
+label_2:   println a
+
+
+После каскадного удаления мертвых переменных для графа
+           b = a
+           a = 3
+label_0:   temp_2 = a - b
+           temp_1 = c > temp_2
+           temp_0 = temp_1
+           if temp_0 goto label_1
+           goto label_2
+label_1:   c = c + 1
+           b = c + 4
+           a = 30
+           goto label_0
+label_2:   println a
+```
+
+[Вверх](#содержание)
+# Передаточная функция в задаче о распространении констант
+
+### Команда Roslyn
+
+#### Постановка задачи
+
+Задача состояла в разработке структуры для хранения передаточной функции для задачи о распространении констант.
+
+#### Зависимости задач в графе задач
+Данная задача зависит от задачи генерации базовых блоков.
+
+От задачи зависит:
+* Реализация итерационного алгоритма для распространения констант
+
+#### Теория
+
+fS — передаточная функция одной команды S.
+1. Если S — не присваивание, то fS — тождественная: `fS(m) = m`
+2. Если S: x = ..., то ∀v ≠ x m′(v) = m(v), а m′(x) определяется так:
+a) если x := c, то m′ x = c
+b) если x = y + z, то
+m′(x) = m(y) + m(z), если m(y) − const и m(z) − const, иначе
+m′(x) = NAC, если m(y) = NAC или m(z) = NAC, иначе
+m′(x) = UNDEF
+c) если x = g(...), то m′(x) = NAC (консервативно)
+
+#### Особенности реализации
+
+```csharp
+using ConstPropBlockInfo = BlockInfo<KeyValuePair<string, ConstPropSemilatticeEl>>;
+using ConstPropKeyValue = KeyValuePair<string, ConstPropSemilatticeEl>;
+public partial class ConstantPropagationOptimizer
+{
+	public static TransferFunction<ConstPropBlockInfo> TransferFunction()
+		=> new TransferFunction<ConstPropBlockInfo>(bi =>
+		{
+			var m = bi.IN.ToDictionary(e => e.Key);
+			foreach (var command in bi.Commands)
+			{
+				if (command.arg1 is ThreeAddressLogicValue
+						|| command.arg1 is ThreeAddressDoubleValue
+						|| command.arg2 is ThreeAddressLogicValue
+						|| command.arg2 is ThreeAddressDoubleValue)
+					continue;
+				if (command.operation == ThreeOperator.Assign)
+					m[command.result] = new ConstPropKeyValue(command.result,
+						GetSemilatticeEl(command.arg1, m));
+				else if (command.operation == ThreeOperator.Plus
+						|| command.operation == ThreeOperator.Minus
+						|| command.operation == ThreeOperator.Mult
+						|| command.operation == ThreeOperator.Div)
+				{
+					var el1 = GetSemilatticeEl(command.arg1, m);
+					var el2 = GetSemilatticeEl(command.arg2, m);
+					if (el1.Constantness == ValConstType.Const
+							&& el2.Constantness == ValConstType.Const)
+						m[command.result] = new ConstPropKeyValue(command.result,
+							new ConstPropSemilatticeEl(ValConstType.Const,
+								EvalConst(el1.Value, el2.Value, command.operation)));
+					else if (el1.Constantness == ValConstType.NAC
+							|| el2.Constantness == ValConstType.NAC)
+						m[command.result] = new ConstPropKeyValue(command.result,
+							new ConstPropSemilatticeEl(ValConstType.NAC));
+					else
+						m[command.result] = new ConstPropKeyValue(command.result,
+							new ConstPropSemilatticeEl(ValConstType.Undef));
+				}
+			}
+			var Out = new ConstPropBlockInfo(bi);
+			Out.OUT = new HashSet<ConstPropKeyValue>(m.Values);
+			return Out;
+		});
+	private static int EvalConst(int c1, int c2, ThreeOperator op)
+	{
+		switch (op)
+		{
+			case ThreeOperator.Plus:  return c1 + c2;
+			case ThreeOperator.Minus: return c1 - c2;
+			case ThreeOperator.Mult:  return c1 * c2;
+			case ThreeOperator.Div:   return c1 / c2;
+			default: throw new Exception("Logic error");
+		}
+	}
+	private static ConstPropSemilatticeEl GetSemilatticeEl
+		(ThreeAddressValueType val,
+		 Dictionary<string, ConstPropKeyValue> m)
+	{
+		ConstPropSemilatticeEl semilatticeEl = null;
+		if (val is ThreeAddressStringValue v)
+			semilatticeEl = m[v.Value].Value;
+		else if (val is ThreeAddressIntValue c)
+			semilatticeEl = new ConstPropSemilatticeEl(ValConstType.Const, c.Value);
+		return semilatticeEl;
+	}
+}
+```
+Класс _ConstantPropagationOptimizer_ предоставляет функцию _TransferFunction_ в формате, совместимом с обобщённым итерационным алгоритмом. _ConstPropSemilatticeEl_ — это тип элементов полурешётки. Значения этого типа имеют два поля: _Constantness_ и _Value_. Поле _Constantness_ допускает значения _Const_, _NAC_ и _Undef_. Поле _Value_ используется, если _Constantness_ имеет значение _Const_, и хранит значение константы типа _int_.
+
+#### Тесты
+Пример исходной программы:
+```
+{
+	int t1, t2, i, x, u1;
+	i = 2;
+	t1 = 4 * i;
+	x = 3 + 17;
+	u1 = 5 * t1;
+	t2 = i;
+}
+```
+Пример работы передаточной функции:
+```
+Before
+i: (Undef, 0)
+t1: (Undef, 0)
+x: (Undef, 0)
+u1: (Undef, 0)
+t2: (Undef, 0)
+After
+i: (Const, 2)
+t1: (Const, 8)
+x: (Const, 20)
+u1: (Const, 40)
+t2: (Const, 2)
+```
+
+[Вверх](#содержание)
 # Вычисление множеств DEFb и USEb для активных переменных
 
 (Граф потока управления (CFG): Вычисление множеств DEFb и USEb для активных переменных)
@@ -4531,297 +4822,6 @@ label_1:   println a
 label_0:
 label_1:   println a
            println b
-```
-
-[Вверх](#содержание)
-# Класс передаточной функции
-
-### Команда Roll
-
-#### Постановка задачи
-Написать класс передаточной функции. Функция может задаваться формулой, алгоритмом. Реализовать суперпозицию функций.
-
-#### Зависимости задач в графе задач
-
-От задачи зависит:
-* Обобщенный итерационный алгоритм
-
-#### Теория
-Передаточная функция преобразует множество IN на входе в блок во множество на выходе из блока OUT.
-
-#### Особенности реализации
-Для использования данной оптимизации необходимо:
-1. Подключить пространство имен using SimpleLang.GenericTransferFunction;
-2. Написать делегат или множество делегатов, реализующих конкретную передаточную функцию.
-3. Создать объект передаточной функции, передав в конструктор делегат или список делегатов.
-4. Применить передаточную функцию к объекту путем вызова у передаточной функции метода Apply.
-
-Ниже представлен код использования данной функции:
-```csharp
-                    using SimpleLang.GenericIterativeAlgorithm;
-using GenericTransferFunction;
-
-
-CFG controlFlowGraph = new CFG(blocks);
-
-using SimpleLang.GenericIterativeAlgorithm;
-using GenericTransferFunction;
-
-
-CFG controlFlowGraph = new CFG(blocks);
-
-                    // создание информации о блоках
-                    var blocksInfo = new List<BlockInfo<string>>();
-
-                    // вычисление множеств Def и Use для всего графа потоков данных
-                    var DefUse = new DefUseBlocks(controlFlowGraph);
-                    // создание информации о блоках
-
-                    for (int i = 0; i < DefUse.DefBs.Count; i++)
-                        blocksInfo.Add(new BlockInfo<string>(DefUse.DefBs[i], DefUse.UseBs[i]));
-
-                    // оператор сбора для анализа активных переменных
-                    Func<List<BlockInfo<string>>, CFG, int, BlockInfo<string>> meetOperator = (blocksInfos, graph, index) =>
-                    {
-                        var successorIndexes = graph.cfg.GetOutputNodes(index);
-                        var resInfo = new BlockInfo<string>(blocksInfos[index]);
-                        foreach (var i in successorIndexes)
-                            resInfo.OUT.UnionWith(blocksInfos[i].IN);
-                        return resInfo;
-                    };
-
-                    // делегат передаточной функции для анализа активных переменных
-                    Func<BlockInfo<string>, BlockInfo<string>> tFunc = (blockInfo) =>
-                    {
-                        blockInfo.IN = new HashSet<string>();
-                        blockInfo.IN.UnionWith(blockInfo.OUT);
-                        blockInfo.IN.ExceptWith(blockInfo.HelpFirst);
-                        blockInfo.IN.UnionWith(blockInfo.HelpSecond);
-                        return blockInfo;
-                    };
-
-                    var transferFunction = new TransferFunction<BlockInfo<string>>(tFunc);
-
-                    // создание объекта итерационного алгоритма
-                    var iterativeAlgorithm = new IterativeAlgorithm<string>(blocksInfo, controlFlowGraph, meetOperator,
-                    false, new HashSet<string>(), new HashSet<string>(), transferFunction);
-
-                    // выполнение алгоритма - вычисление IN и OUT
-                    iterativeAlgorithm.Perform();
-
-                    controlFlowGraph = ControlFlowOptimisations.DeadOrAliveOnGraph(iterativeAlgorithm.GetOUTs(), controlFlowGraph); // выполнение оптимизации
-
-```
-В строках 46-62 создаются делегаты и объекты передаточных функций. Для наглядности они представлены в виде двух функций, суперпозиция которых передается в конструктор итерационного алгоритма. Суперпозиция передаточных функций синтаксически оформлена через оператор \*. При этом результатом суперпозиции будет новый объект передаточной функции, в списке делегатов которого содержатся все делегаты исходных функций.
-Еще примеры использования данного класса:
-```csharp
-using GenericTransferFunction;
-using SimpleLang.Visitors;
-
-// сначала описать передаточную функцию как делегат
-// например эквивалентная передаточная функция для строк
-Func<string, string> EquivalentFunction = (In) => In;
-
-//создать объект передаточной функции одним из методов:
-
-var ts = new TransferFunction<string>(EquivalentFunction);
-
-// применение передаточной функции к аргументу выполняется через метод Apply
-string s = "d";
-string res = ts.Apply(s);
-
-// суперпозиция передаточных функций - новая передаточная функция
-var tsSuperpostion = (ts * ts * ts);
-
-// получение результата применения суперпозиции без создания нового объекта функции
-var resSuperpostion = (ts * ts * ts).Apply(s);
-
-// чтобы изначально создать объект передаточной функции, которая является суперпозицией, нужно вызвать конструктор, принимающий List<Func<T, T>> algorithms
-var listFs = new List<Func<string, string>>() 
-{
-	EquivalentFunction, EquivalentFunction, EquivalentFunction
-};
-var tfAlgorithms = new TransferFunction<string>(listFs);
-```
-
-#### Тесты
-``` csharp
-Исходный код
-{
-    int a,b,c;
-    b = a;
-    a = 1;
-    a = 2;
-    a = 3;
-    while ((c > (a - b)))
-    {
-        c = (c + 1);
-        a = b;
-        b = 100;
-        b = (c + 4);
-        a = 30;
-    }
-    println(a);
-}
-Блоки трехадресного кода до каскадного удаления мертвых переменных
-           b = a
-           a = 1
-           a = 2
-           a = 3
-label_0:   temp_2 = a - b
-           temp_1 = c > temp_2
-           temp_0 = temp_1
-           if temp_0 goto label_1
-           goto label_2
-label_1:   c = c + 1
-           a = b
-           b = 100
-           b = c + 4
-           a = 30
-           goto label_0
-label_2:   println a
-
-
-После каскадного удаления мертвых переменных для графа
-           b = a
-           a = 3
-label_0:   temp_2 = a - b
-           temp_1 = c > temp_2
-           temp_0 = temp_1
-           if temp_0 goto label_1
-           goto label_2
-label_1:   c = c + 1
-           b = c + 4
-           a = 30
-           goto label_0
-label_2:   println a
-```
-
-[Вверх](#содержание)
-# Передаточная функция в задаче о распространении констант
-
-### Команда Roslyn
-
-#### Постановка задачи
-
-Задача состояла в разработке структуры для хранения передаточной функции для задачи о распространении констант.
-
-#### Зависимости задач в графе задач
-Данная задача зависит от задачи генерации базовых блоков.
-
-От задачи зависит:
-* Реализация итерационного алгоритма для распространения констант
-
-#### Теория
-
-fS — передаточная функция одной команды S.
-1. Если S — не присваивание, то fS — тождественная: `fS(m) = m`
-2. Если S: x = ..., то ∀v ≠ x m′(v) = m(v), а m′(x) определяется так:
-a) если x := c, то m′ x = c
-b) если x = y + z, то
-m′(x) = m(y) + m(z), если m(y) − const и m(z) − const, иначе
-m′(x) = NAC, если m(y) = NAC или m(z) = NAC, иначе
-m′(x) = UNDEF
-c) если x = g(...), то m′(x) = NAC (консервативно)
-
-#### Особенности реализации
-
-```csharp
-using ConstPropBlockInfo = BlockInfo<KeyValuePair<string, ConstPropSemilatticeEl>>;
-using ConstPropKeyValue = KeyValuePair<string, ConstPropSemilatticeEl>;
-public partial class ConstantPropagationOptimizer
-{
-	public static TransferFunction<ConstPropBlockInfo> TransferFunction()
-		=> new TransferFunction<ConstPropBlockInfo>(bi =>
-		{
-			var m = bi.IN.ToDictionary(e => e.Key);
-			foreach (var command in bi.Commands)
-			{
-				if (command.arg1 is ThreeAddressLogicValue
-						|| command.arg1 is ThreeAddressDoubleValue
-						|| command.arg2 is ThreeAddressLogicValue
-						|| command.arg2 is ThreeAddressDoubleValue)
-					continue;
-				if (command.operation == ThreeOperator.Assign)
-					m[command.result] = new ConstPropKeyValue(command.result,
-						GetSemilatticeEl(command.arg1, m));
-				else if (command.operation == ThreeOperator.Plus
-						|| command.operation == ThreeOperator.Minus
-						|| command.operation == ThreeOperator.Mult
-						|| command.operation == ThreeOperator.Div)
-				{
-					var el1 = GetSemilatticeEl(command.arg1, m);
-					var el2 = GetSemilatticeEl(command.arg2, m);
-					if (el1.Constantness == ValConstType.Const
-							&& el2.Constantness == ValConstType.Const)
-						m[command.result] = new ConstPropKeyValue(command.result,
-							new ConstPropSemilatticeEl(ValConstType.Const,
-								EvalConst(el1.Value, el2.Value, command.operation)));
-					else if (el1.Constantness == ValConstType.NAC
-							|| el2.Constantness == ValConstType.NAC)
-						m[command.result] = new ConstPropKeyValue(command.result,
-							new ConstPropSemilatticeEl(ValConstType.NAC));
-					else
-						m[command.result] = new ConstPropKeyValue(command.result,
-							new ConstPropSemilatticeEl(ValConstType.Undef));
-				}
-			}
-			var Out = new ConstPropBlockInfo(bi);
-			Out.OUT = new HashSet<ConstPropKeyValue>(m.Values);
-			return Out;
-		});
-	private static int EvalConst(int c1, int c2, ThreeOperator op)
-	{
-		switch (op)
-		{
-			case ThreeOperator.Plus:  return c1 + c2;
-			case ThreeOperator.Minus: return c1 - c2;
-			case ThreeOperator.Mult:  return c1 * c2;
-			case ThreeOperator.Div:   return c1 / c2;
-			default: throw new Exception("Logic error");
-		}
-	}
-	private static ConstPropSemilatticeEl GetSemilatticeEl
-		(ThreeAddressValueType val,
-		 Dictionary<string, ConstPropKeyValue> m)
-	{
-		ConstPropSemilatticeEl semilatticeEl = null;
-		if (val is ThreeAddressStringValue v)
-			semilatticeEl = m[v.Value].Value;
-		else if (val is ThreeAddressIntValue c)
-			semilatticeEl = new ConstPropSemilatticeEl(ValConstType.Const, c.Value);
-		return semilatticeEl;
-	}
-}
-```
-Класс _ConstantPropagationOptimizer_ предоставляет функцию _TransferFunction_ в формате, совместимом с обобщённым итерационным алгоритмом. _ConstPropSemilatticeEl_ — это тип элементов полурешётки. Значения этого типа имеют два поля: _Constantness_ и _Value_. Поле _Constantness_ допускает значения _Const_, _NAC_ и _Undef_. Поле _Value_ используется, если _Constantness_ имеет значение _Const_, и хранит значение константы типа _int_.
-
-#### Тесты
-Пример исходной программы:
-```
-{
-	int t1, t2, i, x, u1;
-	i = 2;
-	t1 = 4 * i;
-	x = 3 + 17;
-	u1 = 5 * t1;
-	t2 = i;
-}
-```
-Пример работы передаточной функции:
-```
-Before
-i: (Undef, 0)
-t1: (Undef, 0)
-x: (Undef, 0)
-u1: (Undef, 0)
-t2: (Undef, 0)
-After
-i: (Const, 2)
-t1: (Const, 8)
-x: (Const, 20)
-u1: (Const, 40)
-t2: (Const, 2)
 ```
 
 [Вверх](#содержание)
