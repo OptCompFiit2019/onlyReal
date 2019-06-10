@@ -64,6 +64,7 @@
             this.checkBox53 = new System.Windows.Forms.CheckBox();
             this.checkBox52 = new System.Windows.Forms.CheckBox();
             this.checkBox51 = new System.Windows.Forms.CheckBox();
+            this.checkBox19 = new System.Windows.Forms.CheckBox();
             this.checkBox18 = new System.Windows.Forms.CheckBox();
             this.checkBox17 = new System.Windows.Forms.CheckBox();
             this.checkBox16 = new System.Windows.Forms.CheckBox();
@@ -286,6 +287,7 @@
             this.tabPage2.Controls.Add(this.checkBox52);
             this.tabPage2.Controls.Add(this.checkBox51);
             this.tabPage2.Controls.Add(this.checkBox16);
+            this.tabPage2.Controls.Add(this.checkBox19);
             this.tabPage2.Controls.Add(this.checkBox18);
             this.tabPage2.Controls.Add(this.checkBox17);
             this.tabPage2.Controls.Add(this.checkBox15);
@@ -579,13 +581,24 @@
             // checkBox16
             // 
             this.checkBox16.AutoSize = true;
-            this.checkBox16.Location = new System.Drawing.Point(4, 421);
+            this.checkBox16.Location = new System.Drawing.Point(4,444);
             this.checkBox16.Name = "checkBox16";
             this.checkBox16.Size = new System.Drawing.Size(70, 17);
             this.checkBox16.TabIndex = 3;
             this.checkBox16.Text = "Select All";
             this.checkBox16.UseVisualStyleBackColor = true;
             this.checkBox16.CheckedChanged += new System.EventHandler(this.checkBox5_CheckedChanged);
+            // 
+            // checkBox19
+            // 
+            this.checkBox19.AutoSize = true;
+            this.checkBox19.Location = new System.Drawing.Point(4,398);
+            this.checkBox19.Name = "checkBox19";
+            this.checkBox19.Size = new System.Drawing.Size(78, 17);
+            this.checkBox19.TabIndex = 3;
+            this.checkBox19.Text = "Constant Propagation";
+            this.checkBox19.UseVisualStyleBackColor = true;
+            this.checkBox19.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // checkBox18
             // 
@@ -893,6 +906,7 @@
         private System.Windows.Forms.CheckBox checkBox53;
         private System.Windows.Forms.CheckBox checkBox52;
         private System.Windows.Forms.CheckBox checkBox51;
+        private System.Windows.Forms.CheckBox checkBox19;
         private System.Windows.Forms.CheckBox checkBox18;
         private System.Windows.Forms.CheckBox checkBox17;
         private System.Windows.Forms.CheckBox checkBox16;

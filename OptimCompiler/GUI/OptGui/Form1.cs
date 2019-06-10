@@ -107,6 +107,8 @@ namespace OptGui
                 res.Add(new SimpleLang.ThreeOptimize.DeadOrAliveOnGraphAdapter());
             if (checkBox18.Checked)
                 res.Add(new SimpleLang.ThreeCodeOptimisations.ConstantPropagationOptimizer());
+            if (checkBox19.Checked)
+                res.Add(new SimpleLang.ExprOptimisations.AvailableExprsOptimizer());
             return res;
         }
         void UpdateForms() {
@@ -661,6 +663,8 @@ namespace OptGui
             checkBox14.Checked = checkBox16.Checked;
             checkBox15.Checked = checkBox16.Checked;
             checkBox17.Checked = checkBox16.Checked;
+            checkBox18.Checked = checkBox16.Checked;
+            checkBox19.Checked = checkBox16.Checked;
             UpdateMode();
         }
     }

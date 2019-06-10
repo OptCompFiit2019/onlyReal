@@ -12,7 +12,7 @@ namespace SimpleLang.ExprOptimisations
 {
     using Expr = Tuple<ThreeAddressValueType, ThreeOperator, ThreeAddressValueType>;
 
-    class AvailableExprsOptimizer : ThreeCodeOptimiser
+    public class AvailableExprsOptimizer : ThreeCodeOptimiser
 	{
         private CFG controlFlowGraph;
 
