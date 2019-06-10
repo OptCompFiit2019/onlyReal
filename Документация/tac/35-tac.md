@@ -15,6 +15,38 @@
 
 
 #### Особенности реализации
+
+Для определения глубины графа необходимо найти самый длинный путь, состоящий лишь из обратных дуг. В данной реализации для графа с правильной нумерацией дуга является обратной, если она ведет из узла с большим индексом в узел с меньшим индексом.
+Алгоритм находит все обратные дуги, а затем для каждой из них ищет путь наибольшей длины.
+
+``` csharp
+public static int GetGraphDepth(ControlFlowGraph graph)
+{
+    int maxDepth = 0;
+    var backwardArcs = new Dictionary<int, int>();
+
+    for(int nodeId = 0; nodeId < graph.blocks.Count; nodeId++)
+    {
+        var successors = graph.cfg.GetOutputNodes(nodeId);
+        foreach (var s in successors)
+            if(s <= nodeId)                    
+                backwardArcs.Add(nodeId, s);                
+    }
+
+    foreach(var arc in backwardArcs)
+    {
+        int currentDepth = 0;
+        var currentNode = arc.Key;
+        while(backwardArcs.ContainsKey(currentNode))
+        {
+            currentNode = backwardArcs[currentNode];
+            currentDepth++;
+        }
+        maxDepth = currentDepth > maxDepth ? currentDepth : maxDepth; 
+    }
+    return maxDepth;
+}
+```
 Для использования данной оптимизации необходимо:
 1. Подключить пространство имен using SimpleLang.ControlFlowGraph;
 2. Построить граф с правильной нумерацией вершин
