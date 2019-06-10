@@ -596,7 +596,7 @@
             this.checkBox19.Name = "checkBox19";
             this.checkBox19.Size = new System.Drawing.Size(78, 17);
             this.checkBox19.TabIndex = 3;
-            this.checkBox19.Text = "Constant Propagation";
+            this.checkBox19.Text = "Available Exprs";
             this.checkBox19.UseVisualStyleBackColor = true;
             this.checkBox19.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
